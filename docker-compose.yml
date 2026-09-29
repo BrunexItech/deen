@@ -1,0 +1,26 @@
+# Local development database. The API, web portal and mobile app run natively
+# (see README). Postgres is published on 5437 so it never collides with the
+# other projects on this machine.
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    # Local development only: skip fsync so schema resets and tests are fast on slow disks.
+    # Production uses deploy/docker-compose.prod.yml with full durability.
+    command: ["postgres", "-c", "fsync=off", "-c", "synchronous_commit=off", "-c", "full_page_writes=off"]
+    environment:
+      POSTGRES_USER: deen
+      POSTGRES_PASSWORD: deen
+      POSTGRES_DB: deen
+    ports:
+      - "5437:5432"
+    volumes:
+      - deen_pg:/var/lib/postgresql/data
+      - ./backend/scripts/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U deen"]
+      interval: 5s
+      retries: 10
+
+volumes:
+  deen_pg:

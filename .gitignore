@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+backend/.env
+backend/data/
+.pytest_cache/
+
+# Node
+node_modules/
+.next/
+web/.env.local
+mobile/.expo/
+mobile/dist/
+mobile/android/
+mobile/ios/
+*.tsbuildinfo
+next-env.d.ts
+
+# OS / editors
+.DS_Store
+.vscode/
+*.log
