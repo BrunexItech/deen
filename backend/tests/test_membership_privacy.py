@@ -51,6 +51,7 @@ async def test_free_tier_application_quota(admin_web):
     from datetime import timedelta
 
     from app.core.clock import utcnow
+    from tests.conftest import publish
     from tests.test_platform_flow import OPP, _org_and_rep
 
     org, rep = await _org_and_rep(admin_web, verification="verified")
@@ -60,7 +61,7 @@ async def test_free_tier_application_quota(admin_web):
                 "deadline": (utcnow() + timedelta(days=20)).isoformat()}
         opp = (await rep.post("/api/v1/org/opportunities", json=body)).json()
         await rep.post(f"/api/v1/org/opportunities/{opp['id']}/submit")
-        await admin_web.post(f"/api/v1/admin/opportunities/{opp['id']}/actions", json={"action": "publish"})
+        await publish(admin_web, opp["id"])
         ids.append(opp["id"])
     member, _ = await register_member()
     for opp_id in ids[:3]:
@@ -91,5 +92,5 @@ async def test_daily_reminder_and_taxonomy():
     today = (await member.get("/api/v1/content/today")).json()
     assert today["reminder"]["reference"] and today["zakat"]["silver_nisab_grams"] == 595
     tax = (await member.get("/api/v1/taxonomy")).json()
-    assert len(tax["counties"]) == 47 and {c["key"] for c in tax["categories"]} >= {"education", "employment"}
+    assert len(tax["counties"]) == 47 and {c["key"] for c in tax["categories"]} == {"education", "career", "entrepreneurship", "community", "islamic_economy", "support"}
     await member.aclose()

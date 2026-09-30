@@ -32,12 +32,14 @@ def _user_row(u: User, profile: MemberProfile | None = None) -> dict:
             "last_active_at": u.last_active_at, "totp_enabled": u.totp_enabled,
             "county": profile.county if profile else None,
             "education_level": profile.education_level if profile else None,
-            "age": age_on(profile.date_of_birth) if profile else None}
+            "age": age_on(profile.date_of_birth) if profile else None,
+            "user_types": (profile.user_types or []) if profile else []}
 
 
 @router.get("/members")
 async def members(session: DB, p: Principal = require(Perm.users_view), q: str | None = None,
                   county: str | None = None, status: str | None = None, identity: str | None = None,
+                  user_type: str | None = None,
                   page: int = 1, limit: int = 30):
     stmt = select(User, MemberProfile).outerjoin(MemberProfile, MemberProfile.user_id == User.id).where(
         User.role == Role.member, User.status != UserStatus.deleted)
@@ -50,6 +52,8 @@ async def members(session: DB, p: Principal = require(Perm.users_view), q: str |
         stmt = stmt.where(User.status == status)
     if identity:
         stmt = stmt.where(User.identity_status == identity)
+    if user_type:
+        stmt = stmt.where(MemberProfile.user_types.any(user_type))
     total = await session.scalar(select(func.count()).select_from(stmt.subquery()))
     limit = max(1, min(limit, 100))
     rows = (await session.execute(stmt.order_by(User.created_at.desc()).offset((max(page, 1) - 1) * limit)

@@ -52,9 +52,11 @@ def _snapshot(user: User, profile: MemberProfile | None) -> dict:
 def _app_out(a: Application, opp_card: dict | None = None, events: list | None = None) -> dict:
     return {"id": a.id, "status": a.status.value, "cover_note": a.cover_note, "answers": a.answers or {},
             "documents": [{**d, "url": f"/api/v1/files/{d['file_id']}"} for d in (a.documents or [])],
-            "external": bool((a.answers or {}).get("_external")), "match_score": a.match_score,
-            "created_at": a.created_at, "updated_at": a.updated_at, "opportunity": opp_card,
-            "events": events}
+            "source": a.source, "external": a.source != "deen", "match_score": a.match_score,
+            "manual": {"title": a.manual_title, "organization": a.manual_organization, "url": a.manual_url,
+                       "deadline": a.manual_deadline} if a.source == "manual" else None,
+            "notes": a.member_notes, "created_at": a.created_at, "updated_at": a.updated_at,
+            "opportunity": opp_card, "events": events}
 
 
 # ---------- member ----------
@@ -131,8 +133,8 @@ async def applied_externally(opp_id: str, p: Member, session: DB):
     if not opp or opp.apply_mode != ApplyMode.external:
         raise HTTPException(404, "Opportunity not found")
     ctx = await member_context(session, p.user)
-    app = Application(opportunity_id=opp.id, organization_id=opp.organization_id, user_id=p.id,
-                      answers={"_external": True}, profile_snapshot=_snapshot(p.user, ctx.profile),
+    app = Application(opportunity_id=opp.id, organization_id=opp.organization_id, user_id=p.id, source="external",
+                      answers={}, profile_snapshot=_snapshot(p.user, ctx.profile),
                       match_score=evaluate(opp, ctx.signals).score)
     session.add(app)
     try:
@@ -153,11 +155,17 @@ async def my_applications(p: Member, session: DB, status: str | None = None):
     if status:
         stmt = stmt.where(Application.status == status)
     apps = (await session.execute(stmt.order_by(Application.updated_at.desc()).limit(200))).scalars().all()
+    opp_ids = [a.opportunity_id for a in apps if a.opportunity_id]
     opps = {o.id: o for o in (await session.execute(
-        select(Opportunity).where(Opportunity.id.in_([a.opportunity_id for a in apps])))).scalars()} if apps else {}
+        select(Opportunity).where(Opportunity.id.in_(opp_ids)))).scalars()} if opp_ids else {}
     orgs = await orgs_by_id(session, {o.organization_id for o in opps.values()})
-    return [_app_out(a, card(opps[a.opportunity_id], orgs.get(opps[a.opportunity_id].organization_id)))
-            for a in apps if a.opportunity_id in opps]
+    out = []
+    for a in apps:
+        o = opps.get(a.opportunity_id) if a.opportunity_id else None
+        if a.opportunity_id and not o:
+            continue
+        out.append(_app_out(a, card(o, orgs.get(o.organization_id)) if o else None))
+    return out
 
 
 @member_router.get("/applications/{app_id}")
@@ -165,13 +173,13 @@ async def my_application(app_id: str, p: Member, session: DB):
     a = await session.get(Application, app_id)
     if not a or a.user_id != p.id:
         raise HTTPException(404, "Application not found")
-    opp = await session.get(Opportunity, a.opportunity_id)
-    orgs = await orgs_by_id(session, {opp.organization_id})
+    opp = await session.get(Opportunity, a.opportunity_id) if a.opportunity_id else None
+    orgs = await orgs_by_id(session, {opp.organization_id}) if opp else {}
     events = (await session.execute(select(ApplicationEvent).where(ApplicationEvent.application_id == a.id)
                                     .order_by(ApplicationEvent.created_at))).scalars().all()
     outcome = await session.scalar(select(Outcome.id).where(Outcome.user_id == p.id,
-                                                            Outcome.opportunity_id == opp.id))
-    out = _app_out(a, card(opp, orgs.get(opp.organization_id)),
+                                                            Outcome.opportunity_id == opp.id)) if opp else None
+    out = _app_out(a, card(opp, orgs.get(opp.organization_id)) if opp else None,
                    [{"status": e.status, "message": e.message, "at": e.created_at} for e in events])
     out["outcome_shared"] = outcome is not None
     return out
@@ -182,7 +190,7 @@ async def withdraw(app_id: str, p: Member, session: DB):
     a = await session.get(Application, app_id)
     if not a or a.user_id != p.id:
         raise HTTPException(404, "Application not found")
-    if a.status in (AppStatus.accepted, AppStatus.rejected, AppStatus.withdrawn):
+    if a.source != "deen" or a.status in (AppStatus.accepted, AppStatus.rejected, AppStatus.withdrawn):
         raise HTTPException(409, "This application can no longer be withdrawn")
     a.status = AppStatus.withdrawn
     session.add(ApplicationEvent(application_id=a.id, actor_id=p.id, status="withdrawn"))
@@ -240,7 +248,7 @@ async def org_list(p: OrgUser, session: DB, opportunity_id: str | None = None, s
         "items": [{"id": r.id, "status": r.status.value, "applicant": (r.profile_snapshot or {}).get("full_name"),
                    "county": (r.profile_snapshot or {}).get("county"),
                    "education_level": (r.profile_snapshot or {}).get("education_level"),
-                   "match_score": r.match_score, "external": bool((r.answers or {}).get("_external")),
+                   "match_score": r.match_score, "external": r.source == "external",
                    "opportunity": {"id": r.opportunity_id, "title": titles.get(r.opportunity_id)},
                    "created_at": r.created_at} for r in rows],
         "next_cursor": nxt,

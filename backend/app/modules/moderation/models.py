@@ -16,13 +16,14 @@ class ReportStatus(str, enum.Enum):
     dismissed = "dismissed"
 
 
+# Spec section 23.
 REPORT_REASONS = {
-    "scam": "Scam or fraud",
-    "fee": "Asks applicants to pay",
+    "scam": "Fake opportunity",
+    "fee": "Suspicious payment request",
+    "fake_org": "Fake organization",
+    "incorrect": "Incorrect information",
+    "expired": "Expired opportunity",
     "misleading": "Misleading information",
-    "expired": "Expired or closed",
-    "inappropriate": "Inappropriate content",
-    "duplicate": "Duplicate listing",
     "other": "Something else",
 }
 

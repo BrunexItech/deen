@@ -6,13 +6,14 @@ import asyncio
 import logging
 
 from app import models  # noqa: F401  (register tables)
-from app.core.clock import utcnow
+from app.core.clock import TZ, utcnow
 from app.core.db import SessionLocal
 from app.modules.jobs.service import enqueue, run_ready
 
 # Importing these modules registers their job handlers.
 from app.modules.admin import platform as _announcements  # noqa: F401,E402
 from app.modules.notifications import service as _notifications  # noqa: F401,E402
+from app.modules.opportunities import digest as _digest  # noqa: F401,E402
 from app.modules.opportunities import service as _opportunities  # noqa: F401,E402
 from app.modules.subscriptions import jobs as _subscription_jobs  # noqa: F401,E402
 from app.modules.subscriptions import router as _payments  # noqa: F401,E402
@@ -25,9 +26,14 @@ async def schedule_maintenance() -> None:
     """One maintenance run per window, however many workers are alive (dedupe key)."""
     now = utcnow()
     window = now.replace(minute=now.minute - now.minute % MAINTENANCE_EVERY_MINUTES, second=0, microsecond=0)
+    local = now.astimezone(TZ)
     async with SessionLocal() as session:
         for kind in ("opportunities.maintenance", "subscriptions.maintenance"):
             await enqueue(session, kind, {}, dedupe_key=f"{kind}:{window.isoformat()}")
+        # Weekly digest: Monday from 08:00 Nairobi time, once per ISO week.
+        if local.weekday() == 0 and local.hour >= 8:
+            year, week, _ = local.isocalendar()
+            await enqueue(session, "digest.weekly", {}, dedupe_key=f"digest:{year}-{week}")
         await session.commit()
 
 

@@ -11,7 +11,9 @@ from app.modules.opportunities.risk import scan
 def opp(**kw):
     base = dict(id="o1", title="Data Science Scholarship", summary="For data students", description="x" * 200,
                 category="education", type="scholarship", tags=[], skills=["data analysis"], counties=[],
-                is_remote=False, is_international=False, education_levels=[], min_age=None, max_age=None,
+                work_mode="physical", is_international=False, eligible_countries=[], education_levels=[],
+                min_age=None, max_age=None, fields_of_study=[], industry=None, min_experience_years=None,
+                target_user_types=[],
                 gender=None, deadline=utcnow() + timedelta(days=30), is_event=False, eligibility="Anyone",
                 apply_mode=ApplyMode.external, external_url="https://example.org/apply", requirements="",
                 application_process="")
@@ -27,7 +29,8 @@ def member(**kw):
 
 
 def test_strong_match_explains_itself():
-    m = evaluate(opp(counties=["Mombasa"], education_levels=["undergraduate"]), member())
+    m = evaluate(opp(counties=["Mombasa"], education_levels=["undergraduate"], target_user_types=["student"],
+                     industry="Research"), member(user_types={"student"}, industry="Research"))
     assert m.eligible and m.score >= 80
     assert len(m.reasons) == 3 and any("Mombasa" in r for r in m.reasons)
 
@@ -44,7 +47,19 @@ def test_unknown_profile_fields_never_block():
 
 
 def test_remote_ignores_county_restriction():
-    assert evaluate(opp(counties=["Nairobi"], is_remote=True), member()).eligible
+    assert evaluate(opp(counties=["Nairobi"], work_mode="remote"), member()).eligible
+
+
+def test_country_and_experience_blockers():
+    m = evaluate(opp(eligible_countries=["Uganda"], min_experience_years=3), member(experience_years=1))
+    assert not m.eligible and len(m.blockers) == 2
+
+
+def test_member_category_and_industry_boost():
+    base = evaluate(opp(), member()).score
+    boosted = evaluate(opp(target_user_types=["woman_entrepreneur"], industry="Fashion & Textiles"),
+                       member(user_types={"woman_entrepreneur"}, industry="Fashion & Textiles"))
+    assert boosted.score > base and any("women entrepreneurs" in r for r in boosted.reasons)
 
 
 def test_affinity_decays_and_is_bounded():

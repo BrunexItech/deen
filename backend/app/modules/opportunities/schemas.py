@@ -8,11 +8,16 @@ from uuid import uuid4
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from app.modules.opportunities.models import AccessTier, ApplyMode
-from app.modules.taxonomy.data import CATEGORIES, COUNTIES, EDUCATION_KEYS
+from app.modules.taxonomy.data import (CATEGORIES, COMPENSATION, COUNTIES, COUNTRIES, EDUCATION_KEYS, INDUSTRIES,
+                                       ISLAMIC_TAG_KEYS, USER_TYPE_KEYS, VOLUNTEER_CAUSES, WORK_MODES)
 
 _TYPES = {t: c["key"] for c in CATEGORIES for t, _ in c["types"]}
 _URL = re.compile(r"^https?://[^\s/$.?#].[^\s]*$", re.IGNORECASE)
 QUESTION_KINDS = {"short_text", "long_text", "single_choice", "multi_choice", "yes_no", "number", "date"}
+_WORK_MODES = {k for k, _ in WORK_MODES}
+_COMPENSATION = {k for k, _ in COMPENSATION}
+_CAUSES = {k for k, _ in VOLUNTEER_CAUSES}
+EVENT_TYPES = {"event", "workshop", "seminar"}
 
 
 class Question(BaseModel):
@@ -41,10 +46,31 @@ class OpportunityIn(BaseModel):
     benefits: str = Field("", max_length=8000)
     requirements: str = Field("", max_length=8000)
     application_process: str = Field("", max_length=8000)
+    country: str = "Kenya"
     counties: list[str] = []
     location_label: str | None = Field(None, max_length=160)
-    is_remote: bool = False
+    work_mode: str = "physical"
     is_international: bool = False
+    eligible_countries: list[str] = []
+    industry: str | None = None
+    department: str | None = Field(None, max_length=120)
+    responsibilities: str = Field("", max_length=8000)
+    duration_label: str | None = Field(None, max_length=80)
+    duration_weeks: int | None = Field(None, ge=0, le=520)
+    time_commitment: str | None = Field(None, max_length=120)
+    compensation: str = "undisclosed"
+    allowances: str | None = Field(None, max_length=200)
+    certificate_provided: bool = False
+    weekend: bool = False
+    student_friendly: bool = False
+    causes: list[str] = []
+    contact_email: str | None = Field(None, max_length=254)
+    contact_phone: str | None = Field(None, max_length=20)
+    fields_of_study: list[str] = Field(default_factory=list, max_length=20)
+    min_experience_years: int | None = Field(None, ge=0, le=50)
+    target_user_types: list[str] = []
+    islamic_tags: list[str] = []
+    shariah_basis: str | None = Field(None, max_length=2000)
     education_levels: list[str] = []
     min_age: int | None = Field(None, ge=10, le=100)
     max_age: int | None = Field(None, ge=10, le=100)
@@ -68,7 +94,7 @@ class OpportunityIn(BaseModel):
     access_tier: AccessTier = AccessTier.free
     feature_requested: bool = False
 
-    @field_validator("tags", "skills", "required_documents")
+    @field_validator("tags", "skills", "required_documents", "fields_of_study")
     @classmethod
     def _clean_list(cls, v: list[str]) -> list[str]:
         seen, out = set(), []
@@ -87,6 +113,27 @@ class OpportunityIn(BaseModel):
             raise ValueError(f"Unknown county: {bad[0]}")
         if bad := [e for e in self.education_levels if e not in EDUCATION_KEYS]:
             raise ValueError(f"Unknown education level: {bad[0]}")
+        if self.work_mode not in _WORK_MODES:
+            raise ValueError("Work mode must be physical, remote or hybrid")
+        if self.compensation not in _COMPENSATION:
+            raise ValueError("Choose paid, stipend, unpaid or not disclosed")
+        if self.industry and self.industry not in INDUSTRIES:
+            raise ValueError(f"Unknown industry: {self.industry}")
+        if self.country not in COUNTRIES:
+            raise ValueError(f"Unknown country: {self.country}")
+        if bad := [c for c in self.eligible_countries if c not in COUNTRIES]:
+            raise ValueError(f"Unknown country: {bad[0]}")
+        if bad := [c for c in self.causes if c not in _CAUSES]:
+            raise ValueError(f"Unknown cause: {bad[0]}")
+        if bad := [t for t in self.target_user_types if t not in USER_TYPE_KEYS]:
+            raise ValueError(f"Unknown user category: {bad[0]}")
+        if bad := [t for t in self.islamic_tags if t not in ISLAMIC_TAG_KEYS]:
+            raise ValueError(f"Unknown Islamic-friendly tag: {bad[0]}")
+        # Spec section 25: never label Shariah-conscious without a credible, recorded basis.
+        if "shariah_conscious" in self.islamic_tags and len((self.shariah_basis or "").strip()) < 20:
+            raise ValueError("Explain the basis for the Shariah-conscious label (e.g. the certifying Shariah board)")
+        if self.country != "Kenya":
+            self.is_international = True
         if self.gender not in (None, "male", "female"):
             raise ValueError("Gender must be male, female or empty")
         if self.min_age and self.max_age and self.min_age > self.max_age:
@@ -97,7 +144,7 @@ class OpportunityIn(BaseModel):
             raise ValueError("Enter a full application link starting with https://")
         if self.starts_at and self.ends_at and self.ends_at < self.starts_at:
             raise ValueError("The event ends before it starts")
-        if self.type in {"event", "conference", "lecture", "workshop", "fundraiser"}:
+        if self.type in EVENT_TYPES:
             self.is_event = True
         for q in self.form_questions:
             if q.kind in ("single_choice", "multi_choice") and len(q.options) < 2:

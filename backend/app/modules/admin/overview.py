@@ -96,6 +96,17 @@ async def overview(session: DB, days: int = 30):
         .group_by(Organization.id).order_by(func.coalesce(func.sum(Opportunity.applications_count), 0).desc()).limit(8))
     top_opps = (await session.execute(select(Opportunity).where(Opportunity.published_at.is_not(None))
                                       .order_by(Opportunity.views_count.desc()).limit(8))).scalars().all()
+    top_saved = (await session.execute(select(Opportunity).where(Opportunity.published_at.is_not(None))
+                                       .order_by(Opportunity.saves_count.desc()).limit(5))).scalars().all()
+    top_applied = (await session.execute(select(Opportunity).where(Opportunity.published_at.is_not(None))
+                                         .order_by(Opportunity.applications_count.desc()).limit(5))).scalars().all()
+    member_profiles = select(MemberProfile).join(User, User.id == MemberProfile.user_id).where(*members).subquery()
+    interest_col = func.unnest(member_profiles.c.interests)
+    interests = (await session.execute(select(interest_col, func.count()).group_by(interest_col)
+                                       .order_by(func.count().desc()))).all()
+    type_col = func.unnest(member_profiles.c.user_types)
+    user_types = (await session.execute(select(type_col, func.count()).group_by(type_col)
+                                        .order_by(func.count().desc()))).all()
     plan_mix = await session.execute(
         select(Plan.name, func.count()).join(Subscription, Subscription.plan_id == Plan.id)
         .where(Subscription.status == SubStatus.active, Subscription.ends_at > now).group_by(Plan.name))
@@ -106,6 +117,8 @@ async def overview(session: DB, days: int = 30):
             "active_30d": active_30d or 0, "paying_members": paying or 0,
             "organizations": sum(orgs.values()), "verified_orgs": orgs.get(Verification.verified, 0) + orgs.get(Verification.trusted, 0),
             "live_opportunities": opp_status.get(OppStatus.published, 0),
+            "expired_opportunities": opp_status.get(OppStatus.expired, 0),
+            "suspended_opportunities": opp_status.get(OppStatus.suspended, 0),
             "applications": apps_total or 0, "accepted": accepted or 0, "outcomes": outcomes or 0,
             "successful_connections": (accepted or 0) + (outcomes or 0),
             "revenue_period": float(revenue_period or 0), "revenue_all": float(revenue_all or 0),
@@ -133,4 +146,8 @@ async def overview(session: DB, days: int = 30):
                                "applications": o.applications_count, "saves": o.saves_count}
                               for o in top_opps],
         "plan_mix": [{"plan": n, "count": c} for n, c in plan_mix.all()],
+        "most_saved": [{"id": o.id, "title": o.title, "saves": o.saves_count} for o in top_saved],
+        "most_applied": [{"id": o.id, "title": o.title, "applications": o.applications_count} for o in top_applied],
+        "interests": [{"category": k, "members": n} for k, n in interests],
+        "user_types": [{"type": k, "members": n} for k, n in user_types],
     }

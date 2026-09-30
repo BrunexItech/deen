@@ -10,14 +10,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.clock import utcnow
 from app.core.config import settings
 from app.core.roles import Role
+from app.modules.applications.models import Application
 from app.modules.jobs.service import enqueue, handler
 from app.modules.notifications.service import notify
 from app.modules.opportunities import risk
-from app.modules.opportunities.matching import Match, MemberSignals, bump_affinity, evaluate
+from app.modules.opportunities.matching import DISCLAIMER, Match, MemberSignals, bump_affinity, evaluate
 from app.modules.opportunities.models import (AccessTier, EngagementEvent, Opportunity, OppStatus, ReviewEvent,
                                               SavedOpportunity)
 from app.modules.orgs.models import Organization, OrgFollow, OrgStatus, Verification
 from app.modules.subscriptions.service import tier_allows
+from app.modules.taxonomy.data import CHECKLIST_KEYS
+from app.modules.taxonomy.models import OpportunityType
 from app.modules.users.models import MemberProfile, User, UserStatus
 
 S = OppStatus
@@ -30,9 +33,14 @@ REVIEW_ACTIONS: dict[str, tuple[set[OppStatus], OppStatus]] = {
     "approve": ({S.submitted, S.under_review, S.verification}, S.approved),
     "publish": ({S.submitted, S.approved, S.under_review, S.verification}, S.published),
     "reject": ({S.submitted, S.under_review, S.verification, S.info_requested}, S.rejected),
-    "archive": ({S.published, S.approved, S.expired}, S.archived),
+    "archive": ({S.published, S.approved, S.expired, S.suspended}, S.archived),
     "republish": ({S.archived, S.expired}, S.published),
+    "suspend": ({S.published}, S.suspended),
+    "reinstate": ({S.suspended}, S.published),
+    "mark_expired": ({S.published, S.suspended}, S.expired),
 }
+# Actions that make an opportunity visible to members: the verification checklist must be complete.
+PUBLISHING = {"publish", "republish", "reinstate"}
 ORG_EDITABLE = {S.draft, S.info_requested, S.rejected}
 
 
@@ -55,6 +63,28 @@ def _days_left(opp: Opportunity) -> int | None:
     return max(0, (opp.deadline - utcnow()).days)
 
 
+def status_label(opp: Opportunity) -> str:
+    """What members see (spec section 14): Application open / Closing soon / Application closed…"""
+    if opp.status == S.published:
+        days = _days_left(opp)
+        if opp.deadline and opp.deadline < utcnow():
+            return "Application closed"
+        return "Closing soon" if days is not None and days <= 7 else "Application open"
+    return {S.expired: "Application closed", S.archived: "Application closed", S.suspended: "Suspended",
+            S.rejected: "Rejected", S.submitted: "Pending verification", S.under_review: "Under review",
+            S.verification: "Under review", S.info_requested: "Under review", S.approved: "Verified",
+            S.draft: "Draft"}.get(opp.status, opp.status.value)
+
+
+def _location(opp: Opportunity) -> str:
+    if opp.location_label:
+        return opp.location_label
+    if opp.work_mode == "remote":
+        return "Remote"
+    place = ", ".join(opp.counties[:2]) if opp.counties else ("Kenya-wide" if opp.country == "Kenya" else opp.country)
+    return f"{place} · Hybrid" if opp.work_mode == "hybrid" else place
+
+
 def card(opp: Opportunity, org: Organization | None, *, match: Match | None = None, saved: bool = False,
          locked: bool = False) -> dict:
     days = _days_left(opp)
@@ -62,13 +92,19 @@ def card(opp: Opportunity, org: Organization | None, *, match: Match | None = No
         "id": opp.id, "title": opp.title, "summary": opp.summary, "category": opp.category, "type": opp.type,
         "organization": org_mini(org), "deadline": opp.deadline, "days_left": days,
         "closing_soon": days is not None and days <= 7 and opp.status == S.published,
-        "location": opp.location_label or ("Remote" if opp.is_remote else ", ".join(opp.counties[:2]) or "Kenya-wide"),
-        "is_remote": opp.is_remote, "is_event": opp.is_event, "starts_at": opp.starts_at,
+        "status_label": status_label(opp),
+        # "Verified by DEEN" = passed the admin checklist and published (spec section 14).
+        "verified_by_deen": opp.verified_at is not None and opp.status in (S.published, S.expired, S.archived),
+        "location": _location(opp), "country": opp.country, "work_mode": opp.work_mode,
+        "is_remote": opp.work_mode == "remote", "is_international": opp.is_international,
+        "is_event": opp.is_event, "starts_at": opp.starts_at, "industry": opp.industry,
+        "duration_label": opp.duration_label, "compensation": opp.compensation,
         "amount_label": opp.amount_label, "access_tier": opp.access_tier.value, "locked": locked,
-        "featured": opp.featured, "status": opp.status.value, "published_at": opp.published_at,
+        "featured": opp.featured, "sponsored": opp.sponsored, "islamic_tags": opp.islamic_tags or [],
+        "status": opp.status.value, "published_at": opp.published_at,
         "saved": saved, "applications_count": opp.applications_count,
         "match": {"score": match.score, "eligible": match.eligible, "reasons": match.reasons,
-                  "blockers": match.blockers} if match else None,
+                  "blockers": match.blockers, "disclaimer": DISCLAIMER} if match else None,
     }
 
 
@@ -77,15 +113,22 @@ def detail(opp: Opportunity, org: Organization | None, *, match: Match | None = 
     out = card(opp, org, match=match, saved=saved, locked=locked)
     out.update({
         "description": opp.description, "eligibility": opp.eligibility, "benefits": opp.benefits,
-        "requirements": opp.requirements, "tags": opp.tags, "counties": opp.counties,
-        "education_levels": opp.education_levels, "min_age": opp.min_age, "max_age": opp.max_age,
-        "gender": opp.gender, "skills": opp.skills, "is_international": opp.is_international,
+        "requirements": opp.requirements, "responsibilities": opp.responsibilities, "tags": opp.tags,
+        "counties": opp.counties, "eligible_countries": opp.eligible_countries,
+        "education_levels": opp.education_levels, "fields_of_study": opp.fields_of_study,
+        "min_age": opp.min_age, "max_age": opp.max_age, "min_experience_years": opp.min_experience_years,
+        "gender": opp.gender, "skills": opp.skills, "target_user_types": opp.target_user_types,
+        "department": opp.department, "duration_weeks": opp.duration_weeks, "time_commitment": opp.time_commitment,
+        "allowances": opp.allowances, "certificate_provided": opp.certificate_provided, "weekend": opp.weekend,
+        "student_friendly": opp.student_friendly, "causes": opp.causes, "shariah_basis": opp.shariah_basis,
+        "contact_email": opp.contact_email, "contact_phone": opp.contact_phone,
         "ends_at": opp.ends_at, "venue": opp.venue, "slots": opp.slots,
         "requires_verified_identity": opp.requires_verified_identity,
         "apply_mode": opp.apply_mode.value, "required_documents": opp.required_documents,
         "attachments": [{**a, "url": file_url(a.get("file_id"))} for a in (opp.attachments or [])],
         "organization": {**(org_mini(org) or {}), "tagline": org.tagline if org else None,
                          "website": org.website if org else None},
+        "verified_at": opp.verified_at,
         "application": application,
         "share_url": f"{settings.app_url}/o/{opp.id}",
     })
@@ -105,8 +148,15 @@ def staff_view(opp: Opportunity, org: Organization | None) -> dict:
                 "views_count": opp.views_count, "clicks_count": opp.clicks_count, "saves_count": opp.saves_count,
                 "created_at": opp.created_at, "updated_at": opp.updated_at,
                 "application_process": opp.application_process, "external_url": opp.external_url,
-                "form_questions": opp.form_questions or []})
+                "form_questions": opp.form_questions or [],
+                "verification_checklist": opp.verification_checklist or {},
+                "checklist_complete": checklist_complete(opp)})
     return out
+
+
+def checklist_complete(opp: Opportunity) -> bool:
+    done = opp.verification_checklist or {}
+    return all(done.get(k) in ("yes", "na") for k in CHECKLIST_KEYS)
 
 
 # ---------- member context ----------
@@ -204,13 +254,16 @@ async def review_action(session: AsyncSession, opp: Opportunity, action: str, ac
     if opp.status not in sources:
         raise HTTPException(409, f"Can't {action.replace('_', ' ')} an opportunity that is {opp.status.value.replace('_', ' ')}")
     org = await session.get(Organization, opp.organization_id)
-    if target == S.published:
+    if action in PUBLISHING:
         if org.verification == Verification.pending or org.status != OrgStatus.active:
             raise HTTPException(409, "Verify the organization before publishing its opportunities")
+        if not checklist_complete(opp):
+            raise HTTPException(409, "Complete the verification checklist before publishing")
+        opp.verified_at = opp.verified_at or utcnow()
         if opp.deadline and opp.deadline < utcnow():
             raise HTTPException(409, "The deadline has passed. Update it before publishing.")
-    if action in ("request_info", "reject") and not (note or "").strip():
-        raise HTTPException(422, "Tell the organization what to change or why it was declined")
+    if action in ("request_info", "reject", "suspend") and not (note or "").strip():
+        raise HTTPException(422, "Add a note explaining why")
     opp.reviewed_by_id = actor_id
     await transition(session, opp, target, actor_id, note)
     org_users = (await session.execute(select(User.id).where(User.organization_id == opp.organization_id,
@@ -220,6 +273,7 @@ async def review_action(session: AsyncSession, opp: Opportunity, action: str, ac
         S.published: ("Your opportunity is live", f'"{opp.title}" is now published to DEEN members.'),
         S.rejected: ("Submission declined", f'"{opp.title}": {note}'),
         S.approved: ("Approved", f'"{opp.title}" was approved and will be published shortly.'),
+        S.suspended: ("Opportunity suspended", f'"{opp.title}" was taken down pending review: {note}'),
     }
     if target in titles:
         t, b = titles[target]
@@ -244,7 +298,7 @@ async def fanout(session: AsyncSession, payload: dict) -> None:
             .where(User.status == UserStatus.active, User.role == Role.member, MemberProfile.user_id > after,
                    MemberProfile.onboarding_completed.is_(True)))
     # Cheap SQL pre-filter: skip members who can never be eligible.
-    if opp.counties and not (opp.is_remote or opp.is_international):
+    if opp.counties and opp.work_mode != "remote" and not opp.is_international:
         stmt = stmt.where(or_(MemberProfile.county.is_(None), MemberProfile.county.in_(opp.counties)))
     if opp.gender:
         stmt = stmt.where(or_(MemberProfile.gender.is_(None), MemberProfile.gender == opp.gender))
@@ -280,28 +334,42 @@ async def maintenance(session: AsyncSession, payload: dict) -> None:
         await transition(session, opp, S.expired, None, "Deadline passed")
     await session.flush()
 
-    closing = (await session.execute(
+    await send_deadline_reminders(session, now)
+
+
+# Reminder stages for saved opportunities (spec section 20): 7 days, 3 days, 1 day before closing.
+REMINDER_STAGES = ((3, 1), (2, 3), (1, 7))  # (stage, days before deadline), tightest first
+
+
+async def send_deadline_reminders(session: AsyncSession, now) -> None:
+    type_names = dict((await session.execute(select(OpportunityType.key, OpportunityType.name))).all())
+    rows = (await session.execute(
         select(SavedOpportunity, Opportunity)
         .join(Opportunity, Opportunity.id == SavedOpportunity.opportunity_id)
-        .where(Opportunity.status == S.published, SavedOpportunity.reminded_at.is_(None),
-               Opportunity.deadline.between(now, now + timedelta(days=3)))
-        .limit(5000)
+        .where(Opportunity.status == S.published, SavedOpportunity.reminder_stage < 3,
+               Opportunity.deadline.between(now, now + timedelta(days=7)))
+        .limit(10000)
     )).all()
-    by_opp: dict[str, tuple[Opportunity, list[str]]] = {}
-    for saved, opp in closing:
-        saved.reminded_at = now
-        by_opp.setdefault(opp.id, (opp, []))[1].append(saved.user_id)
-    from app.modules.applications.models import Application
-
-    for opp, users in by_opp.values():
-        applied = set((await session.execute(select(Application.user_id).where(
-            Application.opportunity_id == opp.id, Application.user_id.in_(users)))).scalars())
-        pending = [u for u in users if u not in applied]
-        days = max(0, (opp.deadline - now).days)
-        when = "today" if days == 0 else "tomorrow" if days == 1 else f"in {days} days"
-        await notify(session, pending, kind="deadlines", title=f"Closing {when}",
-                     body=f"{opp.title}: don't miss it. Apply before the deadline.",
-                     data={"screen": "opportunity", "id": opp.id})
+    batches: dict[tuple[str, int], tuple[Opportunity, list[str]]] = {}
+    for saved, opp in rows:
+        days_left = (opp.deadline - now).total_seconds() / 86400
+        stage = next((st for st, d in REMINDER_STAGES if days_left <= d), 0)
+        if stage > saved.reminder_stage:
+            saved.reminder_stage, saved.reminded_at = stage, now
+            batches.setdefault((opp.id, stage), (opp, []))[1].append(saved.user_id)
+    for (_, stage), (opp, users) in batches.items():
+        # Anyone who already sent their application doesn't need a nudge ("started" still does).
+        done = set((await session.execute(select(Application.user_id).where(
+            Application.opportunity_id == opp.id, Application.user_id.in_(users),
+            Application.status != "started"))).scalars())
+        pending = [u for u in users if u not in done]
+        if not pending:
+            continue
+        kind = type_names.get(opp.type, "Opportunity")
+        when = {3: "tomorrow", 2: "in 3 days", 1: "in 7 days"}[stage]
+        await notify(session, pending, kind="deadlines", title=f"Your saved {kind.lower()} closes {when}",
+                     body=f"{opp.title}. Apply before the deadline.", data={"screen": "opportunity", "id": opp.id},
+                     channels_=("push", "email") if stage == 3 else ("push",))
 
 
 async def counts_by_category(session: AsyncSession) -> dict[str, int]:

@@ -102,3 +102,13 @@ async def run_jobs() -> None:
 
     while await run_ready(50):
         pass
+
+
+async def publish(admin, opp_id: str):
+    """Completes DEEN's verification checklist, then publishes (as a reviewer would)."""
+    from app.modules.taxonomy.data import CHECKLIST_KEYS
+
+    r = await admin.put(f"/api/v1/admin/opportunities/{opp_id}/checklist",
+                        json={"items": {k: "yes" for k in CHECKLIST_KEYS}})
+    assert r.status_code == 200, r.text
+    return await admin.post(f"/api/v1/admin/opportunities/{opp_id}/actions", json={"action": "publish"})

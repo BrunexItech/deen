@@ -9,13 +9,15 @@ from sqlalchemy.exc import IntegrityError
 
 from app.core.clock import utcnow
 from app.core.deps import DB, Member
+from app.core.roles import Role
 from app.modules.applications.models import Application
-from app.modules.opportunities.matching import evaluate
+from app.modules.opportunities.matching import evaluate, headline
 from app.modules.opportunities.models import Opportunity, SavedOpportunity
 from app.modules.opportunities.service import (card, detail, is_locked, live_filter, member_context, orgs_by_id,
                                                saved_ids, track)
 from app.modules.orgs.models import Organization, OrgStatus, Verification
-from app.core.roles import Role
+from app.modules.taxonomy.data import STUDENT_HUB
+from app.modules.taxonomy.models import OpportunityType
 from app.modules.users.models import User
 
 router = APIRouter(prefix="/api/v1/opportunities", tags=["discovery"])
@@ -36,7 +38,7 @@ async def for_you(p: Member, session: DB):
     stmt = select(Opportunity).where(live_filter(), _live_orgs())
     if sig.county:
         stmt = stmt.where(or_(Opportunity.counties == [], Opportunity.counties.any(sig.county),
-                              Opportunity.is_remote, Opportunity.is_international))
+                              Opportunity.work_mode == "remote", Opportunity.is_international))
     if sig.gender:
         stmt = stmt.where(or_(Opportunity.gender.is_(None), Opportunity.gender == sig.gender))
     opps = (await session.execute(
@@ -63,7 +65,16 @@ async def for_you(p: Member, session: DB):
     events = sorted([(o, m) for o, m in eligible if o.is_event and o.starts_at and o.starts_at > now],
                     key=lambda x: x[0].starts_at)[:10]
     profile_ready = bool(ctx.profile and ctx.profile.onboarding_completed)
+    week_ago = now - timedelta(days=7)
+    newest = sorted([(o, m) for o, m in scored if o.published_at and o.published_at >= week_ago],
+                    key=lambda x: x[0].published_at, reverse=True)[:12]
+    active_apps = await session.scalar(select(func.count()).select_from(Application).where(
+        Application.user_id == p.id, Application.status.in_(["started", "submitted", "in_review", "shortlisted",
+                                                              "interview"])))
     return {
+        "headline": headline(sig, ctx.profile),
+        "new": [c(o, m) for o, m in newest],
+        "active_applications": active_apps or 0,
         "summary": [{"category": k, "count": v} for k, v in sorted(summary.items(), key=lambda kv: -kv[1])],
         "total_matches": len(strong),
         "featured": [c(o, m) for o, m in featured],
@@ -79,10 +90,20 @@ async def for_you(p: Member, session: DB):
 async def explore(
     p: Member, session: DB,
     q: str | None = Query(None, max_length=120),
-    category: str | None = None, type: str | None = None, county: str | None = None,
-    organization_id: str | None = None,
+    category: str | None = None, type: str | None = None,
+    types: str | None = Query(None, max_length=400, description="Comma-separated type keys"),
+    country: str | None = None, county: str | None = None, organization_id: str | None = None,
+    education_level: str | None = None, field_of_study: str | None = Query(None, max_length=80),
+    industry: str | None = None, max_experience: int | None = Query(None, ge=0, le=50),
+    age: int | None = Query(None, ge=10, le=100),
+    compensation: Literal["paid", "unpaid", "stipend"] | None = None,
+    work_mode: Literal["physical", "remote", "hybrid"] | None = None,
+    duration: Literal["short", "medium", "long"] | None = None,
+    scope: Literal["local", "international"] | None = None,
     closing_within: int | None = Query(None, ge=1, le=365),
     remote: bool | None = None, events: bool | None = None,
+    cause: str | None = None, weekend: bool | None = None, student_friendly: bool | None = None,
+    certificate: bool | None = None, islamic: bool | None = None, islamic_tag: str | None = None,
     eligible_only: bool = False,
     sort: Literal["relevance", "deadline", "newest"] = "relevance",
     page: int = Query(1, ge=1, le=50), limit: int = Query(20, ge=1, le=50),
@@ -100,21 +121,69 @@ async def explore(
         stmt = stmt.where(Opportunity.category == category)
     if type:
         stmt = stmt.where(Opportunity.type == type)
+    if types:
+        stmt = stmt.where(Opportunity.type.in_([t.strip() for t in types.split(",") if t.strip()]))
+    if country:
+        stmt = stmt.where(Opportunity.country == country)
     if county:
         stmt = stmt.where(or_(Opportunity.counties.any(county), Opportunity.counties == []))
     if organization_id:
         stmt = stmt.where(Opportunity.organization_id == organization_id)
+    if education_level:
+        stmt = stmt.where(or_(Opportunity.education_levels == [], Opportunity.education_levels.any(education_level)))
+    if field_of_study:
+        like = f"%{field_of_study.strip()}%"
+        stmt = stmt.where(or_(func.array_to_string(Opportunity.fields_of_study, " ").ilike(like),
+                              Opportunity.title.ilike(like)))
+    if industry:
+        stmt = stmt.where(Opportunity.industry == industry)
+    if max_experience is not None:
+        stmt = stmt.where(or_(Opportunity.min_experience_years.is_(None),
+                              Opportunity.min_experience_years <= max_experience))
+    if age is not None:
+        stmt = stmt.where(or_(Opportunity.min_age.is_(None), Opportunity.min_age <= age),
+                          or_(Opportunity.max_age.is_(None), Opportunity.max_age >= age))
+    if compensation == "paid":
+        stmt = stmt.where(Opportunity.compensation.in_(["paid", "stipend"]))
+    elif compensation:
+        stmt = stmt.where(Opportunity.compensation == compensation)
+    if work_mode:
+        stmt = stmt.where(Opportunity.work_mode == work_mode)
+    if remote:
+        stmt = stmt.where(Opportunity.work_mode == "remote")
+    if duration == "short":
+        stmt = stmt.where(Opportunity.duration_weeks <= 4)
+    elif duration == "medium":
+        stmt = stmt.where(Opportunity.duration_weeks.between(5, 12))
+    elif duration == "long":
+        stmt = stmt.where(Opportunity.duration_weeks > 12)
+    if scope == "local":
+        stmt = stmt.where(Opportunity.is_international.is_(False))
+    elif scope == "international":
+        stmt = stmt.where(Opportunity.is_international.is_(True))
     if closing_within:
         stmt = stmt.where(Opportunity.deadline <= utcnow() + timedelta(days=closing_within))
-    if remote:
-        stmt = stmt.where(Opportunity.is_remote.is_(True))
     if events:
         stmt = stmt.where(Opportunity.is_event.is_(True))
+    if cause:
+        stmt = stmt.where(Opportunity.causes.any(cause))
+    if weekend:
+        stmt = stmt.where(Opportunity.weekend.is_(True))
+    if student_friendly:
+        stmt = stmt.where(Opportunity.student_friendly.is_(True))
+    if certificate:
+        stmt = stmt.where(Opportunity.certificate_provided.is_(True))
+    if islamic:
+        stmt = stmt.where(or_(Opportunity.islamic_tags != [], Opportunity.category == "islamic_economy"))
+    if islamic_tag:
+        stmt = stmt.where(Opportunity.islamic_tags.any(islamic_tag))
 
     total = await session.scalar(select(func.count()).select_from(stmt.subquery()))
     if sort == "deadline":
         stmt = stmt.order_by(Opportunity.deadline.asc().nullslast(), Opportunity.id)
-    elif sort == "newest" or rank is None:
+    elif sort == "newest":
+        stmt = stmt.order_by(Opportunity.published_at.desc(), Opportunity.id)
+    elif rank is None:
         stmt = stmt.order_by(Opportunity.featured.desc(), Opportunity.published_at.desc(), Opportunity.id)
     else:
         stmt = stmt.order_by(rank.desc(), Opportunity.published_at.desc())
@@ -131,6 +200,28 @@ async def explore(
     if sort == "relevance" and rank is None:
         items.sort(key=lambda x: -(x["match"]["score"] if x["match"] else 0))
     return {"items": items, "total": total or 0, "page": page, "has_more": page * limit < (total or 0)}
+
+
+@router.get("/hub")
+async def student_hub(p: Member, session: DB):
+    """Student & Graduate Hub (spec section 26): Study, Experience, Career, Growth."""
+    ctx = await member_context(session, p.user)
+    all_types = [t for _, _, ts in STUDENT_HUB for t in ts]
+    rows = (await session.execute(select(Opportunity).where(live_filter(), _live_orgs(), Opportunity.type.in_(all_types))
+                                  .order_by(Opportunity.deadline.asc().nullslast()).limit(300))).scalars().all()
+    orgs = await orgs_by_id(session, {o.organization_id for o in rows})
+    names = dict((await session.execute(select(OpportunityType.key, OpportunityType.name))).all())
+    sections = []
+    for key, label, ts in STUDENT_HUB:
+        items = [o for o in rows if o.type in ts]
+        counts = {t: sum(1 for o in items if o.type == t) for t in ts}
+        sections.append({
+            "key": key, "label": label,
+            "types": [{"key": t, "name": names.get(t, t), "count": counts[t]} for t in ts],
+            "items": [card(o, orgs.get(o.organization_id), match=evaluate(o, ctx.signals), locked=is_locked(o, ctx))
+                      for o in items[:8]],
+        })
+    return {"sections": sections}
 
 
 @router.get("/saved")

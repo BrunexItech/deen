@@ -83,9 +83,11 @@ async def test_password_reset_via_otp(client):
     r = await client.post("/api/v1/auth/reset", json={"identifier": "0712345678", "code": code,
                                                       "new_password": "NewPass4567"})
     assert r.status_code == 200
-    # Old sessions are gone, new password works.
+    # Old sessions are gone, new password works: on the already-known phone, no extra code needed.
     assert (await c.get("/api/v1/me")).status_code == 401
-    r = await client.post("/api/v1/auth/login", json={"identifier": "0712345678", "password": "NewPass4567"})
+    known = {"device_id": "dev-0712345678", "device_name": "Test phone", "platform": "android"}
+    r = await client.post("/api/v1/auth/login", json={"identifier": "0712345678", "password": "NewPass4567",
+                                                      "device": known})
     assert r.status_code == 200 and r.json()["access_token"]
     await c.aclose()
 
@@ -102,4 +104,24 @@ async def test_totp_mfa_flow(admin_web):
     r = await c.post("/api/v1/auth/mfa", json={"mfa_token": r.json()["mfa_token"],
                                                "code": pyotp.TOTP(setup["secret"]).now()})
     assert r.status_code == 200 and r.json()["user"]["portal"] == "admin"
+    await c.aclose()
+
+
+async def test_new_device_requires_sms_code(client):
+    """Two-factor: the right password on an unknown phone still needs the SMS code."""
+    c, _ = await register_member()
+    new_phone = {"device_id": "stolen-phone", "device_name": "Unknown", "platform": "android"}
+    r = await client.post("/api/v1/auth/login", json={"identifier": "0712345678", "password": PASSWORD,
+                                                      "device": new_phone})
+    body = r.json()
+    assert body.get("device_verify_required") and "access_token" not in body
+    bad = await client.post("/api/v1/auth/verify-device", json={"phone": "0712345678", "code": "000000",
+                                                                "device": new_phone})
+    assert bad.status_code == 400
+    ok = await client.post("/api/v1/auth/verify-device", json={"phone": "0712345678", "code": body["dev_code"],
+                                                               "device": new_phone})
+    assert ok.status_code == 200 and ok.json()["access_token"]
+    # The member is warned about the new sign-in.
+    notes = (await c.get("/api/v1/notifications")).json()["items"]
+    assert any("New sign-in" in n["title"] for n in notes)
     await c.aclose()

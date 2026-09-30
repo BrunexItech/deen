@@ -16,12 +16,14 @@ from app.modules.admin import platform as admin_platform
 from app.modules.admin import users as admin_users
 from app.modules.applications.router import member_router as applications_router
 from app.modules.applications.router import org_router as org_applications_router
+from app.modules.applications.tracker import router as tracker_router
 from app.modules.content.router import router as content_router
 from app.modules.directory.router import router as directory_router
 from app.modules.files.router import router as files_router
 from app.modules.identity.router import router as identity_router
 from app.modules.moderation.router import router as reports_router
 from app.modules.notifications.router import router as notifications_router
+from app.modules.opportunities import questions
 from app.modules.opportunities.router import public_router
 from app.modules.opportunities.router import router as discovery_router
 from app.modules.orgs.portal_router import router as org_portal_router
@@ -73,8 +75,8 @@ app.add_middleware(
 for r in (
     auth_router, me_router, privacy_router, taxonomy_router, discovery_router, applications_router,
     organizations_router, membership_router, notifications_router, files_router, content_router, reports_router,
-    directory_router, identity_router, search_router, public_router,
-    org_portal_router, org_applications_router,
+    directory_router, identity_router, search_router, public_router, tracker_router, questions.member_router,
+    org_portal_router, org_applications_router, questions.org_router, questions.admin_router,
     admin_overview.router, admin_opportunities.router, admin_orgs.router, admin_users.router, admin_platform.router,
 ):
     app.include_router(r)

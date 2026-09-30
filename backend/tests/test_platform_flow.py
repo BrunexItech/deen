@@ -3,7 +3,8 @@ ORGANIZATION -> SUBMIT -> DEEN VERIFIES -> PUBLISH -> MEMBER DISCOVERS -> APPLIE
 from datetime import timedelta
 
 from app.core.clock import utcnow
-from tests.conftest import _client, register_member, run_jobs
+from app.core.config import settings
+from tests.conftest import _client, publish, register_member, run_jobs
 
 OPP = {
     "title": "Mombasa Engineering Scholarship",
@@ -50,7 +51,10 @@ async def test_full_loop(admin_web):
     r = await admin_web.post(f"/api/v1/admin/opportunities/{opp_id}/actions", json={"action": "publish"})
     assert r.status_code == 409
     await admin_web.post(f"/api/v1/admin/organizations/{org['id']}/verification", json={"verification": "verified"})
+    # ...and until DEEN's verification checklist is complete.
     r = await admin_web.post(f"/api/v1/admin/opportunities/{opp_id}/actions", json={"action": "publish"})
+    assert r.status_code == 409 and "checklist" in r.json()["detail"]
+    r = await publish(admin_web, opp_id)
     assert r.status_code == 200 and r.json()["status"] == "published"
 
     # A matching member discovers it with an explanation...
@@ -60,7 +64,7 @@ async def test_full_loop(admin_web):
                                                   "onboarding_completed": True})
     feed = (await member.get("/api/v1/opportunities/feed")).json()
     card = next(c for c in feed["for_you"] if c["id"] == opp_id)
-    assert card["match"]["eligible"] and card["match"]["score"] >= 60
+    assert card["match"]["eligible"] and card["match"]["score"] >= settings.match_notify_threshold
     assert any("Mombasa" in r for r in card["match"]["reasons"])
 
     # ...while a member elsewhere sees why they're not eligible.

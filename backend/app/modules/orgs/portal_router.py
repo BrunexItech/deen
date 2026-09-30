@@ -1,16 +1,17 @@
 """Organization portal: profile, team, opportunities and analytics for one organization."""
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, EmailStr, Field
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 
 from app.core.audit import record
 from app.core.clock import local_day, utcnow
 from app.core.deps import DB, OrgAdmin, OrgUser
 from app.core.roles import Role
 from app.modules.applications.models import Application, AppStatus, Outcome
-from app.modules.opportunities.models import EngagementEvent, Opportunity, OppStatus, ReviewEvent, ReviewMessage
+from app.modules.opportunities.models import (EngagementEvent, Opportunity, OppStatus, ReviewEvent, ReviewMessage,
+                                              SavedOpportunity)
 from app.modules.opportunities.schemas import OpportunityIn, submission_problems
 from app.modules.opportunities.service import ORG_EDITABLE, run_risk_scan, staff_view, transition
 from app.modules.orgs.models import Invite, Organization
@@ -203,6 +204,33 @@ async def close(opp_id: str, p: OrgUser, session: DB):
     await transition(session, opp, OppStatus.archived, p.id, "Closed by organization")
     await session.commit()
     return {"ok": True, "status": opp.status.value}
+
+
+class DeadlineIn(BaseModel):
+    deadline: datetime
+
+
+@router.post("/opportunities/{opp_id}/deadline")
+async def update_deadline(opp_id: str, body: DeadlineIn, p: OrgUser, session: DB):
+    """Providers extend or bring forward a live deadline without re-review (spec section 16).
+    The change is logged and visible to DEEN reviewers; members who saved it get fresh reminders."""
+    opp = await _own_opp(session, opp_id, p)
+    if opp.status not in (OppStatus.published, OppStatus.submitted, OppStatus.under_review, OppStatus.approved):
+        raise HTTPException(409, "Edit the opportunity to change its deadline")
+    if body.deadline < utcnow():
+        raise HTTPException(422, "The new deadline is in the past")
+    before = opp.deadline
+    opp.deadline = body.deadline
+    session.add(ReviewEvent(opportunity_id=opp.id, actor_id=p.id, from_status=opp.status.value,
+                            to_status=opp.status.value,
+                            note=f"Deadline changed from {before:%d %b %Y} to {body.deadline:%d %b %Y}" if before
+                            else f"Deadline set to {body.deadline:%d %b %Y}"))
+    await session.execute(update(SavedOpportunity).where(SavedOpportunity.opportunity_id == opp.id)
+                          .values(reminder_stage=0))
+    record(session, actor_id=p.id, action="opportunity.deadline_changed", entity="opportunity", entity_id=opp.id,
+           ip=p.ip, deadline=body.deadline.isoformat())
+    await session.commit()
+    return {"ok": True, "deadline": opp.deadline}
 
 
 @router.post("/opportunities/{opp_id}/duplicate")

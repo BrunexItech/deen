@@ -10,7 +10,8 @@ from app.core.deps import DB, CurrentUser, Member
 from app.modules.applications.models import Application, Outcome
 from app.modules.files.models import StoredFile
 from app.modules.opportunities.models import SavedOpportunity
-from app.modules.taxonomy.data import CATEGORIES, CATEGORY_KEYS, COUNTIES, EDUCATION_KEYS, EMPLOYMENT_STATUSES
+from app.modules.taxonomy.data import (CATEGORIES, CATEGORY_KEYS, COUNTIES, COUNTRIES, EDUCATION_KEYS,
+                                       EMPLOYMENT_STATUSES, INDUSTRIES, USER_TYPE_KEYS)
 from app.modules.users.models import MemberProfile, User
 from app.modules.users.service import user_payload
 
@@ -54,16 +55,18 @@ async def update_me(body: AccountIn, p: CurrentUser, session: DB):
 
 # ---------- member profile ----------
 
-PROFILE_FIELDS = ("county", "town", "date_of_birth", "gender", "education_level", "field_of_study", "institution",
-                  "profession", "employment_status", "bio", "skills", "interests", "opportunity_types",
-                  "career_interests", "business_interests", "languages")
+PROFILE_FIELDS = ("country", "county", "town", "date_of_birth", "gender", "education_level", "field_of_study",
+                  "institution", "profession", "employment_status", "user_types", "industry", "business_sector",
+                  "years_in_business", "experience_years", "bio", "skills", "interests", "opportunity_types",
+                  "career_interests", "business_interests", "languages", "whatsapp_opt_in")
 
 
 def completeness(p: MemberProfile | None) -> tuple[int, list[str]]:
     if not p:
         return 0, ["location", "education", "interests", "skills"]
     checks = {
-        "location": bool(p.county), "age": bool(p.date_of_birth), "education": bool(p.education_level),
+        "location": bool(p.county or (p.country and p.country != "Kenya")), "age": bool(p.date_of_birth),
+        "who you are": len(p.user_types or []) >= 1, "education": bool(p.education_level),
         "field of study or profession": bool(p.field_of_study or p.profession),
         "work status": bool(p.employment_status), "skills": len(p.skills or []) >= 2,
         "interests": len(p.interests or []) >= 1, "opportunity types": len(p.opportunity_types or []) >= 1,
@@ -76,7 +79,8 @@ def completeness(p: MemberProfile | None) -> tuple[int, list[str]]:
 def profile_out(p: MemberProfile | None) -> dict:
     pct, missing = completeness(p)
     data = {f: getattr(p, f) if p else None for f in PROFILE_FIELDS}
-    for f in ("skills", "interests", "opportunity_types", "career_interests", "business_interests", "languages"):
+    for f in ("skills", "interests", "opportunity_types", "career_interests", "business_interests", "languages",
+              "user_types"):
         data[f] = data[f] or []
     data.update({"age": age_on(p.date_of_birth) if p else None, "completeness": pct, "missing": missing,
                  "onboarding_completed": bool(p and p.onboarding_completed)})
@@ -84,6 +88,7 @@ def profile_out(p: MemberProfile | None) -> dict:
 
 
 class ProfileIn(BaseModel):
+    country: str | None = None
     county: str | None = None
     town: str | None = Field(None, max_length=80)
     date_of_birth: date | None = None
@@ -93,6 +98,12 @@ class ProfileIn(BaseModel):
     institution: str | None = Field(None, max_length=160)
     profession: str | None = Field(None, max_length=120)
     employment_status: str | None = None
+    user_types: list[str] | None = None
+    industry: str | None = None
+    business_sector: str | None = Field(None, max_length=80)
+    years_in_business: int | None = Field(None, ge=0, le=80)
+    experience_years: int | None = Field(None, ge=0, le=60)
+    whatsapp_opt_in: bool | None = None
     bio: str | None = Field(None, max_length=600)
     skills: list[str] | None = Field(None, max_length=30)
     interests: list[str] | None = None
@@ -109,11 +120,30 @@ class ProfileIn(BaseModel):
             raise ValueError("Choose a Kenyan county")
         return v
 
+    @field_validator("country")
+    @classmethod
+    def _country(cls, v):
+        if v and v not in COUNTRIES:
+            raise ValueError("Choose a country")
+        return v
+
+    @field_validator("industry")
+    @classmethod
+    def _industry(cls, v):
+        if v and v not in INDUSTRIES:
+            raise ValueError("Choose an industry")
+        return v
+
+    @field_validator("user_types")
+    @classmethod
+    def _user_types(cls, v):
+        return [t for t in (v or []) if t in USER_TYPE_KEYS] if v is not None else None
+
     @field_validator("gender")
     @classmethod
     def _gender(cls, v):
         if v and v not in ("male", "female"):
-            raise ValueError("Choose brother or sister")
+            raise ValueError("Choose male or female")
         return v
 
     @field_validator("education_level")

@@ -20,6 +20,7 @@ from app.core.ratelimit import RateLimiter, client_ip
 from app.core.roles import Role, is_org, is_platform
 from app.core.security import (burn_password_check, create_mfa_token, decode_token, hash_password, keyed_hash,
                                new_totp_secret, password_problems, totp_uri, verify_password, verify_totp)
+from app.modules.notifications.service import notify
 from app.modules.orgs.models import Invite, Organization
 from app.modules.users.models import MemberProfile, OtpPurpose, User, UserSession, UserStatus
 from app.modules.users.service import (DeviceIn, check_otp, clear_web_cookies, issue_session, revoke_all,
@@ -173,6 +174,12 @@ async def login(body: LoginIn, request: Request, response: Response, session: DB
         dev_code = await send_otp(session, user.phone, OtpPurpose.verify_phone)
         return {"verify_required": True, "phone": user.phone, "phone_masked": mask_phone(user.phone),
                 "dev_code": dev_code}
+    # Two-factor for members: a password alone never opens the account on a phone we
+    # haven't seen before. The SMS code proves possession of the registered number.
+    if user.role == Role.member and not await _known_device(session, user.id, body.device.device_id):
+        dev_code = await send_otp(session, user.phone, OtpPurpose.new_device)
+        return {"device_verify_required": True, "phone": user.phone, "phone_masked": mask_phone(user.phone),
+                "dev_code": dev_code}
     if user.totp_enabled:
         return {"mfa_required": True, "mfa_token": create_mfa_token(user.id, body.device.model_dump())}
     if staff and settings.staff_mfa_required and settings.is_production:
@@ -180,6 +187,33 @@ async def login(body: LoginIn, request: Request, response: Response, session: DB
     record(session, actor_id=user.id, action="auth.login", entity="user", entity_id=user.id, ip=ip,
            device=body.device.device_name)
     return await issue_session(session, user, body.device, ip, web=web, response=response)
+
+
+async def _known_device(session, user_id: str, device_id: str) -> bool:
+    return bool(await session.scalar(select(UserSession.id).where(
+        UserSession.user_id == user_id, UserSession.device_id == device_id).limit(1)))
+
+
+class DeviceVerifyIn(BaseModel):
+    phone: str
+    code: str = Field(min_length=4, max_length=8)
+    device: DeviceIn
+
+
+@router.post("/verify-device")
+async def verify_device(body: DeviceVerifyIn, request: Request, response: Response, session: DB):
+    phone = _phone(body.phone)
+    await verify_limiter.hit(f"{client_ip(request)}:{phone}")
+    await check_otp(session, phone, OtpPurpose.new_device, body.code)
+    user = await session.scalar(select(User).where(User.phone == phone))
+    if not user or user.status != UserStatus.active:
+        raise HTTPException(400, "That code is not correct")
+    record(session, actor_id=user.id, action="auth.new_device", entity="user", entity_id=user.id,
+           ip=client_ip(request), device=body.device.device_name)
+    await notify(session, [user.id], kind="announcements", title="New sign-in to your DEEN account",
+                 body=f"Signed in on {body.device.device_name}. If this wasn't you, reset your password now.",
+                 data={"screen": "security"}, channels_=("push", "sms"))
+    return await issue_session(session, user, body.device, client_ip(request), web=False, response=response)
 
 
 class MfaIn(BaseModel):

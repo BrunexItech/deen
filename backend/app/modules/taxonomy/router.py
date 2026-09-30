@@ -3,7 +3,9 @@ from sqlalchemy import select
 
 from app.core.deps import DB
 from app.modules.opportunities.service import counts_by_category
-from app.modules.taxonomy.data import COUNTIES, EDUCATION_LEVELS, EMPLOYMENT_STATUSES, LANGUAGES, SKILL_SUGGESTIONS
+from app.modules.taxonomy.data import (COMPENSATION, COUNTIES, COUNTRIES, EDUCATION_LEVELS, EMPLOYMENT_STATUSES,
+                                       INDUSTRIES, ISLAMIC_TAGS, LANGUAGES, SKILL_SUGGESTIONS, STUDENT_HUB,
+                                       USER_TYPES, VERIFICATION_CHECKLIST, VOLUNTEER_CAUSES, WORK_MODES)
 from app.modules.taxonomy.models import Category, OpportunityType
 
 router = APIRouter(prefix="/api/v1/taxonomy", tags=["taxonomy"])
@@ -38,4 +40,17 @@ async def taxonomy(response: Response, session: DB):
         "employment_statuses": [{"key": k, "name": n} for k, n in EMPLOYMENT_STATUSES],
         "languages": LANGUAGES,
         "skills": SKILL_SUGGESTIONS,
+        "countries": COUNTRIES,
+        "industries": INDUSTRIES,
+        "user_types": pairs(USER_TYPES),
+        "work_modes": pairs(WORK_MODES),
+        "compensation": pairs(COMPENSATION),
+        "causes": pairs(VOLUNTEER_CAUSES),
+        "islamic_tags": pairs(ISLAMIC_TAGS),
+        "verification_checklist": pairs(VERIFICATION_CHECKLIST),
+        "student_hub": [{"key": k, "label": l, "types": t} for k, l, t in STUDENT_HUB],
     }
+
+
+def pairs(items) -> list[dict]:
+    return [{"key": k, "name": n} for k, n in items]

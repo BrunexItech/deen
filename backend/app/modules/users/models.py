@@ -75,6 +75,7 @@ class OtpPurpose(str, enum.Enum):
     verify_phone = "verify_phone"
     reset_password = "reset_password"
     verify_email = "verify_email"
+    new_device = "new_device"
 
 
 class OtpCode(Base):
@@ -95,6 +96,7 @@ class MemberProfile(Base):
     __tablename__ = "member_profiles"
 
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), unique=True)
+    country: Mapped[str] = mapped_column(String(60), default="Kenya")
     county: Mapped[str | None] = mapped_column(String(40), index=True)
     town: Mapped[str | None] = mapped_column(String(80))
     date_of_birth: Mapped[date | None] = mapped_column(Date)
@@ -104,6 +106,12 @@ class MemberProfile(Base):
     institution: Mapped[str | None] = mapped_column(String(160))
     profession: Mapped[str | None] = mapped_column(String(120))
     employment_status: Mapped[str | None] = mapped_column(String(30))
+    user_types: Mapped[list[str]] = mapped_column(ARRAY(String(30)), default=list)  # student, entrepreneur…
+    industry: Mapped[str | None] = mapped_column(String(60))
+    business_sector: Mapped[str | None] = mapped_column(String(80))
+    years_in_business: Mapped[int | None] = mapped_column(Integer)
+    experience_years: Mapped[int | None] = mapped_column(Integer)
+    whatsapp_opt_in: Mapped[bool] = mapped_column(Boolean, default=False)
     bio: Mapped[str | None] = mapped_column(Text)
     skills: Mapped[list[str]] = mapped_column(ARRAY(String(60)), default=list)
     interests: Mapped[list[str]] = mapped_column(ARRAY(String(40)), default=list)  # category keys

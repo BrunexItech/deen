@@ -10,7 +10,7 @@ from app.core.clock import TZ, utcnow
 from app.modules.jobs.service import enqueue, handler
 from app.modules.notifications import channels
 from app.modules.notifications.models import DEFAULT_PREFS, Notification, NotificationPreference, PushToken
-from app.modules.users.models import User, UserStatus
+from app.modules.users.models import MemberProfile, User, UserStatus
 
 
 def merged_prefs(stored: dict | None) -> dict:
@@ -86,6 +86,13 @@ async def deliver(session: AsyncSession, p: dict) -> None:
         for uid, user in users.items():
             if user.email and allowed(uid, "email"):
                 await channels.send_email(user.email, title, body, channels.branded_email(title, body))
+
+    if "whatsapp" in wanted:
+        opted = set((await session.execute(select(MemberProfile.user_id).where(
+            MemberProfile.user_id.in_(list(users)), MemberProfile.whatsapp_opt_in.is_(True)))).scalars())
+        for uid, user in users.items():
+            if user.phone and uid in opted and allowed(uid, "whatsapp"):
+                await channels.send_whatsapp(user.phone, f"*{title}*\n{body}")
 
     if "sms" in wanted:
         for uid, user in users.items():

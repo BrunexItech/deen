@@ -67,8 +67,6 @@ async def put_prefs(body: PrefsIn, p: CurrentUser, session: DB):
     if isinstance(q, dict):
         clean["quiet_hours"] = {"enabled": bool(q.get("enabled")), "start": int(q.get("start", 22)) % 24,
                                 "end": int(q.get("end", 6)) % 24}
-    if body.prefs.get("digest") in ("instant", "daily"):
-        clean["digest"] = body.prefs["digest"]
     row = await session.scalar(select(NotificationPreference).where(NotificationPreference.user_id == p.id))
     merged = merged_prefs({**(row.prefs if row else {}), **clean})
     if row:

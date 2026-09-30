@@ -1,5 +1,6 @@
 """Opportunity review & management for DEEN staff."""
 from datetime import datetime
+from typing import Literal
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
@@ -11,7 +12,9 @@ from app.core.roles import Perm
 from app.modules.notifications.service import notify
 from app.modules.opportunities.models import AccessTier, Opportunity, OppStatus, ReviewEvent, ReviewMessage
 from app.modules.opportunities.schemas import OpportunityIn
-from app.modules.opportunities.service import REVIEW_ACTIONS, orgs_by_id, review_action, run_risk_scan, staff_view
+from app.modules.opportunities.service import (REVIEW_ACTIONS, checklist_complete, orgs_by_id, review_action,
+                                               run_risk_scan, staff_view)
+from app.modules.taxonomy.data import CHECKLIST_KEYS
 from app.modules.orgs.models import Organization
 from app.modules.users.models import User
 
@@ -80,7 +83,7 @@ class ActionIn(BaseModel):
     note: str | None = Field(None, max_length=4000)
 
 
-PUBLISHING_ACTIONS = {"publish", "republish", "archive"}
+PUBLISHING_ACTIONS = {"publish", "republish", "archive", "reinstate", "mark_expired"}
 
 
 @router.post("/{opp_id}/actions")
@@ -101,9 +104,27 @@ async def act(opp_id: str, body: ActionIn, session: DB, p: Staff):
     return {"ok": True, "status": opp.status.value}
 
 
+class ChecklistIn(BaseModel):
+    items: dict[str, Literal["yes", "na", "no"]]
+
+
+@router.put("/{opp_id}/checklist")
+async def checklist(opp_id: str, body: ChecklistIn, session: DB, p: Principal = require(Perm.opps_review)):
+    """The verification checklist (spec section 14). Every item must be "yes" or "na" before publishing."""
+    opp = await session.get(Opportunity, opp_id)
+    if not opp:
+        raise HTTPException(404, "Opportunity not found")
+    opp.verification_checklist = {k: v for k, v in body.items.items() if k in CHECKLIST_KEYS}
+    record(session, actor_id=p.id, action="opportunity.checklist", entity="opportunity", entity_id=opp.id, ip=p.ip,
+           done=sum(1 for v in opp.verification_checklist.values() if v in ("yes", "na")))
+    await session.commit()
+    return {"verification_checklist": opp.verification_checklist, "checklist_complete": checklist_complete(opp)}
+
+
 class AdminEditIn(OpportunityIn):
     featured: bool = False
     featured_until: datetime | None = None
+    sponsored: bool = False
 
 
 @router.put("/{opp_id}")
@@ -113,7 +134,7 @@ async def edit(opp_id: str, body: AdminEditIn, session: DB, p: Principal = requi
         raise HTTPException(404, "Opportunity not found")
     data = body.to_columns()
     for k, v in data.items():
-        if k in {"featured", "featured_until"} or k in OpportunityIn.model_fields:
+        if k in {"featured", "featured_until", "sponsored"} or k in OpportunityIn.model_fields:
             setattr(opp, k, v)
     await run_risk_scan(session, opp)
     record(session, actor_id=p.id, action="opportunity.edited", entity="opportunity", entity_id=opp.id, ip=p.ip)
@@ -123,6 +144,7 @@ async def edit(opp_id: str, body: AdminEditIn, session: DB, p: Principal = requi
 
 class FeatureIn(BaseModel):
     featured: bool
+    sponsored: bool | None = None
     featured_until: datetime | None = None
     access_tier: AccessTier | None = None
 
@@ -133,6 +155,8 @@ async def placement(opp_id: str, body: FeatureIn, session: DB, p: Principal = re
     if not opp:
         raise HTTPException(404, "Opportunity not found")
     opp.featured, opp.featured_until = body.featured, body.featured_until
+    if body.sponsored is not None:
+        opp.sponsored = body.sponsored
     opp.feature_requested = False
     if body.access_tier:
         opp.access_tier = body.access_tier

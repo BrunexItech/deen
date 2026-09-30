@@ -8,15 +8,17 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.db import Base
 
 # Notification kinds a member can switch per channel.
-KINDS = ("matches", "deadlines", "applications", "subscription", "announcements", "organizations", "reminders")
-CHANNELS = ("push", "email", "sms")
+KINDS = ("matches", "deadlines", "applications", "subscription", "announcements", "organizations", "digest",
+         "questions")
+CHANNELS = ("push", "email", "sms", "whatsapp")
 
 DEFAULT_PREFS = {
     "push": {k: True for k in KINDS},
-    "email": {k: k in ("applications", "subscription", "announcements") for k in KINDS},
+    "email": {k: k in ("applications", "subscription", "announcements", "digest") for k in KINDS},
     "sms": {k: k in ("subscription",) for k in KINDS},
+    # WhatsApp is opt-in only (explicit consent, spec section 22); nothing is on by default.
+    "whatsapp": {k: False for k in KINDS},
     "quiet_hours": {"enabled": True, "start": 22, "end": 6},
-    "digest": "instant",  # instant | daily
 }
 
 

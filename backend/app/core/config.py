@@ -62,6 +62,10 @@ class Settings(BaseSettings):
     smtp_user: str = ""
     smtp_password: str = ""
     smtp_from: str = "DEEN <no-reply@deen.africa>"
+    whatsapp_provider: str = "sandbox"  # sandbox | cloud (Meta WhatsApp Business Cloud API)
+    wa_phone_number_id: str = ""
+    wa_access_token: str = ""
+    wa_template: str = "deen_update"
     expo_push_enabled: bool = True
     expo_access_token: str = ""
 
@@ -75,7 +79,7 @@ class Settings(BaseSettings):
     mpesa_callback_token: str = "change-me-callback"
 
     # Matching
-    match_notify_threshold: int = 60  # score (0-100) above which a new opportunity notifies a member
+    match_notify_threshold: int = 50  # score (0-100) above which a new opportunity notifies a member
     fanout_batch_size: int = 2000
 
     @property

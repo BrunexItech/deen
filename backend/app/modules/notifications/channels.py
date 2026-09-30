@@ -29,6 +29,23 @@ async def send_sms(phone: str, text: str) -> None:
     log.info("[sms sandbox] to=%s text=%s", phone, text)
 
 
+async def send_whatsapp(phone: str, text: str) -> None:
+    """WhatsApp Business Cloud API. Business-initiated messages must use an approved
+    template; `wa_template` carries the text as its single body parameter."""
+    if settings.whatsapp_provider == "cloud" and settings.wa_access_token and settings.wa_phone_number_id:
+        body = {
+            "messaging_product": "whatsapp", "to": phone.lstrip("+"), "type": "template",
+            "template": {"name": settings.wa_template, "language": {"code": "en"},
+                         "components": [{"type": "body", "parameters": [{"type": "text", "text": text[:1000]}]}]},
+        }
+        async with httpx.AsyncClient(timeout=15) as client:
+            r = await client.post(f"https://graph.facebook.com/v20.0/{settings.wa_phone_number_id}/messages",
+                                  json=body, headers={"Authorization": f"Bearer {settings.wa_access_token}"})
+            r.raise_for_status()
+        return
+    log.info("[whatsapp sandbox] to=%s text=%s", phone, text)
+
+
 def _smtp_send(msg: EmailMessage) -> None:
     with smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=20) as s:
         s.starttls()

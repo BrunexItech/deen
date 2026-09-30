@@ -45,11 +45,12 @@ async def create_report(body: ReportIn, p: CurrentUser, session: DB):
         session.add(Report(reporter_id=p.id, target_type=body.target_type, target_id=body.target_id,
                            reason=body.reason, details=body.details))
         await session.flush()
-    if body.target_type == "opportunity" and body.reason in ("scam", "fee"):
+    fraud = ["scam", "fee", "fake_org"]
+    if body.target_type == "opportunity" and body.reason in fraud:
         reporters = await session.scalar(select(func.count(func.distinct(Report.reporter_id))).where(
-            Report.target_id == target.id, Report.reason.in_(["scam", "fee"]), Report.status == ReportStatus.open))
+            Report.target_id == target.id, Report.reason.in_(fraud), Report.status == ReportStatus.open))
         if reporters >= AUTO_HOLD_THRESHOLD and target.status.value == "published":
-            await transition(session, target, OppStatus.under_review, None,
-                             f"Automatically held: {reporters} members reported possible fraud")
+            await transition(session, target, OppStatus.suspended, None,
+                             f"Automatically suspended: {reporters} members reported possible fraud")
     await session.commit()
     return {"ok": True, "message": "Thank you. Our trust & safety team will review this. JazakAllahu khayran."}

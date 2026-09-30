@@ -61,5 +61,6 @@ async def applications_this_month(session: AsyncSession, user_id: str) -> int:
     from app.modules.applications.models import Application
 
     start = utcnow().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    # Only applications sent through DEEN count towards the plan limit, never self-tracked ones.
     return await session.scalar(select(func.count()).select_from(Application).where(
-        Application.user_id == user_id, Application.created_at >= start)) or 0
+        Application.user_id == user_id, Application.source == "deen", Application.created_at >= start)) or 0
