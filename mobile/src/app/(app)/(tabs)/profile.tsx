@@ -2,7 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import {
-  BadgeCheck, Bell, ChevronRight, Crown, FileLock2, Fingerprint, Gift, HeartHandshake, LogOut, Shield, Store, UserRoundPen, type LucideIcon,
+  BadgeCheck, Bell, ChevronRight, Crown, FileLock2, Fingerprint, Gift, GraduationCap, HeartHandshake, LogOut, Shield, Sparkles, Store,
+  UserRoundPen, type LucideIcon,
 } from "lucide-react-native";
 import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -74,6 +75,8 @@ export default function Me() {
           <Row icon={UserRoundPen} label="Edit profile" sub="Education, skills, interests" onPress={() => router.push("/onboarding")} />
           <Row icon={BadgeCheck} label="Verify your identity" sub={{ none: "Unlock verified-only support", pending: "Under review", verified: "Verified ✓", rejected: "Needs attention" }[user.identity_status]}
             onPress={() => router.push("/identity")} right={user.identity_status === "verified" ? <Badge label="Verified" tone="good" /> : undefined} />
+          <Row icon={Sparkles} label="My DEEN Experience" sub="Build your experience profile and CV" onPress={() => router.push("/experience")} />
+          <Row icon={GraduationCap} label="Student & Graduate Hub" sub="Study · Experience · Career · Growth" onPress={() => router.push("/hub")} />
           <Row icon={Store} label="My business or practice" sub="List it in the halal directory" onPress={() => router.push("/directory/mine")} />
           <Row icon={HeartHandshake} label="Share a success story" sub="Tell us when an opportunity changed your life" onPress={() => router.push("/applications")} />
         </View>
@@ -93,7 +96,7 @@ export default function Me() {
             { text: "Cancel", style: "cancel" }, { text: "Sign out", style: "destructive", onPress: () => signOut() },
           ])} right={<View />} />
         </View>
-        <T v="caption" center style={{ marginTop: 20 }}>DEEN v1.0 · Made with care in Kenya</T>
+        <T v="caption" center style={{ marginTop: 20 }}>DEEN · Development and Education Empowerment Network · v1.0</T>
       </ScrollView>
     </SafeAreaView>
   );

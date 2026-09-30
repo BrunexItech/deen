@@ -50,7 +50,10 @@ export default function Onboarding() {
     set(k, d[k].includes(v) ? d[k].filter((x) => x !== v) : [...d[k], v]);
 
   const dob = d.dob_y.length === 4 && d.dob_m && d.dob_d ? `${d.dob_y}-${d.dob_m.padStart(2, "0")}-${d.dob_d.padStart(2, "0")}` : null;
-  const canNext = [!!d.county && !!d.gender, !!d.education_level, d.skills.length > 0, d.interests.length > 0][step];
+  const inKenya = (d.country ?? "Kenya") === "Kenya";
+  const entrepreneur = d.user_types.some((t) => t === "entrepreneur" || t === "woman_entrepreneur");
+  const num = (v: string) => (v.replace(/\D/g, "") === "" ? null : Number(v.replace(/\D/g, "")));
+  const canNext = [d.user_types.length > 0 && (!inKenya || !!d.county) && !!d.gender, !!d.education_level, d.skills.length > 0, d.interests.length > 0][step];
 
   async function next() {
     setSaving(true);
@@ -81,7 +84,14 @@ export default function Onboarding() {
             {step === 0 && (
               <>
                 <T v="body" style={{ color: colors.ink500 }}>This helps DEEN show you opportunities near you and ones you&apos;re eligible for.</T>
-                <T v="label">I am a</T>
+                <T v="label">I am… (choose all that apply)</T>
+                <View style={styles.wrap}>
+                  {tax.user_types.map((u) => (
+                    <Chip key={u.key} label={u.name} active={d.user_types.includes(u.key)}
+                      onPress={() => set("user_types", d.user_types.includes(u.key) ? d.user_types.filter((x) => x !== u.key) : [...d.user_types, u.key])} />
+                  ))}
+                </View>
+                <T v="label">Gender</T>
                 <View style={styles.row}>
                   {[["male", "Brother"], ["female", "Sister"]].map(([v, l]) => (
                     <Tap key={v} onPress={() => set("gender", v)} style={[styles.big, d.gender === v && styles.bigOn]}>
@@ -97,11 +107,19 @@ export default function Onboarding() {
                       placeholderTextColor={colors.ink300} style={[styles.dob, { flex: len === 4 ? 1.6 : 1 }]} />
                   ))}
                 </View>
-                <T v="label">County {d.county ? `· ${d.county}` : ""}</T>
-                <Input placeholder="Search counties" value={countyQ} onChangeText={setCountyQ} />
+                <T v="label">Country</T>
                 <View style={styles.wrap}>
-                  {counties.slice(0, countyQ ? 47 : 14).map((c) => <Chip key={c} label={c} active={d.county === c} onPress={() => set("county", c)} />)}
+                  {tax.countries.slice(0, 9).map((c) => <Chip key={c} label={c} active={(d.country ?? "Kenya") === c} onPress={() => setD({ ...d, country: c, county: c === "Kenya" ? d.county : null })} />)}
                 </View>
+                {inKenya && (
+                  <>
+                    <T v="label">County {d.county ? `· ${d.county}` : ""}</T>
+                    <Input placeholder="Search counties" value={countyQ} onChangeText={setCountyQ} />
+                    <View style={styles.wrap}>
+                      {counties.slice(0, countyQ ? 47 : 14).map((c) => <Chip key={c} label={c} active={d.county === c} onPress={() => set("county", c)} />)}
+                    </View>
+                  </>
+                )}
                 <Input label="Town (optional)" value={d.town ?? ""} onChangeText={(v) => set("town", v)} placeholder="e.g. Eastleigh, Old Town" />
               </>
             )}
@@ -114,6 +132,17 @@ export default function Onboarding() {
                 <T v="label">Right now I&apos;m</T>
                 <View style={styles.wrap}>{tax.employment_statuses.map((e) => <Chip key={e.key} label={e.name} active={d.employment_status === e.key} onPress={() => set("employment_status", e.key)} />)}</View>
                 <Input label="Profession (optional)" value={d.profession ?? ""} onChangeText={(v) => set("profession", v)} placeholder="e.g. Teacher, Accountant" />
+                <Input label="Years of work experience" keyboardType="number-pad" value={d.experience_years?.toString() ?? ""} onChangeText={(v) => set("experience_years", num(v))} placeholder="0" />
+                <T v="label">Industry {d.industry ? `· ${d.industry}` : ""}</T>
+                <View style={styles.wrap}>
+                  {tax.industries.map((i) => <Chip key={i} label={i} active={d.industry === i} onPress={() => set("industry", d.industry === i ? null : i)} />)}
+                </View>
+                {entrepreneur && (
+                  <>
+                    <Input label="Business sector" value={d.business_sector ?? ""} onChangeText={(v) => set("business_sector", v)} placeholder="e.g. Fashion, Food, Retail" />
+                    <Input label="Years in business" keyboardType="number-pad" value={d.years_in_business?.toString() ?? ""} onChangeText={(v) => set("years_in_business", num(v))} placeholder="0" />
+                  </>
+                )}
               </>
             )}
             {step === 2 && (

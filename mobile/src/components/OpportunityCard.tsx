@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import { BadgeCheck, Bookmark, BookmarkCheck, Briefcase, CalendarDays, Clock, Crown, GraduationCap, HeartHandshake, Landmark, Lock, MapPin, Rocket, Sparkles, Users, type LucideIcon } from "lucide-react-native";
+import { BadgeCheck, Bookmark, BookmarkCheck, Briefcase, CalendarDays, Clock, Crown, GraduationCap, HeartHandshake, Landmark, Lock, MapPin, Rocket, ShieldCheck, Sparkles, Users, type LucideIcon } from "lucide-react-native";
 import { StyleSheet, Text, View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import { apiConfig } from "@/lib/api";
@@ -76,6 +76,15 @@ export function OpportunityCard({ o, compact = false }: { o: OppCard; compact?: 
         </View>
         {o.match && !blocked ? <MatchRing score={o.match.score} size={44} /> : null}
       </View>
+      <View style={styles.trust}>
+        {o.verified_by_deen && (
+          <View style={styles.verified}><ShieldCheck size={12} color={colors.leaf600} /><Text style={styles.verifiedText}>Verified by DEEN</Text></View>
+        )}
+        {o.sponsored && <Badge label="Sponsored" tone="warn" />}
+        {o.work_mode !== "physical" && <Badge label={o.work_mode === "remote" ? "Remote" : "Hybrid"} tone="info" />}
+        {!!o.duration_label && <Badge label={o.duration_label} />}
+        {o.compensation === "paid" && !o.amount_label && <Badge label="Paid" tone="good" />}
+      </View>
       {!!o.amount_label && <Text style={styles.amount} numberOfLines={1}>{o.amount_label}</Text>}
       {!compact && <T v="small" numberOfLines={2} style={{ marginTop: 6 }}>{o.summary}</T>}
       {o.match && o.match.reasons.length > 0 && !blocked && (
@@ -147,7 +156,10 @@ const styles = StyleSheet.create({
   card: { backgroundColor: colors.white, borderRadius: radius.lg, padding: 16, borderWidth: 1, borderColor: colors.sand200, ...shadow.card },
   top: { flexDirection: "row", gap: 12, alignItems: "flex-start" },
   orgRow: { flexDirection: "row", alignItems: "center", gap: 4 },
-  amount: { fontFamily: fonts.bold, fontSize: 14, color: colors.brand700, marginTop: 10 },
+  amount: { fontFamily: fonts.bold, fontSize: 14, color: colors.brand700, marginTop: 8 },
+  trust: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 6, marginTop: 10 },
+  verified: { flexDirection: "row", alignItems: "center", gap: 4 },
+  verifiedText: { fontFamily: fonts.bold, fontSize: 11, color: colors.leaf700 },
   reason: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 10, backgroundColor: colors.gold50, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 7 },
   footer: { flexDirection: "row", alignItems: "center", gap: 10, marginTop: 12 },
   cat: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 },

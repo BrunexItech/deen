@@ -26,6 +26,7 @@ export interface Match {
   eligible: boolean;
   reasons: string[];
   blockers: string[];
+  disclaimer: string;
 }
 
 export interface OrgMini {
@@ -49,8 +50,18 @@ export interface OppCard {
   days_left: number | null;
   closing_soon: boolean;
   location: string;
+  country: string;
+  work_mode: "physical" | "remote" | "hybrid";
   is_remote: boolean;
+  is_international: boolean;
   is_event: boolean;
+  industry: string | null;
+  duration_label: string | null;
+  compensation: "paid" | "stipend" | "unpaid" | "undisclosed";
+  status_label: string;
+  verified_by_deen: boolean;
+  sponsored: boolean;
+  islamic_tags: string[];
   starts_at: string | null;
   amount_label: string | null;
   access_tier: "free" | "member" | "premium";
@@ -73,7 +84,23 @@ export interface OppDetail extends OppCard {
   eligibility: string;
   benefits: string;
   requirements: string;
+  responsibilities: string;
   application_process: string | null;
+  eligible_countries: string[];
+  fields_of_study: string[];
+  min_experience_years: number | null;
+  target_user_types: string[];
+  department: string | null;
+  time_commitment: string | null;
+  allowances: string | null;
+  certificate_provided: boolean;
+  weekend: boolean;
+  student_friendly: boolean;
+  causes: string[];
+  shariah_basis: string | null;
+  contact_email: string | null;
+  contact_phone: string | null;
+  verified_at: string | null;
   tags: string[];
   counties: string[];
   education_levels: string[];
@@ -95,6 +122,9 @@ export interface OppDetail extends OppCard {
 }
 
 export interface Feed {
+  headline: string | null;
+  new: OppCard[];
+  active_applications: number;
   summary: { category: string; count: number }[];
   total_matches: number;
   featured: OppCard[];
@@ -110,15 +140,25 @@ export interface Application {
   status: string;
   cover_note: string | null;
   answers: Record<string, unknown>;
+  source: "deen" | "external" | "manual";
   external: boolean;
+  manual: { title: string; organization: string; url: string | null; deadline: string | null } | null;
+  notes: string | null;
   created_at: string;
   updated_at: string;
-  opportunity: OppCard;
+  opportunity: OppCard | null;
   events?: { status: string; message: string | null; at: string }[];
   outcome_shared?: boolean;
 }
 
 export interface Profile {
+  country: string | null;
+  user_types: string[];
+  industry: string | null;
+  business_sector: string | null;
+  years_in_business: number | null;
+  experience_years: number | null;
+  whatsapp_opt_in: boolean | null;
   county: string | null;
   town: string | null;
   date_of_birth: string | null;
@@ -140,13 +180,47 @@ export interface Profile {
   onboarding_completed: boolean;
 }
 
+type KeyName = { key: string; name: string };
+
 export interface Taxonomy {
-  categories: { key: string; name: string; tab_label: string; color: string; live_count: number; types: { key: string; name: string }[] }[];
+  categories: { key: string; name: string; tab_label: string; color: string; live_count: number; types: KeyName[] }[];
   counties: string[];
-  education_levels: { key: string; name: string }[];
-  employment_statuses: { key: string; name: string }[];
+  education_levels: KeyName[];
+  employment_statuses: KeyName[];
   languages: string[];
   skills: string[];
+  countries: string[];
+  industries: string[];
+  user_types: KeyName[];
+  work_modes: KeyName[];
+  compensation: KeyName[];
+  causes: KeyName[];
+  islamic_tags: KeyName[];
+  student_hub: { key: string; label: string; types: string[] }[];
+}
+
+export interface Experience {
+  id: string;
+  kind: string;
+  title: string;
+  organization: string;
+  location: string | null;
+  start_date: string | null;
+  end_date: string | null;
+  description: string | null;
+  skills: string[];
+  verified: boolean;
+  opportunity_id: string | null;
+}
+
+export interface QA {
+  id: string;
+  question: string;
+  answer: string | null;
+  status: string;
+  answered_by: string | null;
+  mine: boolean;
+  created_at: string;
 }
 
 export interface Plan {

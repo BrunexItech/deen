@@ -1,16 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
-import { Heart, MessageSquareQuote } from "lucide-react-native";
+import * as WebBrowser from "expo-web-browser";
+import { ExternalLink, Heart, MessageSquareQuote, Trash2 } from "lucide-react-native";
 import { useState } from "react";
 import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LoadingScreen } from "@/components/Loader";
 import { OpportunityCard } from "@/components/OpportunityCard";
 import { Sheet } from "@/components/Sheet";
-import { Arabic, Button, Card, Header, Input, T } from "@/components/ui";
-import { get, post } from "@/lib/api";
+import { Arabic, Button, Card, Chip, Header, Input, T } from "@/components/ui";
+import { api, get, post } from "@/lib/api";
 import { keys } from "@/lib/queries";
-import { APP_STATUS } from "@/lib/status";
+import { APP_STATUS, SELF_STATUSES } from "@/lib/status";
 import { colors } from "@/lib/theme";
 import { toast, toastError } from "@/lib/toast";
 import type { Application } from "@/lib/types";
@@ -24,24 +25,49 @@ export default function ApplicationScreen() {
   const refresh = () => { qc.invalidateQueries({ queryKey: ["application", id] }); qc.invalidateQueries({ queryKey: keys.applications }); };
 
   const withdraw = useMutation({ mutationFn: () => post(`/applications/${id}/withdraw`), onSuccess: () => { toast("Application withdrawn"); refresh(); }, onError: toastError });
+  const setStatus = useMutation({
+    mutationFn: (status: string) => api(`/applications/${id}/self`, { method: "PATCH", body: { status } }),
+    onSuccess: () => { toast("Status updated"); refresh(); },
+    onError: toastError,
+  });
+  const remove = useMutation({
+    mutationFn: () => api(`/applications/${id}`, { method: "DELETE" }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: keys.applications }); router.back(); },
+    onError: toastError,
+  });
   const outcome = useMutation({
-    mutationFn: () => post(`/opportunities/${a!.opportunity.id}/outcome`, { story: story || null, share_publicly: false }),
+    mutationFn: () => post(`/opportunities/${a!.opportunity!.id}/outcome`, { story: story || null, share_publicly: false }),
     onSuccess: () => { toast("JazakAllahu khayran for sharing your story!"); setOpen(false); refresh(); },
     onError: toastError,
   });
 
   if (isLoading || !a) return <LoadingScreen label="Loading application" />;
   const s = APP_STATUS[a.status] ?? APP_STATUS.submitted;
-  const finished = ["accepted", "rejected", "withdrawn"].includes(a.status);
+  const finished = ["accepted", "rejected", "withdrawn", "closed"].includes(a.status);
+  const selfTracked = a.source !== "deen";
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Header title="Application" />
       <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }}>
-        <OpportunityCard o={a.opportunity} />
+        {a.opportunity ? <OpportunityCard o={a.opportunity} /> : a.manual && (
+          <Card style={{ gap: 4 }}>
+            <T v="caption">{a.manual.organization} · recorded by you</T>
+            <T v="h2">{a.manual.title}</T>
+            {a.manual.url && <Button title="Open link" icon={ExternalLink} variant="secondary" size="md" style={{ marginTop: 8 }} onPress={() => WebBrowser.openBrowserAsync(a.manual!.url!)} />}
+          </Card>
+        )}
         <Card>
           <T v="overline">Status</T>
           <T v="title" color={s.color} style={{ marginTop: 4 }}>{s.label}</T>
+          {selfTracked && (
+            <View style={{ marginTop: 14, gap: 8 }}>
+              <T v="caption">You applied outside DEEN, so you keep this status up to date:</T>
+              <View style={styles.wrap}>
+                {SELF_STATUSES.map((k) => <Chip key={k} label={APP_STATUS[k].label} active={a.status === k} onPress={() => setStatus.mutate(k)} />)}
+              </View>
+            </View>
+          )}
           <View style={{ marginTop: 18 }}>
             {(a.events ?? []).map((e, i, arr) => {
               const st = APP_STATUS[e.status] ?? APP_STATUS.submitted;
@@ -49,7 +75,7 @@ export default function ApplicationScreen() {
               return (
                 <View key={i} style={styles.step}>
                   <View style={{ alignItems: "center" }}>
-                    <View style={[styles.node, { backgroundColor: last ? st.color : colors.brand500 }]} />
+                    <View style={[styles.node, { backgroundColor: last ? st.color : colors.leaf500 }]} />
                     {!last && <View style={styles.line} />}
                   </View>
                   <View style={{ flex: 1, paddingBottom: last ? 0 : 18 }}>
@@ -68,24 +94,30 @@ export default function ApplicationScreen() {
           </View>
         </Card>
 
-        {a.status === "accepted" && !a.outcome_shared && (
+        {a.status === "accepted" && a.opportunity && !a.outcome_shared && (
           <Card style={{ backgroundColor: colors.gold50, borderColor: colors.gold100, gap: 8 }}>
             <Arabic size={22} color={colors.gold700}>الْحَمْدُ لِلَّهِ الَّذِي بِنِعْمَتِهِ تَتِمُّ الصَّالِحَاتُ</Arabic>
             <T v="small" style={{ fontStyle: "italic" }}>&ldquo;Praise be to Allah, by whose grace good deeds are completed.&rdquo; (Sunan Ibn Majah 3803)</T>
-            <T v="body">Mabrook! Tell us how this opportunity helped you. Your story measures DEEN&apos;s real impact.</T>
+            <T v="body">Mabrook! Add it to your DEEN Experience and share how it helped you.</T>
             <Button title="Share my story" variant="gold" icon={Heart} onPress={() => setOpen(true)} size="md" />
+            <Button title="Add to My Experience" variant="secondary" size="md" onPress={() => router.push("/experience")} />
           </Card>
         )}
         {a.status === "rejected" && (
           <Card style={{ gap: 6 }}>
             <Arabic size={20}>وَعَسَىٰ أَن تَكْرَهُوا شَيْئًا وَهُوَ خَيْرٌ لَّكُمْ</Arabic>
             <T v="small" style={{ fontStyle: "italic" }}>&ldquo;Perhaps you dislike something and it is good for you.&rdquo; (Qur&apos;an 2:216)</T>
-            <Button title="Find similar opportunities" variant="secondary" size="md" onPress={() => router.push({ pathname: "/explore", params: { category: a.opportunity.category } })} />
+            {a.opportunity && <Button title="Find similar opportunities" variant="secondary" size="md" onPress={() => router.push({ pathname: "/explore", params: { category: a.opportunity!.category } })} />}
           </Card>
         )}
-        {!finished && !a.external && (
+        {!finished && a.source === "deen" && (
           <Button title="Withdraw application" variant="ghost" onPress={() => Alert.alert("Withdraw?", "The organization will no longer consider this application.", [
             { text: "Keep it", style: "cancel" }, { text: "Withdraw", style: "destructive", onPress: () => withdraw.mutate() },
+          ])} />
+        )}
+        {selfTracked && (
+          <Button title="Remove from tracker" icon={Trash2} variant="ghost" onPress={() => Alert.alert("Remove this entry?", "It only disappears from your tracker.", [
+            { text: "Cancel", style: "cancel" }, { text: "Remove", style: "destructive", onPress: () => remove.mutate() },
           ])} />
         )}
       </ScrollView>
@@ -98,8 +130,9 @@ export default function ApplicationScreen() {
 }
 
 const styles = StyleSheet.create({
+  wrap: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   step: { flexDirection: "row", gap: 14 },
   node: { width: 14, height: 14, borderRadius: 7, marginTop: 4, borderWidth: 3, borderColor: colors.white },
-  line: { flex: 1, width: 2, backgroundColor: colors.brand100, marginVertical: 2 },
+  line: { flex: 1, width: 2, backgroundColor: colors.leaf100, marginVertical: 2 },
   msg: { flexDirection: "row", gap: 8, marginTop: 8, backgroundColor: colors.brand50, borderRadius: 12, padding: 10 },
 });

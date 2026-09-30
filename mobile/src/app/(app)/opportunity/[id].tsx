@@ -4,12 +4,13 @@ import { router, useLocalSearchParams } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import {
   AlertTriangle, BadgeCheck, Bookmark, BookmarkCheck, CalendarDays, Check, ChevronRight, Crown, ExternalLink, FileText,
-  Flag, MapPin, Share2, ShieldCheck, Sparkles, Users, XCircle,
+  Flag, Landmark, MapPin, Share2, ShieldCheck, Sparkles, Users, XCircle,
 } from "lucide-react-native";
 import { useState } from "react";
 import { Alert, FlatList, ScrollView, Share, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { LoadingScreen } from "@/components/Loader";
+import { QASection } from "@/components/QASection";
 import { CATEGORY_ICON, MatchRing, OpportunityCard, OrgLogo, Verified } from "@/components/OpportunityCard";
 import { Sheet } from "@/components/Sheet";
 import { Arabic, Badge, Button, Chip, ErrorState, Header, IconButton, Input, T, Tap } from "@/components/ui";
@@ -74,6 +75,17 @@ export default function OpportunityScreen() {
   const Icon = CATEGORY_ICON[o.category] ?? Sparkles;
   const edu = (k: string) => tax?.education_levels.find((e) => e.key === k)?.name ?? k;
   const closed = o.days_left !== null && o.deadline !== null && new Date(o.deadline) < new Date();
+  const name = (list: { key: string; name: string }[] | undefined, k: string) => list?.find((x) => x.key === k)?.name ?? k;
+  const roleFacts = ([
+    ["Industry", o.industry], ["Department", o.department], ["Duration", o.duration_label],
+    ["Work mode", o.work_mode === "physical" ? null : o.work_mode === "remote" ? "Remote" : "Hybrid"],
+    ["Pay", o.compensation === "undisclosed" ? null : name(tax?.compensation, o.compensation)],
+    ["Time commitment", o.time_commitment], ["Allowances", o.allowances],
+    ["Starts", o.starts_at && !o.is_event ? new Date(o.starts_at).toLocaleDateString("en-KE", { day: "numeric", month: "short", year: "numeric" }) : null],
+    ["Certificate", o.certificate_provided ? "Provided" : null], ["Weekends", o.weekend ? "Yes" : null],
+    ["Student-friendly", o.student_friendly ? "Yes" : null],
+    ["Causes", o.causes.length ? o.causes.map((c) => name(tax?.causes, c)).join(", ") : null],
+  ] as [string, string | null][]).filter(([, v]) => v) as [string, string][];
 
   async function openExternal() {
     try {
@@ -132,6 +144,13 @@ export default function OpportunityScreen() {
         </LinearGradient>
 
         <View style={{ padding: 20 }}>
+          <View style={styles.statusRow}>
+            {o.verified_by_deen ? (
+              <View style={styles.verifiedBanner}><ShieldCheck size={16} color={colors.white} /><Text style={styles.verifiedText}>VERIFIED BY DEEN</Text></View>
+            ) : null}
+            <Badge label={o.status_label} tone={o.status_label === "Closing soon" ? "warn" : o.status_label === "Application open" ? "good" : "neutral"} />
+            {o.sponsored && <Badge label="Sponsored" tone="warn" />}
+          </View>
           {o.match && (
             <View style={[styles.matchCard, !o.match.eligible && { borderColor: colors.sand300 }]}>
               <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
@@ -143,10 +162,11 @@ export default function OpportunityScreen() {
               </View>
               {(o.match.eligible ? o.match.reasons : o.match.blockers).map((r) => (
                 <View key={r} style={styles.reason}>
-                  {o.match!.eligible ? <Check size={15} color={colors.brand600} strokeWidth={3} /> : <AlertTriangle size={15} color={colors.amber800} />}
+                  {o.match!.eligible ? <Check size={15} color={colors.leaf600} strokeWidth={3} /> : <AlertTriangle size={15} color={colors.amber800} />}
                   <T v="small" style={{ flex: 1, color: colors.ink700 }}>{r}</T>
                 </View>
               ))}
+              <T v="caption" style={{ marginTop: 4 }}>{o.match.disclaimer}</T>
             </View>
           )}
 
@@ -159,15 +179,27 @@ export default function OpportunityScreen() {
                 {o.is_event && o.starts_at ? new Date(o.starts_at).toLocaleDateString("en-KE", { day: "numeric", month: "short" }) : o.deadline ? new Date(o.deadline).toLocaleDateString("en-KE", { day: "numeric", month: "short" }) : "Open"}
               </T>
             </View>
-            <View style={styles.fact}><Users size={16} color={colors.brand700} /><T v="caption">Open to</T><T v="label">{o.gender === "female" ? "Sisters" : o.gender === "male" ? "Brothers" : "Everyone"}</T></View>
+            <View style={styles.fact}><Users size={16} color={colors.brand700} /><T v="caption">Open to</T><T v="label">{o.gender === "female" ? "Women" : o.gender === "male" ? "Men" : "Everyone"}</T></View>
           </View>
+
+          {roleFacts.length > 0 && (
+            <View style={styles.role}>
+              {roleFacts.map(([l, v]) => (
+                <View key={l} style={styles.roleItem}><T v="caption">{l}</T><T v="label">{v}</T></View>
+              ))}
+            </View>
+          )}
 
           {o.closing_soon && <View style={styles.closing}><AlertTriangle size={16} color={colors.rose600} /><T v="label" color={colors.rose600}>Closes {o.days_left === 0 ? "today" : `in ${o.days_left} day${o.days_left === 1 ? "" : "s"}`}. Don&apos;t miss it!</T></View>}
 
           <Block title="About" text={o.description} />
+          <Block title="Responsibilities" text={o.responsibilities} />
           <Block title="Eligibility" text={o.eligibility} />
-          {(o.education_levels.length > 0 || o.min_age || o.max_age || o.counties.length > 0) && (
+          {(o.education_levels.length > 0 || o.min_age || o.max_age || o.counties.length > 0 || o.fields_of_study.length > 0 || o.target_user_types.length > 0) && (
             <View style={styles.tags}>
+              {o.target_user_types.map((t) => <Badge key={t} label={tax?.user_types.find((u) => u.key === t)?.name ?? t} tone="info" />)}
+              {o.fields_of_study.map((f) => <Badge key={f} label={f} tone="gold" />)}
+              {o.min_experience_years ? <Badge label={`${o.min_experience_years}+ yrs experience`} /> : null}
               {o.education_levels.map((e) => <Badge key={e} label={edu(e)} tone="good" />)}
               {(o.min_age || o.max_age) && <Badge label={`Age ${o.min_age ?? "any"}–${o.max_age ?? "any"}`} />}
               {o.counties.slice(0, 5).map((c) => <Badge key={c} label={c} tone="info" />)}
@@ -184,11 +216,23 @@ export default function OpportunityScreen() {
             </View>
           )}
           {o.venue && <Block title="Venue" text={o.venue} />}
+          {o.islamic_tags.length > 0 && (
+            <View style={[styles.safety, { backgroundColor: colors.leaf50, borderColor: colors.leaf100, alignItems: "flex-start" }]}>
+              <Landmark size={18} color={colors.leaf700} />
+              <View style={{ flex: 1, gap: 6 }}>
+                <View style={styles.tags}>{o.islamic_tags.map((t) => <Badge key={t} label={tax?.islamic_tags.find((x) => x.key === t)?.name ?? t} tone="good" />)}</View>
+                {o.shariah_basis && <T v="caption">Shariah basis: {o.shariah_basis}</T>}
+              </View>
+            </View>
+          )}
+          {(o.contact_email || o.contact_phone) && <Block title="Official contact" text={[o.contact_email, o.contact_phone].filter(Boolean).join("\n")} />}
 
           <View style={styles.safety}>
             <ShieldCheck size={18} color={colors.brand700} />
-            <T v="small" style={{ flex: 1 }}>DEEN reviewed this listing. Genuine opportunities never ask you to pay. If anyone does, report it.</T>
+            <T v="small" style={{ flex: 1 }}>{o.verified_by_deen ? "DEEN reviewed the organization, link, deadline and details of this listing. " : ""}Verification is not a guarantee of selection. Genuine opportunities never ask you to pay. If anyone does, report it.</T>
           </View>
+
+          <QASection opportunityId={o.id} />
 
           {o.application?.status === "accepted" && (
             <View style={[styles.safety, { backgroundColor: colors.gold50, borderColor: colors.gold100 }]}>
@@ -229,6 +273,11 @@ export default function OpportunityScreen() {
 }
 
 const styles = StyleSheet.create({
+  statusRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 8, marginBottom: 14 },
+  verifiedBanner: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: colors.leaf600, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5 },
+  verifiedText: { fontFamily: fonts.extrabold, fontSize: 11, letterSpacing: 1, color: colors.white },
+  role: { flexDirection: "row", flexWrap: "wrap", marginTop: 14, backgroundColor: colors.white, borderRadius: 18, borderWidth: 1, borderColor: colors.sand200, padding: 6 },
+  roleItem: { width: "50%", padding: 8, gap: 2 },
   glow: { position: "absolute", width: 300, height: 300, borderRadius: 150, backgroundColor: "rgba(227,157,41,0.14)", top: -120, right: -100 },
   hero: { paddingHorizontal: 20, paddingBottom: 22, paddingTop: 6 },
   cat: { flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 9, alignSelf: "flex-start" },

@@ -1,29 +1,52 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { Bell, ChevronRight, Crown, Search, Sparkles, UserRoundPen } from "lucide-react-native";
+import {
+  Award, Bell, Briefcase, Building2, ChevronRight, Crown, FileStack, GraduationCap, HandHeart, Landmark, Rocket, Search,
+  Sparkles, Stethoscope, UserRoundPen, Users, type LucideIcon,
+} from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { FlatList, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FeedSkeleton } from "@/components/Loader";
-import { CATEGORY_ICON, FeaturedCard, OpportunityCard } from "@/components/OpportunityCard";
-import { ReminderCard } from "@/components/Reminder";
+import { FeaturedCard, OpportunityCard } from "@/components/OpportunityCard";
 import { Card, ErrorState, IconButton, Section, T, Tap } from "@/components/ui";
 import { hijriLabel } from "@/lib/faith";
-import { useFeed, useProfile, useToday, useUnread } from "@/lib/queries";
+import { useFeed, useProfile, useUnread } from "@/lib/queries";
 import { useSession } from "@/lib/session";
-import { CATEGORY_META, colors, fonts } from "@/lib/theme";
+import { colors, fonts } from "@/lib/theme";
+import type { OppCard } from "@/lib/types";
 import { fmtTime, usePrayer } from "@/lib/usePrayer";
+
+// Home categories (spec section 33). Each opens Explore pre-filtered.
+const QUICK: { label: string; icon: LucideIcon; params: Record<string, string>; color: string }[] = [
+  { label: "Scholarships", icon: GraduationCap, params: { types: "scholarship" }, color: "#004485" },
+  { label: "Grants", icon: Award, params: { types: "business_grant,funding,education_assistance" }, color: "#C98516" },
+  { label: "Jobs", icon: Briefcase, params: { types: "job,graduate_trainee" }, color: "#0B57A4" },
+  { label: "Attachments", icon: Building2, params: { types: "attachment" }, color: "#2E9A2E" },
+  { label: "Internships", icon: Stethoscope, params: { types: "internship" }, color: "#7C3AED" },
+  { label: "Volunteer", icon: HandHeart, params: { types: "volunteer" }, color: "#BE123C" },
+  { label: "Training", icon: Sparkles, params: { types: "training,workshop,seminar,certification" }, color: "#0F766E" },
+  { label: "Fellowships", icon: Users, params: { types: "fellowship" }, color: "#1D4ED8" },
+  { label: "Business", icon: Rocket, params: { category: "entrepreneurship" }, color: "#B45309" },
+  { label: "Islamic Economy", icon: Landmark, params: { category: "islamic_economy" }, color: "#6D28D9" },
+];
 
 function greeting() {
   const h = new Date().getHours();
   return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
 }
 
+function Rail({ data }: { data: OppCard[] }) {
+  return (
+    <FlatList horizontal data={data} keyExtractor={(o) => o.id} renderItem={({ item }) => <OpportunityCard o={item} compact />}
+      contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }} showsHorizontalScrollIndicator={false} />
+  );
+}
+
 export default function Home() {
   const user = useSession((s) => s.user);
   const feed = useFeed();
-  const today = useToday();
   const unread = useUnread();
   const profile = useProfile();
   const prayer = usePrayer();
@@ -31,9 +54,9 @@ export default function Home() {
 
   const refresh = useCallback(async () => {
     setRefreshing(true);
-    await Promise.all([feed.refetch(), today.refetch(), unread.refetch()]);
+    await Promise.all([feed.refetch(), unread.refetch(), profile.refetch()]);
     setRefreshing(false);
-  }, [feed, today, unread]);
+  }, [feed, unread, profile]);
 
   const f = feed.data;
   const first = user?.full_name.split(" ")[0] ?? "";
@@ -50,17 +73,18 @@ export default function Home() {
             <T v="small">{greeting()} · {hijriLabel()}</T>
             <T v="title" numberOfLines={1}>Assalamu alaikum, {first}</T>
           </View>
-          <IconButton icon={Search} label="Search" onPress={() => router.push("/search")} />
           <IconButton icon={Bell} label="Notifications" badge={unread.data?.count} onPress={() => router.push("/notifications")} />
         </View>
+
+        <Tap onPress={() => router.push("/search")} style={styles.search}>
+          <Search size={19} color={colors.ink400} />
+          <Text style={styles.searchText}>What are you looking for?</Text>
+        </Tap>
 
         {prayer && (
           <Tap onPress={() => router.push("/deen")} style={styles.prayer}>
             <View style={styles.prayerDot} />
-            <Text style={styles.prayerText}>
-              <Text style={{ fontFamily: fonts.bold }}>{prayer.next.name}</Text> at {fmtTime(prayer.next.at)} · in {prayer.countdown}
-            </Text>
-            <Text style={styles.prayerPlace}>{prayer.place}</Text>
+            <Text style={styles.prayerText}><Text style={{ fontFamily: fonts.bold }}>{prayer.next.name}</Text> at {fmtTime(prayer.next.at)} · in {prayer.countdown}</Text>
           </Tap>
         )}
 
@@ -69,22 +93,10 @@ export default function Home() {
             <Animated.View entering={FadeInDown.duration(500)} style={{ paddingHorizontal: 20, marginTop: 16 }}>
               <LinearGradient colors={[colors.brand700, colors.brand950]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
                 <View style={styles.heroGlow} />
-                <T v="overline" color={colors.gold400}>Matched for you today</T>
+                <T v="overline" color={colors.gold400}>Recommended for you</T>
                 <Text style={styles.heroNumber}>{f.total_matches}</Text>
-                <T v="body" color={colors.brand100}>
-                  {f.total_matches === 1 ? "opportunity matches" : "opportunities match"} your profile
-                </T>
-                <View style={styles.heroChips}>
-                  {f.summary.map((s) => {
-                    const Icon = CATEGORY_ICON[s.category] ?? Sparkles;
-                    return (
-                      <Tap key={s.category} onPress={() => router.push({ pathname: "/explore", params: { category: s.category } })} style={styles.heroChip}>
-                        <Icon size={13} color={colors.gold400} />
-                        <Text style={styles.heroChipText}>{s.count} {CATEGORY_META[s.category]?.label ?? s.category}</Text>
-                      </Tap>
-                    );
-                  })}
-                </View>
+                <T v="body" color={colors.brand100}>{f.total_matches === 1 ? "opportunity may match" : "opportunities may match"} your profile</T>
+                {f.headline && <Text style={styles.headline}>{f.headline}</Text>}
               </LinearGradient>
             </Animated.View>
 
@@ -101,10 +113,51 @@ export default function Home() {
               </View>
             )}
 
-            {today.data?.reminder && (
-              <View style={{ paddingHorizontal: 20, marginTop: 14 }}>
-                <ReminderCard r={today.data.reminder} />
+            <Section title="Categories">
+              <View style={styles.grid}>
+                {QUICK.map(({ label, icon: Icon, params, color }) => (
+                  <View key={label} style={styles.cell}>
+                    <Tap onPress={() => router.push({ pathname: "/explore", params })} style={styles.quick}>
+                      <View style={[styles.quickIcon, { backgroundColor: `${color}14` }]}><Icon size={20} color={color} /></View>
+                      <Text style={styles.quickText} numberOfLines={1}>{label}</Text>
+                    </Tap>
+                  </View>
+                ))}
               </View>
+            </Section>
+
+            <View style={{ paddingHorizontal: 20, marginTop: 14, flexDirection: "row", gap: 10 }}>
+              <Tap onPress={() => router.push("/applications")} style={[styles.mini, { flex: 1 }]}>
+                <FileStack size={20} color={colors.brand700} />
+                <View style={{ flex: 1 }}><T v="bodyStrong">My applications</T><T v="caption">{f.active_applications} in progress</T></View>
+              </Tap>
+              <Tap onPress={() => router.push("/hub")} style={[styles.mini, { flex: 1 }]}>
+                <GraduationCap size={20} color={colors.gold600} />
+                <View style={{ flex: 1 }}><T v="bodyStrong">Student hub</T><T v="caption">Study · Experience · Career</T></View>
+              </Tap>
+            </View>
+
+            <Section title="Recommended for you" action="See all" onAction={() => router.push("/explore")}>
+              <View style={{ paddingHorizontal: 20, gap: 12 }}>
+                {f.for_you.length === 0 && <T v="small">New opportunities are verified every day. Complete your profile to see your matches.</T>}
+                {f.for_you.slice(0, 6).map((o, i) => (
+                  <Animated.View key={o.id} entering={FadeInDown.delay(Math.min(i, 5) * 60).duration(400)}>
+                    <OpportunityCard o={o} />
+                  </Animated.View>
+                ))}
+              </View>
+            </Section>
+
+            {f.closing_soon.length > 0 && (
+              <Section title="Closing soon" action="See all" onAction={() => router.push({ pathname: "/explore", params: { closing: "7", sort: "deadline" } })}>
+                <Rail data={f.closing_soon} />
+              </Section>
+            )}
+
+            {f.new.length > 0 && (
+              <Section title="New opportunities" action="See all" onAction={() => router.push({ pathname: "/explore", params: { sort: "newest" } })}>
+                <Rail data={f.new} />
+              </Section>
             )}
 
             {f.featured.length > 0 && (
@@ -114,44 +167,21 @@ export default function Home() {
               </Section>
             )}
 
-            {f.closing_soon.length > 0 && (
-              <Section title="Closing soon" action="See all" onAction={() => router.push({ pathname: "/explore", params: { closing: "7" } })}>
-                <FlatList horizontal data={f.closing_soon} keyExtractor={(o) => o.id} renderItem={({ item }) => <OpportunityCard o={item} compact />}
-                  contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }} showsHorizontalScrollIndicator={false} />
-              </Section>
-            )}
+            {f.events.length > 0 && <Section title="Upcoming events"><Rail data={f.events} /></Section>}
 
             {f.tier === "free" && (
-              <View style={{ paddingHorizontal: 20, marginTop: 22 }}>
+              <View style={{ paddingHorizontal: 20, marginTop: 24 }}>
                 <Tap onPress={() => router.push("/membership")}>
-                  <LinearGradient colors={["#F3DD9E", colors.gold500]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.upsell}>
+                  <LinearGradient colors={["#F5C96E", colors.gold500]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.upsell}>
                     <Crown size={22} color={colors.brand950} />
                     <View style={{ flex: 1 }}>
-                      <T v="bodyStrong" color={colors.brand950}>Unlock every opportunity</T>
-                      <T v="small" color={colors.brand900}>Unlimited applications, member-only listings and smart alerts.</T>
+                      <T v="bodyStrong" color={colors.brand950}>Go further with DEEN Premium</T>
+                      <T v="small" color={colors.brand900}>Advanced matching, premium alerts, CV and application support.</T>
                     </View>
                     <ChevronRight size={18} color={colors.brand950} />
                   </LinearGradient>
                 </Tap>
               </View>
-            )}
-
-            <Section title="Recommended for you" action="Explore" onAction={() => router.push("/explore")}>
-              <View style={{ paddingHorizontal: 20, gap: 12 }}>
-                {f.for_you.length === 0 && <T v="small">New opportunities are reviewed every day. Check back soon, in sha Allah.</T>}
-                {f.for_you.map((o, i) => (
-                  <Animated.View key={o.id} entering={FadeInDown.delay(Math.min(i, 6) * 60).duration(400)}>
-                    <OpportunityCard o={o} />
-                  </Animated.View>
-                ))}
-              </View>
-            </Section>
-
-            {f.events.length > 0 && (
-              <Section title="Upcoming events">
-                <FlatList horizontal data={f.events} keyExtractor={(o) => o.id} renderItem={({ item }) => <OpportunityCard o={item} compact />}
-                  contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }} showsHorizontalScrollIndicator={false} />
-              </Section>
             )}
           </>
         )}
@@ -162,17 +192,22 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   top: { flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 20, paddingTop: 10 },
-  prayer: { flexDirection: "row", alignItems: "center", gap: 8, marginHorizontal: 20, marginTop: 14, paddingHorizontal: 14, paddingVertical: 10, backgroundColor: colors.white, borderRadius: 14, borderWidth: 1, borderColor: colors.sand200 },
-  prayerDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.gold500 },
-  prayerText: { flex: 1, fontFamily: fonts.medium, fontSize: 13, color: colors.ink700 },
-  prayerPlace: { fontFamily: fonts.medium, fontSize: 11, color: colors.ink400 },
+  search: { flexDirection: "row", alignItems: "center", gap: 10, marginHorizontal: 20, marginTop: 14, height: 52, backgroundColor: colors.white, borderRadius: 16, paddingHorizontal: 16, borderWidth: 1.5, borderColor: colors.brand100 },
+  searchText: { fontFamily: fonts.medium, fontSize: 15, color: colors.ink400 },
+  prayer: { flexDirection: "row", alignItems: "center", gap: 8, marginHorizontal: 20, marginTop: 10, paddingHorizontal: 14, paddingVertical: 8 },
+  prayerDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: colors.gold500 },
+  prayerText: { flex: 1, fontFamily: fonts.medium, fontSize: 12.5, color: colors.ink500 },
   hero: { borderRadius: 26, padding: 22, overflow: "hidden" },
   heroGlow: { position: "absolute", width: 260, height: 260, borderRadius: 130, backgroundColor: "rgba(227,157,41,0.16)", top: -120, right: -80 },
-  heroNumber: { fontFamily: fonts.extrabold, fontSize: 56, lineHeight: 64, color: colors.white, marginTop: 4 },
-  heroChips: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 16 },
-  heroChip: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "rgba(255,255,255,0.1)", borderRadius: 12, paddingHorizontal: 11, paddingVertical: 7, borderWidth: 1, borderColor: "rgba(242,190,92,0.25)" },
-  heroChipText: { fontFamily: fonts.semibold, fontSize: 12.5, color: colors.white },
+  heroNumber: { fontFamily: fonts.extrabold, fontSize: 54, lineHeight: 62, color: colors.white, marginTop: 4 },
+  headline: { fontFamily: fonts.medium, fontSize: 13, lineHeight: 19, color: "rgba(255,255,255,0.8)", marginTop: 12 },
   prompt: { flexDirection: "row", alignItems: "center", gap: 12 },
   promptIcon: { width: 44, height: 44, borderRadius: 14, backgroundColor: colors.brand50, alignItems: "center", justifyContent: "center" },
+  grid: { flexDirection: "row", flexWrap: "wrap", paddingHorizontal: 14 },
+  cell: { width: "20%" },
+  quick: { alignItems: "center", paddingVertical: 8, gap: 6 },
+  quickIcon: { width: 50, height: 50, borderRadius: 16, alignItems: "center", justifyContent: "center" },
+  quickText: { fontFamily: fonts.semibold, fontSize: 11, color: colors.ink700, textAlign: "center" },
+  mini: { flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: colors.white, borderRadius: 16, padding: 13, borderWidth: 1, borderColor: colors.sand200 },
   upsell: { flexDirection: "row", alignItems: "center", gap: 14, borderRadius: 20, padding: 16 },
 });

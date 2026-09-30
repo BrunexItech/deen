@@ -8,7 +8,8 @@ import { useSession } from "@/lib/session";
 import { colors, fonts } from "@/lib/theme";
 
 export default function Verify() {
-  const { phone, masked, dev, fresh } = useLocalSearchParams<{ phone: string; masked?: string; dev?: string; fresh?: string }>();
+  const { phone, masked, dev, fresh, mode } = useLocalSearchParams<{ phone: string; masked?: string; dev?: string; fresh?: string; mode?: "device" }>();
+  const device = mode === "device";
   const signIn = useSession((s) => s.signIn);
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +28,7 @@ export default function Verify() {
     setBusy(true);
     setError(null);
     try {
-      const r = await post<TokenResponse>("/auth/verify-phone", { phone, code: value, device: await deviceInfo() });
+      const r = await post<TokenResponse>(device ? "/auth/verify-device" : "/auth/verify-phone", { phone, code: value, device: await deviceInfo() });
       await signIn(r, fresh ? "/onboarding" : "/biometric-setup");
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Couldn't verify");
@@ -38,13 +39,14 @@ export default function Verify() {
   }
 
   async function resend() {
-    const r = await post<{ dev_code?: string }>("/auth/otp/resend", { phone, purpose: "verify_phone" }).catch(() => null);
+    const r = await post<{ dev_code?: string }>("/auth/otp/resend", { phone, purpose: device ? "new_device" : "verify_phone" }).catch(() => null);
     if (r?.dev_code) setDevCode(r.dev_code);
     setWait(45);
   }
 
   return (
-    <AuthScaffold title="Verify your number" subtitle={`Enter the 6-digit code we sent to ${masked ?? phone}.`}
+    <AuthScaffold title={device ? "Confirm it's you" : "Verify your number"}
+      subtitle={device ? `This is a new phone for your account. For your security, enter the code we sent to ${masked ?? phone}.` : `Enter the 6-digit code we sent to ${masked ?? phone}.`}
       footer={<Button title="Verify" loading={busy} disabled={code.length < 6} onPress={() => verify()} />}>
       <Pressable onPress={() => input.current?.focus()} style={styles.boxes}>
         {Array.from({ length: 6 }).map((_, i) => (

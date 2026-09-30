@@ -8,7 +8,9 @@ import { ApiError, deviceInfo, post, type TokenResponse } from "@/lib/api";
 import { useSession } from "@/lib/session";
 import { colors } from "@/lib/theme";
 
-type LoginResult = Partial<TokenResponse> & { verify_required?: boolean; phone?: string; phone_masked?: string; dev_code?: string };
+type LoginResult = Partial<TokenResponse> & {
+  verify_required?: boolean; device_verify_required?: boolean; phone?: string; phone_masked?: string; dev_code?: string;
+};
 
 export default function SignIn() {
   const signIn = useSession((s) => s.signIn);
@@ -24,6 +26,9 @@ export default function SignIn() {
       const r = await post<LoginResult>("/auth/login", { identifier: phone, password, device: await deviceInfo() });
       if (r.verify_required) {
         router.push({ pathname: "/verify", params: { phone: r.phone!, masked: r.phone_masked, dev: r.dev_code ?? "" } });
+      } else if (r.device_verify_required) {
+        // Two-factor: first sign-in on this phone needs the SMS code as well as the password.
+        router.push({ pathname: "/verify", params: { phone: r.phone!, masked: r.phone_masked, dev: r.dev_code ?? "", mode: "device" } });
       } else if (r.access_token) {
         await signIn(r as TokenResponse, "/biometric-setup");
       }

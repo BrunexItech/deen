@@ -4,14 +4,18 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { InlineLoader } from "@/components/Loader";
 import { Card, Header, T } from "@/components/ui";
 import { get, put } from "@/lib/api";
+import { keys, useProfile } from "@/lib/queries";
 import { colors } from "@/lib/theme";
 
-type Prefs = Record<"push" | "email" | "sms", Record<string, boolean>> & { quiet_hours: { enabled: boolean; start: number; end: number } };
+type Channel = "push" | "email" | "sms" | "whatsapp";
+type Prefs = Record<Channel, Record<string, boolean>> & { quiet_hours: { enabled: boolean; start: number; end: number } };
 
 const KINDS: Record<string, [string, string]> = {
   matches: ["New matches", "Opportunities that fit your profile"],
   deadlines: ["Deadline reminders", "3 days before saved opportunities close"],
   applications: ["Application updates", "When an organization moves your application"],
+  digest: ["Weekly opportunities digest", "Every Monday: what's new this week"],
+  questions: ["Answers to my questions", "When DEEN or an organization replies"],
   subscription: ["Membership", "Payments and renewals"],
   announcements: ["Community announcements", "News from DEEN"],
   organizations: ["Organizations you follow", "New posts from them"],
@@ -26,7 +30,13 @@ export default function NotificationSettings() {
   });
   if (!data) return <SafeAreaView style={{ flex: 1 }}><Header title="Notifications" /><InlineLoader /></SafeAreaView>;
   const p = data.prefs;
-  const set = (ch: "push" | "email" | "sms", kind: string, v: boolean) => save.mutate({ ...p, [ch]: { ...p[ch], [kind]: v } });
+  const set = (ch: Channel, kind: string, v: boolean) => save.mutate({ ...p, [ch]: { ...p[ch], [kind]: v } });
+  const profile = useProfile();
+  const whatsapp = !!profile.data?.whatsapp_opt_in;
+  const consent = async (v: boolean) => {
+    await put("/me/profile", { whatsapp_opt_in: v });
+    qc.invalidateQueries({ queryKey: keys.profile });
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -39,13 +49,20 @@ export default function NotificationSettings() {
           </View>
           <Switch value={p.quiet_hours.enabled} onValueChange={(v) => save.mutate({ ...p, quiet_hours: { ...p.quiet_hours, enabled: v } })} trackColor={{ true: colors.brand600, false: colors.sand300 }} thumbColor={colors.white} />
         </Card>
+        <Card style={styles.row}>
+          <View style={{ flex: 1 }}>
+            <T v="bodyStrong">WhatsApp messages</T>
+            <T v="caption">I agree to receive DEEN updates on WhatsApp. You can withdraw anytime.</T>
+          </View>
+          <Switch value={whatsapp} onValueChange={consent} trackColor={{ true: colors.leaf600, false: colors.sand300 }} thumbColor={colors.white} />
+        </Card>
         {Object.entries(KINDS).map(([kind, [title, sub]]) => (
           <Card key={kind} style={{ gap: 10 }}>
             <View><T v="bodyStrong">{title}</T><T v="caption">{sub}</T></View>
             <View style={styles.channels}>
-              {(["push", "email", "sms"] as const).map((ch) => (
+              {(whatsapp ? (["push", "email", "sms", "whatsapp"] as const) : (["push", "email", "sms"] as const)).map((ch) => (
                 <View key={ch} style={styles.channel}>
-                  <T v="label">{ch === "sms" ? "SMS" : ch[0].toUpperCase() + ch.slice(1)}</T>
+                  <T v="label">{ch === "sms" ? "SMS" : ch === "whatsapp" ? "WhatsApp" : ch[0].toUpperCase() + ch.slice(1)}</T>
                   <Switch value={!!p[ch]?.[kind]} onValueChange={(v) => set(ch, kind, v)} trackColor={{ true: colors.brand600, false: colors.sand300 }} thumbColor={colors.white} />
                 </View>
               ))}
