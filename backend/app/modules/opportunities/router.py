@@ -14,7 +14,9 @@ from app.modules.opportunities.matching import evaluate
 from app.modules.opportunities.models import Opportunity, SavedOpportunity
 from app.modules.opportunities.service import (card, detail, is_locked, live_filter, member_context, orgs_by_id,
                                                saved_ids, track)
-from app.modules.orgs.models import Organization, OrgStatus
+from app.modules.orgs.models import Organization, OrgStatus, Verification
+from app.core.roles import Role
+from app.modules.users.models import User
 
 router = APIRouter(prefix="/api/v1/opportunities", tags=["discovery"])
 
@@ -211,3 +213,28 @@ async def engagement(opp_id: str, body: EventIn, p: Member, session: DB):
     await track(session, opp, body.kind, p.user, ctx.profile)
     await session.commit()
     return {"ok": True, "external_url": opp.external_url if body.kind == "click" else None}
+
+
+public_router = APIRouter(prefix="/api/v1/public", tags=["public"])
+
+
+@public_router.get("/opportunities/{opp_id}")
+async def public_preview(opp_id: str, session: DB):
+    """Share-link preview (WhatsApp, social). Only live listings, and never the
+    application details: those need the app and a signed-in member."""
+    opp = await session.scalar(select(Opportunity).where(Opportunity.id == opp_id, live_filter()))
+    if not opp:
+        raise HTTPException(404, "This opportunity is no longer available")
+    org = await session.get(Organization, opp.organization_id)
+    c = card(opp, org)
+    return {k: c[k] for k in ("id", "title", "summary", "category", "type", "organization", "deadline", "days_left",
+                              "location", "amount_label", "is_event", "starts_at")}
+
+
+@public_router.get("/stats")
+async def public_stats(session: DB):
+    live = await session.scalar(select(func.count()).select_from(Opportunity).where(live_filter()))
+    orgs = await session.scalar(select(func.count()).select_from(Organization).where(
+        Organization.status == OrgStatus.active, Organization.verification != Verification.pending))
+    members = await session.scalar(select(func.count()).select_from(User).where(User.role == Role.member))
+    return {"live_opportunities": live or 0, "verified_organizations": orgs or 0, "members": members or 0}

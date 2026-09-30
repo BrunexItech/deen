@@ -22,6 +22,7 @@ from app.modules.files.router import router as files_router
 from app.modules.identity.router import router as identity_router
 from app.modules.moderation.router import router as reports_router
 from app.modules.notifications.router import router as notifications_router
+from app.modules.opportunities.router import public_router
 from app.modules.opportunities.router import router as discovery_router
 from app.modules.orgs.portal_router import router as org_portal_router
 from app.modules.orgs.router import router as organizations_router
@@ -72,7 +73,7 @@ app.add_middleware(
 for r in (
     auth_router, me_router, privacy_router, taxonomy_router, discovery_router, applications_router,
     organizations_router, membership_router, notifications_router, files_router, content_router, reports_router,
-    directory_router, identity_router, search_router,
+    directory_router, identity_router, search_router, public_router,
     org_portal_router, org_applications_router,
     admin_overview.router, admin_opportunities.router, admin_orgs.router, admin_users.router, admin_platform.router,
 ):

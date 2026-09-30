@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+/* DEEN design tokens. Emerald for trust, gold for light/opportunity, sand for calm. */
+@theme {
+  --color-emerald-950: #031f18;
+  --color-emerald-900: #062e25;
+  --color-emerald-800: #0a4034;
+  --color-emerald-700: #0b5d4b;
+  --color-emerald-600: #0f7a61;
+  --color-emerald-500: #16977a;
+  --color-emerald-400: #3db592;
+  --color-emerald-100: #dcefe7;
+  --color-emerald-50: #eef7f3;
+
+  --color-gold-700: #8f6a1f;
+  --color-gold-600: #b7862c;
+  --color-gold-500: #c9a34e;
+  --color-gold-400: #dfc07a;
+  --color-gold-100: #f6ecd2;
+  --color-gold-50: #fbf6e9;
+
+  --color-sand-50: #fbfaf6;
+  --color-sand-100: #f6f4ee;
+  --color-sand-200: #ece8dd;
+  --color-sand-300: #ddd7c8;
+
+  --color-ink-900: #0f1a17;
+  --color-ink-700: #2c3a35;
+  --color-ink-500: #5e6b66;
+  --color-ink-400: #7f8a86;
+  --color-ink-300: #a7b0ac;
+
+  /* Amiri after Jakarta: Arabic glyphs such as ﷺ fall back to it per character. */
+  --font-sans: var(--font-jakarta), var(--font-amiri), ui-sans-serif, system-ui, sans-serif;
+  --font-arabic: var(--font-amiri), serif;
+
+  --shadow-card: 0 1px 2px rgb(15 26 23 / 0.04), 0 4px 16px -8px rgb(15 26 23 / 0.08);
+  --shadow-float: 0 12px 40px -12px rgb(6 46 37 / 0.28);
+
+  --animate-fade-up: fade-up 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes shimmer {
+    from { background-position: -400px 0; }
+    to { background-position: 400px 0; }
+  }
+}
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  background: var(--color-sand-100);
+  color: var(--color-ink-900);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-gold-100);
+}
+
+/* Form controls stay at 16px+ so mobile browsers never zoom on focus. */
+input,
+select,
+textarea {
+  font-size: 15px;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--color-sand-200) 0px, var(--color-sand-100) 120px, var(--color-sand-200) 240px);
+  background-size: 800px 100%;
+  animation: var(--animate-shimmer);
+  border-radius: 10px;
+}
+
+/* ---------- The DEEN loader: counter-rotating khatam with a breathing light ---------- */
+.deen-loader .sq-a { animation: deen-spin 2.4s cubic-bezier(0.6, 0.1, 0.4, 0.9) infinite; transform-origin: 50% 50%; }
+.deen-loader .sq-b { animation: deen-spin-rev 2.4s cubic-bezier(0.6, 0.1, 0.4, 0.9) infinite; transform-origin: 50% 50%; }
+.deen-loader .trace { stroke-dasharray: 60 200; animation: deen-trace 1.6s linear infinite; }
+.deen-loader .light { animation: deen-breathe 1.6s ease-in-out infinite; transform-origin: 50% 50%; }
+
+@keyframes deen-spin { to { transform: rotate(90deg); } }
+@keyframes deen-spin-rev { from { transform: rotate(45deg); } to { transform: rotate(-45deg); } }
+@keyframes deen-trace { to { stroke-dashoffset: -260; } }
+@keyframes deen-breathe {
+  0%, 100% { opacity: 0.55; transform: scale(0.82); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deen-loader * { animation-duration: 6s !important; }
+}
+
+/* Khatam lattice drawn on a layer of its own, so it combines with any background (gradients included). */
+.pattern-khatam {
+  position: relative;
+  isolation: isolate;
+}
+.pattern-khatam::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cg fill='none' stroke='%23c9a34e' stroke-opacity='0.14' stroke-width='1'%3E%3Crect x='16' y='16' width='24' height='24'/%3E%3Crect x='16' y='16' width='24' height='24' transform='rotate(45 28 28)'/%3E%3C/g%3E%3C/svg%3E");
+}
