@@ -1,0 +1,65 @@
+# Production stack. Horizontal scale: raise `api` and `worker` replicas; Postgres and
+# Redis are the only stateful services (use managed ones as traffic grows).
+#   docker compose -f deploy/docker-compose.prod.yml --env-file deploy/.env up -d --build
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: deen
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      POSTGRES_DB: deen
+    command: ["postgres", "-c", "max_connections=300", "-c", "shared_buffers=1GB", "-c", "effective_cache_size=3GB", "-c", "work_mem=16MB"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U deen"], interval: 5s, retries: 10 }
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+
+  api:
+    build: ../backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      ENVIRONMENT: production
+      DATABASE_URL: postgresql+asyncpg://deen:${POSTGRES_PASSWORD}@postgres:5432/deen
+      REDIS_URL: redis://redis:6379/0
+      EMBEDDED_WORKER: "false"
+      DATA_DIR: /data
+      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-4}
+    volumes: [uploads:/data]
+    depends_on: { postgres: { condition: service_healthy }, redis: { condition: service_started } }
+    deploy: { replicas: 1 }
+
+  worker:
+    build: ../backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      ENVIRONMENT: production
+      DATABASE_URL: postgresql+asyncpg://deen:${POSTGRES_PASSWORD}@postgres:5432/deen
+      REDIS_URL: redis://redis:6379/0
+      DATA_DIR: /data
+    command: ["python", "-m", "app.worker"]
+    volumes: [uploads:/data]
+    depends_on: { api: { condition: service_started } }
+
+  web:
+    build: ../web
+    restart: unless-stopped
+    environment:
+      API_ORIGIN: http://api:8000
+    depends_on: [api]
+
+  gateway:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    ports: ["${GATEWAY_PORT:-8095}:80"]
+    volumes: [./nginx.conf:/etc/nginx/conf.d/default.conf:ro, ../web/public/downloads:/srv/downloads:ro]
+    depends_on: [web, api]
+
+volumes:
+  pgdata:
+  uploads:
