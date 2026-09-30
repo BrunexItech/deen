@@ -311,14 +311,27 @@ async def fanout(session: AsyncSession, payload: dict) -> None:
         OrgFollow.organization_id == opp.organization_id,
         OrgFollow.user_id.in_([r[0].user_id for r in rows])))).scalars()) if rows else set()
     org = await session.get(Organization, opp.organization_id)
-    targets: list[str] = []
+    # Spec section 21: strong matches, followers of the organization, and members who chose
+    # this category and are in its location all hear about a new opportunity.
+    matches: list[str] = []
+    local: list[str] = []
     for profile, _ in rows:
         m = evaluate(opp, MemberSignals.from_profile(profile))
-        if m.eligible and (m.score >= settings.match_notify_threshold or profile.user_id in followers):
-            targets.append(profile.user_id)
-    if targets:
-        await notify(session, targets, kind="matches", title="New opportunity for you",
-                     body=f"{opp.title} · {org.name}", data={"screen": "opportunity", "id": opp.id})
+        if not m.eligible:
+            continue
+        in_area = opp.work_mode == "remote" or not opp.counties or profile.county in opp.counties
+        if m.score >= settings.match_notify_threshold or profile.user_id in followers:
+            matches.append(profile.user_id)
+        elif opp.category in (profile.interests or []) and in_area:
+            local.append(profile.user_id)
+    data = {"screen": "opportunity", "id": opp.id}
+    if matches:
+        await notify(session, matches, kind="matches", title="New opportunity matching your profile",
+                     body=f"{opp.title} · {org.name}", data=data)
+    if local:
+        where = f" in {opp.counties[0]}" if len(opp.counties) == 1 else ""
+        await notify(session, local, kind="matches", title=f"New in a category you follow{where}",
+                     body=f"{opp.title} · {org.name}", data=data)
     if len(rows) == batch:
         await enqueue(session, "opportunities.fanout", {"opportunity_id": opp.id, "after": rows[-1][0].user_id})
 

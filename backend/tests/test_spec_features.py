@@ -203,3 +203,16 @@ async def test_feed_sections(admin_web):
     assert len(feed["new"]) == 1 and feed["headline"].startswith("You are a student in Health Records in Kisumu")
     await rep.aclose()
     await member.aclose()
+
+
+async def test_category_and_location_alerts(admin_web):
+    """Spec section 21: new opportunity in a selected category / location notifies the member."""
+    _, rep = await _org_and_rep(admin_web, verification="verified")
+    member, _ = await register_member()
+    await member.put("/api/v1/me/profile", json={"county": "Kisumu", "interests": ["career"], "onboarding_completed": True})
+    await _live(admin_web, rep, ATTACHMENT)
+    await run_jobs()
+    titles = [n["title"] for n in (await member.get("/api/v1/notifications")).json()["items"]]
+    assert "New in a category you follow in Kisumu" in titles or "New opportunity matching your profile" in titles
+    for c in (rep, member):
+        await c.aclose()
