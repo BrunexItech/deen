@@ -57,21 +57,21 @@ export default function BiometricSetup() {
   const usable = cap && (cap.enrolled || cap.hardware);
 
   return (
-    <LinearGradient colors={[colors.emerald800, colors.emerald950]} style={{ flex: 1 }}>
+    <LinearGradient colors={[colors.brand800, colors.brand950]} style={{ flex: 1 }}>
       <SafeAreaView style={styles.body}>
         <Pulse><Icon size={54} color={colors.gold400} strokeWidth={1.6} /></Pulse>
         <T v="title" color={colors.white} center style={{ marginTop: 36 }}>Protect your account</T>
-        <T v="body" color={colors.emerald100} center style={{ marginTop: 10 }}>
+        <T v="body" color={colors.brand100} center style={{ marginTop: 10 }}>
           Lock DEEN with your {cap?.label.toLowerCase() ?? "fingerprint"}. Only you can open the app, even if someone else has your phone.
         </T>
         <View style={styles.points}>
           {["Required every time you open DEEN", "Your fingerprint never leaves your phone", "Falls back to your phone PIN if needed"].map((p) => (
-            <View key={p} style={styles.point}><ShieldCheck size={16} color={colors.gold400} /><T v="small" color={colors.emerald100}>{p}</T></View>
+            <View key={p} style={styles.point}><ShieldCheck size={16} color={colors.gold400} /><T v="small" color={colors.brand100}>{p}</T></View>
           ))}
         </View>
         <View style={{ width: "100%", gap: 10, marginTop: "auto" }}>
           <Button title={usable ? `Turn on ${cap!.label}` : "Set up a screen lock first"} variant="gold" icon={Icon} loading={busy} disabled={!usable} onPress={enable} />
-          {!cap?.enrolled && cap && <T v="caption" color={colors.emerald100} center>No fingerprint or face saved on this phone. Add one in Settings → Security, or use your PIN.</T>}
+          {!cap?.enrolled && cap && <T v="caption" color={colors.brand100} center>No fingerprint or face saved on this phone. Add one in Settings → Security, or use your PIN.</T>}
           <Button title="Not now" variant="ghost" onPress={finish} />
         </View>
       </SafeAreaView>
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
   body: { flex: 1, alignItems: "center", paddingHorizontal: 28, paddingTop: 60, paddingBottom: 20 },
   pulseWrap: { width: 170, height: 170, alignItems: "center", justifyContent: "center" },
   ring: { position: "absolute", width: 170, height: 170, borderRadius: 85, borderWidth: 2, borderColor: colors.gold400 },
-  core: { width: 128, height: 128, borderRadius: 42, backgroundColor: "rgba(255,255,255,0.07)", borderWidth: 1, borderColor: "rgba(223,192,122,0.35)", alignItems: "center", justifyContent: "center" },
+  core: { width: 128, height: 128, borderRadius: 42, backgroundColor: "rgba(255,255,255,0.07)", borderWidth: 1, borderColor: "rgba(242,190,92,0.35)", alignItems: "center", justifyContent: "center" },
   points: { marginTop: 28, gap: 12, alignSelf: "stretch" },
   point: { flexDirection: "row", alignItems: "center", gap: 10 },
 });

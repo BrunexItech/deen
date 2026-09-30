@@ -41,16 +41,16 @@ export default function Security() {
       <Header title="Security" />
       <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }}>
         <Card style={styles.row}>
-          <View style={styles.icon}><Fingerprint size={22} color={colors.emerald700} /></View>
+          <View style={styles.icon}><Fingerprint size={22} color={colors.brand700} /></View>
           <View style={{ flex: 1 }}>
             <T v="bodyStrong">{label} lock</T>
             <T v="caption">Required to open DEEN and after 30 seconds away</T>
           </View>
-          <Switch value={biometric} onValueChange={toggle} trackColor={{ true: colors.emerald600, false: colors.sand300 }} thumbColor={colors.white} />
+          <Switch value={biometric} onValueChange={toggle} trackColor={{ true: colors.brand600, false: colors.sand300 }} thumbColor={colors.white} />
         </Card>
 
         <Card style={{ gap: 12 }}>
-          <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}><KeyRound size={18} color={colors.emerald700} /><T v="h3">Change password</T></View>
+          <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}><KeyRound size={18} color={colors.brand700} /><T v="h3">Change password</T></View>
           <Input placeholder="Current password" secureTextEntry value={pw.current_password} onChangeText={(v) => setPw({ ...pw, current_password: v })} />
           <Input placeholder="New password (8+ characters)" secureTextEntry value={pw.new_password} onChangeText={(v) => setPw({ ...pw, new_password: v })} />
           <Button title="Update password" size="md" loading={change.isPending} disabled={!pw.current_password || pw.new_password.length < 8} onPress={() => change.mutate()} />
@@ -82,5 +82,5 @@ export default function Security() {
 
 const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: 12 },
-  icon: { width: 44, height: 44, borderRadius: 14, backgroundColor: colors.emerald50, alignItems: "center", justifyContent: "center" },
+  icon: { width: 44, height: 44, borderRadius: 14, backgroundColor: colors.brand50, alignItems: "center", justifyContent: "center" },
 });

@@ -44,8 +44,8 @@ export default function Privacy() {
     <SafeAreaView style={{ flex: 1 }}>
       <Header title="Privacy & data" />
       <ScrollView contentContainerStyle={{ padding: 20, gap: 16 }}>
-        <Card style={{ gap: 8, backgroundColor: colors.emerald50, borderColor: colors.emerald100 }}>
-          <ShieldCheck size={22} color={colors.emerald700} />
+        <Card style={{ gap: 8, backgroundColor: colors.brand50, borderColor: colors.brand100 }}>
+          <ShieldCheck size={22} color={colors.brand700} />
           <T v="h3">Your data, your rights</T>
           <T v="small">DEEN collects only what it needs to match you with opportunities. Sensitive data (identity documents, application files) is encrypted. Organizations only see what you send them when you apply. Under Kenya&apos;s Data Protection Act 2019 you can access or erase your data at any time.</T>
         </Card>

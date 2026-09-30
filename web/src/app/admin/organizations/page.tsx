@@ -100,7 +100,7 @@ function OrgList() {
         ) : (
           <div className="divide-y divide-sand-200">
             {data.map((o) => (
-              <Link key={o.id} href={`/admin/organizations/${o.id}`} className="flex items-center gap-4 px-5 py-3.5 hover:bg-emerald-50/40">
+              <Link key={o.id} href={`/admin/organizations/${o.id}`} className="flex items-center gap-4 px-5 py-3.5 hover:bg-brand-50/40">
                 <Avatar name={o.name} src={o.logo_url} size={42} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">

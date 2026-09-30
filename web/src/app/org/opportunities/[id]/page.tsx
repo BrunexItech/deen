@@ -53,6 +53,11 @@ export default function OrgOpportunityPage() {
   });
   const remove = useMutation({ mutationFn: () => del(`/org/opportunities/${id}`), onSuccess: () => { toast.success("Draft deleted"); router.push("/org/opportunities"); } });
   const send = useMutation({ mutationFn: () => post(`/org/opportunities/${id}/messages`, { body: msg }), onSuccess: () => { setMsg(""); messages.refetch(); } });
+  const [deadline, setDeadline] = useState("");
+  const moveDeadline = useMutation({
+    mutationFn: () => post(`/org/opportunities/${id}/deadline`, { deadline: new Date(deadline).toISOString() }),
+    onSuccess: () => { toast.success("Deadline updated. Members who saved it will be reminded."); setDeadline(""); refresh(); },
+  });
 
   if (isLoading || !o) return <PageLoader label="Loading opportunity" />;
   const inReview = ["submitted", "under_review", "verification", "approved", "info_requested"].includes(o.status);
@@ -90,11 +95,22 @@ export default function OrgOpportunityPage() {
         </div>
 
         <div className="space-y-5">
-          <Card className="bg-gradient-to-br from-emerald-800 to-emerald-950 !border-0 text-white">
+          <Card className="bg-gradient-to-br from-brand-800 to-brand-950 !border-0 text-white">
             <div className="text-xs font-bold uppercase tracking-widest text-gold-400">What happens next</div>
             <p className="mt-2 text-[15px]">{NEXT_STEP[o.status] ?? "This opportunity is closed."}</p>
             {o.missing.length > 0 && o.editable && <p className="mt-3 rounded-xl bg-white/10 p-3 text-sm">Before submitting, add: {o.missing.join(", ")}.</p>}
           </Card>
+
+          {["published", "submitted", "under_review", "approved"].includes(o.status) && (
+            <Card>
+              <CardHeader title="Update deadline" subtitle={`Current: ${fmtDate(o.deadline, true)}`} />
+              <div className="flex gap-2">
+                <input type="datetime-local" value={deadline} onChange={(e) => setDeadline(e.target.value)} className="h-10 flex-1 rounded-xl border border-sand-300 px-3 text-sm" />
+                <Button size="sm" disabled={!deadline} loading={moveDeadline.isPending} onClick={() => moveDeadline.mutate()}>Save</Button>
+              </div>
+              <p className="mt-2 text-xs text-ink-400">Takes effect immediately; DEEN sees every change in the history.</p>
+            </Card>
+          )}
 
           {o.flags.length > 0 && (
             <Card><CardHeader title="Things to improve" subtitle="Our automated checks noticed these. Fixing them speeds up approval." /><Flags flags={o.flags} /></Card>
@@ -105,7 +121,7 @@ export default function OrgOpportunityPage() {
             <div className="max-h-[360px] space-y-3 overflow-y-auto">
               {!messages.data?.length && <p className="text-sm text-ink-400">Questions about your submission? Message the DEEN review team.</p>}
               {messages.data?.map((m) => (
-                <div key={m.id} className={clsx("max-w-[90%] rounded-2xl px-3.5 py-2.5 text-sm", m.from_platform ? "bg-emerald-50" : "ml-auto bg-sand-100")}>
+                <div key={m.id} className={clsx("max-w-[90%] rounded-2xl px-3.5 py-2.5 text-sm", m.from_platform ? "bg-brand-50" : "ml-auto bg-sand-100")}>
                   <div className="mb-0.5 text-[11px] font-semibold text-ink-400">{m.author} · {ago(m.at)}</div>
                   <div className="whitespace-pre-line">{m.body}</div>
                 </div>
@@ -123,7 +139,7 @@ export default function OrgOpportunityPage() {
               <li className="relative"><span className="absolute -left-[23px] top-1 h-3 w-3 rounded-full border-2 border-white bg-sand-300" /><div className="text-sm font-semibold">Created</div><div className="text-xs text-ink-400">{fmtDate(o.created_at, true)}</div></li>
               {o.history.map((h, i) => (
                 <li key={i} className="relative">
-                  <span className="absolute -left-[23px] top-1 h-3 w-3 rounded-full border-2 border-white bg-emerald-600" />
+                  <span className="absolute -left-[23px] top-1 h-3 w-3 rounded-full border-2 border-white bg-brand-600" />
                   <div className="text-sm font-semibold">{STATUS[h.to as OppStatus]?.label ?? h.to}</div>
                   <div className="text-xs text-ink-400">{fmtDate(h.at, true)}</div>
                   {h.note && <div className="mt-1 text-[13px] text-ink-700">{h.note}</div>}

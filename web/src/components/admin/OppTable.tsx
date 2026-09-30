@@ -41,6 +41,7 @@ export function OppTable({ queue = false }: { queue?: boolean }) {
         { value: "published", label: "Live", count: c.published ?? 0 },
         { value: "approved", label: "Approved", count: c.approved ?? 0 },
         { value: "expired", label: "Expired", count: c.expired ?? 0 },
+        { value: "suspended", label: "Suspended", count: c.suspended ?? 0 },
         { value: "archived", label: "Closed", count: c.archived ?? 0 },
         { value: "rejected", label: "Declined", count: c.rejected ?? 0 },
         { value: "draft", label: "Drafts", count: c.draft ?? 0 },
@@ -70,10 +71,10 @@ export function OppTable({ queue = false }: { queue?: boolean }) {
             </thead>
             <tbody className="divide-y divide-sand-200">
               {data.items.map((o) => (
-                <tr key={o.id} className="group hover:bg-emerald-50/40">
+                <tr key={o.id} className="group hover:bg-brand-50/40">
                   <td className="max-w-[340px] px-5 py-3.5">
                     <Link href={`/admin/opportunities/${o.id}`} className="block">
-                      <div className="truncate font-semibold text-ink-900 group-hover:text-emerald-800">{o.title}</div>
+                      <div className="truncate font-semibold text-ink-900 group-hover:text-brand-800">{o.title}</div>
                       <div className="text-xs text-ink-400">{cat(o.category)}{o.featured && " · ★ Featured"}{o.feature_requested && " · Feature requested"}</div>
                     </Link>
                   </td>

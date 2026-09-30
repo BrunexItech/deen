@@ -49,7 +49,7 @@ export default function ApplicationScreen() {
               return (
                 <View key={i} style={styles.step}>
                   <View style={{ alignItems: "center" }}>
-                    <View style={[styles.node, { backgroundColor: last ? st.color : colors.emerald500 }]} />
+                    <View style={[styles.node, { backgroundColor: last ? st.color : colors.brand500 }]} />
                     {!last && <View style={styles.line} />}
                   </View>
                   <View style={{ flex: 1, paddingBottom: last ? 0 : 18 }}>
@@ -57,7 +57,7 @@ export default function ApplicationScreen() {
                     <T v="caption">{new Date(e.at).toLocaleString("en-KE", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</T>
                     {e.message && (
                       <View style={styles.msg}>
-                        <MessageSquareQuote size={14} color={colors.emerald700} />
+                        <MessageSquareQuote size={14} color={colors.brand700} />
                         <T v="small" style={{ flex: 1, color: colors.ink700 }}>{e.message}</T>
                       </View>
                     )}
@@ -100,6 +100,6 @@ export default function ApplicationScreen() {
 const styles = StyleSheet.create({
   step: { flexDirection: "row", gap: 14 },
   node: { width: 14, height: 14, borderRadius: 7, marginTop: 4, borderWidth: 3, borderColor: colors.white },
-  line: { flex: 1, width: 2, backgroundColor: colors.emerald100, marginVertical: 2 },
-  msg: { flexDirection: "row", gap: 8, marginTop: 8, backgroundColor: colors.emerald50, borderRadius: 12, padding: 10 },
+  line: { flex: 1, width: 2, backgroundColor: colors.brand100, marginVertical: 2 },
+  msg: { flexDirection: "row", gap: 8, marginTop: 8, backgroundColor: colors.brand50, borderRadius: 12, padding: 10 },
 });

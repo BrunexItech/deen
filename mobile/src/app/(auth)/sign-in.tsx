@@ -43,7 +43,7 @@ export default function SignIn() {
       <Input label="Phone number" icon={Phone} placeholder="07xx xxx xxx" keyboardType="phone-pad" autoComplete="tel" value={phone} onChangeText={setPhone} />
       <Input label="Password" icon={Lock} placeholder="Your password" secureTextEntry autoComplete="current-password" value={password} onChangeText={setPassword} onSubmitEditing={submit} />
       {error && <T v="small" color={colors.rose600}>{error}</T>}
-      <Pressable onPress={() => router.push("/forgot")} hitSlop={10}><T v="label" color={colors.emerald700}>Forgot password?</T></Pressable>
+      <Pressable onPress={() => router.push("/forgot")} hitSlop={10}><T v="label" color={colors.brand700}>Forgot password?</T></Pressable>
     </AuthScaffold>
   );
 }

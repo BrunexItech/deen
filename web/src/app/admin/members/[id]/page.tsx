@@ -53,7 +53,7 @@ export default function MemberPage() {
       <div className="mb-6 flex items-center gap-4">
         <Avatar name={m.full_name} size={60} />
         <PageHeader
-          title={<span className="flex items-center gap-2">{m.full_name}{m.identity_status === "verified" && <BadgeCheck className="text-emerald-600" />}</span>}
+          title={<span className="flex items-center gap-2">{m.full_name}{m.identity_status === "verified" && <BadgeCheck className="text-leaf-600" />}</span>}
           subtitle={<span className="flex flex-wrap items-center gap-2">{m.phone} {m.email && `· ${m.email}`} · joined {fmtDate(m.created_at)} {m.status === "suspended" && <Badge tone="bad">Suspended</Badge>}</span>}
         />
       </div>
@@ -99,10 +99,10 @@ export default function MemberPage() {
         <div className="space-y-5">
           <Card>
             <CardHeader title="Membership" />
-            <div className="rounded-2xl bg-gradient-to-br from-emerald-800 to-emerald-950 p-4 text-white">
+            <div className="rounded-2xl bg-gradient-to-br from-brand-800 to-brand-950 p-4 text-white">
               <div className="text-xs uppercase tracking-widest text-gold-400">{m.membership.tier}</div>
               <div className="text-xl font-bold">{m.membership.plan_name}</div>
-              <div className="text-sm text-emerald-100/70">{m.membership.ends_at ? `Until ${fmtDate(m.membership.ends_at)}` : "No expiry"}{m.membership.sponsored && " · Sponsored"}</div>
+              <div className="text-sm text-brand-100/70">{m.membership.ends_at ? `Until ${fmtDate(m.membership.ends_at)}` : "No expiry"}{m.membership.sponsored && " · Sponsored"}</div>
             </div>
             {can("plans.manage") && <Button variant="secondary" className="mt-3 w-full" icon={<Gift size={15} />} onClick={() => setGrantOpen(true)}>Grant membership</Button>}
           </Card>

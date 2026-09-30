@@ -66,7 +66,7 @@ export default function Search() {
             {r.directory.length > 0 && <T v="overline" style={{ marginTop: 8 }}>Businesses & professionals</T>}
             {r.directory.map((d) => (
               <Tap key={d.id} onPress={() => router.push(`/directory/${d.id}`)} style={styles.row}>
-                <View style={styles.store}><Store size={18} color={colors.emerald700} /></View>
+                <View style={styles.store}><Store size={18} color={colors.brand700} /></View>
                 <View style={{ flex: 1 }}><T v="bodyStrong">{d.name}</T><T v="caption" numberOfLines={1}>{d.headline}</T></View>
               </Tap>
             ))}
@@ -79,8 +79,8 @@ export default function Search() {
 
 const styles = StyleSheet.create({
   bar: { flexDirection: "row", alignItems: "center", gap: 12, paddingHorizontal: 16, paddingTop: 8 },
-  input: { flex: 1, flexDirection: "row", alignItems: "center", gap: 10, height: 50, backgroundColor: colors.white, borderRadius: 16, paddingHorizontal: 14, borderWidth: 1.5, borderColor: colors.emerald600 },
+  input: { flex: 1, flexDirection: "row", alignItems: "center", gap: 10, height: 50, backgroundColor: colors.white, borderRadius: 16, paddingHorizontal: 14, borderWidth: 1.5, borderColor: colors.brand600 },
   text: { flex: 1, fontFamily: fonts.medium, fontSize: 16, color: colors.ink900 },
   row: { flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: colors.white, borderRadius: 16, padding: 12, borderWidth: 1, borderColor: colors.sand200 },
-  store: { width: 40, height: 40, borderRadius: 12, backgroundColor: colors.emerald50, alignItems: "center", justifyContent: "center" },
+  store: { width: 40, height: 40, borderRadius: 12, backgroundColor: colors.brand50, alignItems: "center", justifyContent: "center" },
 });

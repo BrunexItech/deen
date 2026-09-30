@@ -34,9 +34,9 @@ function Reminders() {
         action={<Button size="sm" icon={<Plus size={14} />} onClick={() => setEdit(blank)}>Add</Button>} />
       <div className="grid gap-3 lg:grid-cols-2">
         {data?.map((r) => (
-          <button key={r.id} onClick={() => setEdit({ ...r, arabic: r.arabic ?? "", theme: r.theme ?? "" })} className={`rounded-2xl border p-4 text-left transition hover:border-emerald-600/40 ${r.active ? "border-sand-200 bg-white" : "border-dashed border-sand-300 bg-sand-50 opacity-60"}`}>
+          <button key={r.id} onClick={() => setEdit({ ...r, arabic: r.arabic ?? "", theme: r.theme ?? "" })} className={`rounded-2xl border p-4 text-left transition hover:border-brand-600/40 ${r.active ? "border-sand-200 bg-white" : "border-dashed border-sand-300 bg-sand-50 opacity-60"}`}>
             <div className="mb-2 flex items-center justify-between"><Badge tone="gold">{KIND_LABEL[r.kind]}</Badge><span className="text-xs text-ink-400">{r.reference}</span></div>
-            {r.arabic && <p dir="rtl" lang="ar" className="font-arabic text-xl leading-loose text-emerald-800">{r.arabic}</p>}
+            {r.arabic && <p dir="rtl" lang="ar" className="font-arabic text-xl leading-loose text-brand-800">{r.arabic}</p>}
             <p className="mt-1 text-sm text-ink-700">{r.text}</p>
           </button>
         ))}
@@ -113,7 +113,7 @@ function TaxonomyEditor() {
           <div className="flex flex-wrap gap-1.5">
             {c.types.map((t) => (
               <button key={t.key} disabled={!can("taxonomy.manage")} onClick={() => toggle.mutate({ cat: c.key, key: t.key, name: t.name, active: !t.active })}
-                className={`rounded-full px-2.5 py-1 text-xs font-medium ${t.active ? "bg-emerald-50 text-emerald-800" : "bg-sand-200 text-ink-400 line-through"}`} title="Click to enable/disable">
+                className={`rounded-full px-2.5 py-1 text-xs font-medium ${t.active ? "bg-brand-50 text-brand-800" : "bg-sand-200 text-ink-400 line-through"}`} title="Click to enable/disable">
                 {t.name}
               </button>
             ))}

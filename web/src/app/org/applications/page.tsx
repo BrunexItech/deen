@@ -19,7 +19,7 @@ interface Row {
 
 function Score({ n }: { n: number | null }) {
   if (n == null) return null;
-  const color = n >= 70 ? "text-emerald-700 bg-emerald-50" : n >= 45 ? "text-gold-700 bg-gold-50" : "text-ink-500 bg-sand-100";
+  const color = n >= 70 ? "text-brand-700 bg-brand-50" : n >= 45 ? "text-gold-700 bg-gold-50" : "text-ink-500 bg-sand-100";
   return <span className={`rounded-lg px-2 py-0.5 text-xs font-bold tabular-nums ${color}`}>{n}% match</span>;
 }
 
@@ -54,7 +54,7 @@ function Applications() {
         {isLoading ? <TableSkeleton /> : !data?.items.length ? <Empty icon={<Inbox size={26} />} title="No applications yet" body="Applications appear here the moment members apply." /> : (
           <div className="divide-y divide-sand-200">
             {data.items.map((a) => (
-              <Link key={a.id} href={`/org/applications/${a.id}`} className="flex flex-col gap-2 px-5 py-3.5 hover:bg-emerald-50/40 sm:flex-row sm:items-center">
+              <Link key={a.id} href={`/org/applications/${a.id}`} className="flex flex-col gap-2 px-5 py-3.5 hover:bg-brand-50/40 sm:flex-row sm:items-center">
                 <div className="flex flex-1 items-center gap-3">
                   <Avatar name={a.applicant ?? "?"} size={38} />
                   <div className="min-w-0">

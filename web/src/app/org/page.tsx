@@ -52,7 +52,7 @@ export default function OrgDashboard() {
         <Card className="xl:col-span-2">
           <CardHeader title="Engagement, last 30 days" />
           {data.series.length ? (
-            <TrendChart data={data.series} series={[{ key: "view", label: "Views", color: "#c9a34e" }, { key: "click", label: "Clicks", color: "#1d4ed8" }, { key: "apply", label: "Applications", color: "#0f7a61" }]} />
+            <TrendChart data={data.series} series={[{ key: "view", label: "Views", color: "#e39d29" }, { key: "click", label: "Clicks", color: "#004485" }, { key: "apply", label: "Applications", color: "#43b02a" }]} />
           ) : <Empty icon={<Sparkles size={24} />} title="No activity yet" body="Once an opportunity is published, members' views and applications appear here." />}
         </Card>
         <Card>
@@ -61,7 +61,7 @@ export default function OrgDashboard() {
             {data.counties.map((c) => (
               <div key={c.county} className="text-sm">
                 <div className="mb-1 flex justify-between"><span className="font-semibold">{c.county}</span><span className="text-ink-400">{num(c.count)}</span></div>
-                <div className="h-1.5 rounded-full bg-sand-200"><div className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-gold-500" style={{ width: `${(100 * c.count) / maxCounty}%` }} /></div>
+                <div className="h-1.5 rounded-full bg-sand-200"><div className="h-full rounded-full bg-gradient-to-r from-brand-600 to-gold-500" style={{ width: `${(100 * c.count) / maxCounty}%` }} /></div>
               </div>
             ))}
             {!data.counties.length && <p className="text-sm text-ink-400">Appears as members engage.</p>}
@@ -79,7 +79,7 @@ export default function OrgDashboard() {
             <tbody className="divide-y divide-sand-200">
               {data.top.map((o) => (
                 <tr key={o.id}>
-                  <td className="px-5 py-3"><Link href={`/org/opportunities/${o.id}`} className="font-semibold hover:text-emerald-700">{o.title}</Link><div className="text-xs text-ink-400">{STATUS[o.status].label}</div></td>
+                  <td className="px-5 py-3"><Link href={`/org/opportunities/${o.id}`} className="font-semibold hover:text-brand-700">{o.title}</Link><div className="text-xs text-ink-400">{STATUS[o.status].label}</div></td>
                   <td className="px-3 py-3 text-right tabular-nums">{num(o.views)}</td>
                   <td className="px-3 py-3 text-right tabular-nums">{num(o.applications)}</td>
                   <td className="px-5 py-3 text-right font-semibold tabular-nums">{o.conversion}%</td>
@@ -93,7 +93,7 @@ export default function OrgDashboard() {
           <CardHeader title="Application pipeline" />
           <div className="space-y-2">
             {["submitted", "in_review", "shortlisted", "interview", "accepted", "rejected"].map((s) => (
-              <Link key={s} href={`/org/applications?status=${s}`} className="flex items-center justify-between rounded-xl bg-sand-100 px-4 py-2.5 text-sm hover:bg-emerald-50">
+              <Link key={s} href={`/org/applications?status=${s}`} className="flex items-center justify-between rounded-xl bg-sand-100 px-4 py-2.5 text-sm hover:bg-brand-50">
                 <span className="font-semibold">{APP_STATUS[s].label}</span><span className="tabular-nums">{num(data.funnel[s] ?? 0)}</span>
               </Link>
             ))}

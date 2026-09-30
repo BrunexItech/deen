@@ -36,10 +36,13 @@ export const STATUS: Record<OppStatus, { label: string; tone: Tone }> = {
   published: { label: "Live", tone: "good" },
   rejected: { label: "Declined", tone: "bad" },
   expired: { label: "Expired", tone: "neutral" },
+  suspended: { label: "Suspended", tone: "bad" },
   archived: { label: "Closed", tone: "neutral" },
 };
 
 export const APP_STATUS: Record<string, { label: string; tone: Tone }> = {
+  started: { label: "Started", tone: "neutral" },
+  closed: { label: "Closed", tone: "neutral" },
   submitted: { label: "New", tone: "info" },
   in_review: { label: "In review", tone: "info" },
   shortlisted: { label: "Shortlisted", tone: "gold" },

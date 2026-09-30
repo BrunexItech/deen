@@ -79,7 +79,7 @@ export default function OpportunityScreen() {
     try {
       const r = await post<{ external_url: string | null }>(`/opportunities/${id}/events`, { kind: "click" });
       if (r.external_url) {
-        await WebBrowser.openBrowserAsync(r.external_url, { toolbarColor: colors.emerald900, controlsColor: colors.gold400 });
+        await WebBrowser.openBrowserAsync(r.external_url, { toolbarColor: colors.brand900, controlsColor: colors.gold400 });
         if (!asked && !o.application) {
           setAsked(true);
           Alert.alert("Did you apply?", "Add it to your tracker so you can follow up and get reminders.", [
@@ -102,7 +102,7 @@ export default function OpportunityScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.sand100 }}>
       <ScrollView contentContainerStyle={{ paddingBottom: 140 }} showsVerticalScrollIndicator={false}>
-        <LinearGradient colors={[colors.emerald800, colors.emerald950]} style={{ paddingTop: insets.top }}>
+        <LinearGradient colors={[colors.brand800, colors.brand950]} style={{ paddingTop: insets.top }}>
           <View style={styles.glow} />
           <Header dark right={
             <View style={{ flexDirection: "row", gap: 8 }}>
@@ -124,9 +124,9 @@ export default function OpportunityScreen() {
                   <T v="bodyStrong" color={colors.white} numberOfLines={1} style={{ flexShrink: 1 }}>{o.organization.name}</T>
                   <Verified org={o.organization} size={15} />
                 </View>
-                <T v="caption" color={colors.emerald100}>{o.organization.verification === "trusted" ? "Trusted partner" : o.organization.verification === "verified" ? "Verified by DEEN" : "Organization"}</T>
+                <T v="caption" color={colors.brand100}>{o.organization.verification === "trusted" ? "Trusted partner" : o.organization.verification === "verified" ? "Verified by DEEN" : "Organization"}</T>
               </View>
-              <ChevronRight size={18} color={colors.emerald100} />
+              <ChevronRight size={18} color={colors.brand100} />
             </Tap>
           </View>
         </LinearGradient>
@@ -143,7 +143,7 @@ export default function OpportunityScreen() {
               </View>
               {(o.match.eligible ? o.match.reasons : o.match.blockers).map((r) => (
                 <View key={r} style={styles.reason}>
-                  {o.match!.eligible ? <Check size={15} color={colors.emerald600} strokeWidth={3} /> : <AlertTriangle size={15} color={colors.amber800} />}
+                  {o.match!.eligible ? <Check size={15} color={colors.brand600} strokeWidth={3} /> : <AlertTriangle size={15} color={colors.amber800} />}
                   <T v="small" style={{ flex: 1, color: colors.ink700 }}>{r}</T>
                 </View>
               ))}
@@ -151,15 +151,15 @@ export default function OpportunityScreen() {
           )}
 
           <View style={styles.facts}>
-            <View style={styles.fact}><MapPin size={16} color={colors.emerald700} /><T v="caption">Where</T><T v="label" numberOfLines={2}>{o.location}</T></View>
+            <View style={styles.fact}><MapPin size={16} color={colors.brand700} /><T v="caption">Where</T><T v="label" numberOfLines={2}>{o.location}</T></View>
             <View style={styles.fact}>
-              <CalendarDays size={16} color={o.closing_soon ? colors.rose600 : colors.emerald700} />
+              <CalendarDays size={16} color={o.closing_soon ? colors.rose600 : colors.brand700} />
               <T v="caption">{o.is_event ? "When" : "Deadline"}</T>
               <T v="label" color={o.closing_soon ? colors.rose600 : undefined}>
                 {o.is_event && o.starts_at ? new Date(o.starts_at).toLocaleDateString("en-KE", { day: "numeric", month: "short" }) : o.deadline ? new Date(o.deadline).toLocaleDateString("en-KE", { day: "numeric", month: "short" }) : "Open"}
               </T>
             </View>
-            <View style={styles.fact}><Users size={16} color={colors.emerald700} /><T v="caption">Open to</T><T v="label">{o.gender === "female" ? "Sisters" : o.gender === "male" ? "Brothers" : "Everyone"}</T></View>
+            <View style={styles.fact}><Users size={16} color={colors.brand700} /><T v="caption">Open to</T><T v="label">{o.gender === "female" ? "Sisters" : o.gender === "male" ? "Brothers" : "Everyone"}</T></View>
           </View>
 
           {o.closing_soon && <View style={styles.closing}><AlertTriangle size={16} color={colors.rose600} /><T v="label" color={colors.rose600}>Closes {o.days_left === 0 ? "today" : `in ${o.days_left} day${o.days_left === 1 ? "" : "s"}`}. Don&apos;t miss it!</T></View>}
@@ -186,7 +186,7 @@ export default function OpportunityScreen() {
           {o.venue && <Block title="Venue" text={o.venue} />}
 
           <View style={styles.safety}>
-            <ShieldCheck size={18} color={colors.emerald700} />
+            <ShieldCheck size={18} color={colors.brand700} />
             <T v="small" style={{ flex: 1 }}>DEEN reviewed this listing. Genuine opportunities never ask you to pay. If anyone does, report it.</T>
           </View>
 
@@ -208,7 +208,7 @@ export default function OpportunityScreen() {
       </ScrollView>
 
       <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 14) }]}>
-        <IconButton icon={o.saved ? BookmarkCheck : Bookmark} label="Save" onPress={() => save.mutate(o)} color={o.saved ? colors.emerald700 : colors.ink700} size={54} />
+        <IconButton icon={o.saved ? BookmarkCheck : Bookmark} label="Save" onPress={() => save.mutate(o)} color={o.saved ? colors.brand700 : colors.ink700} size={54} />
         <View style={{ flex: 1 }}>
           {o.application && status ? (
             <Button title={`${status.label} · View application`} variant="secondary" onPress={() => router.push(`/application/${o.application!.id}`)} />
@@ -229,19 +229,19 @@ export default function OpportunityScreen() {
 }
 
 const styles = StyleSheet.create({
-  glow: { position: "absolute", width: 300, height: 300, borderRadius: 150, backgroundColor: "rgba(201,163,78,0.14)", top: -120, right: -100 },
+  glow: { position: "absolute", width: 300, height: 300, borderRadius: 150, backgroundColor: "rgba(227,157,41,0.14)", top: -120, right: -100 },
   hero: { paddingHorizontal: 20, paddingBottom: 22, paddingTop: 6 },
   cat: { flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 9, alignSelf: "flex-start" },
   catText: { fontFamily: fonts.bold, fontSize: 12 },
   amount: { fontFamily: fonts.bold, fontSize: 17, color: colors.gold400, marginTop: 8 },
   org: { flexDirection: "row", alignItems: "center", gap: 12, marginTop: 18, backgroundColor: "rgba(255,255,255,0.08)", borderRadius: 16, padding: 12 },
-  matchCard: { backgroundColor: colors.white, borderRadius: 20, padding: 16, borderWidth: 1.5, borderColor: colors.emerald100, gap: 8 },
+  matchCard: { backgroundColor: colors.white, borderRadius: 20, padding: 16, borderWidth: 1.5, borderColor: colors.brand100, gap: 8 },
   noMatch: { width: 58, height: 58, borderRadius: 29, backgroundColor: colors.sand100, alignItems: "center", justifyContent: "center" },
   reason: { flexDirection: "row", gap: 8, alignItems: "center", paddingTop: 2 },
   facts: { flexDirection: "row", gap: 10, marginTop: 14 },
   fact: { flex: 1, backgroundColor: colors.white, borderRadius: 16, padding: 12, gap: 3, borderWidth: 1, borderColor: colors.sand200 },
   closing: { flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: colors.rose50, borderRadius: 14, padding: 12, marginTop: 14 },
   tags: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 10 },
-  safety: { flexDirection: "row", alignItems: "center", gap: 10, marginTop: 24, backgroundColor: colors.emerald50, borderRadius: 16, padding: 14, borderWidth: 1, borderColor: colors.emerald100 },
+  safety: { flexDirection: "row", alignItems: "center", gap: 10, marginTop: 24, backgroundColor: colors.brand50, borderRadius: 16, padding: 14, borderWidth: 1, borderColor: colors.brand100 },
   bar: { position: "absolute", left: 0, right: 0, bottom: 0, flexDirection: "row", gap: 10, alignItems: "center", paddingHorizontal: 16, paddingTop: 12, backgroundColor: "rgba(246,244,238,0.97)", borderTopWidth: 1, borderTopColor: colors.sand200 },
 });

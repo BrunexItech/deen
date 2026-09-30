@@ -55,7 +55,7 @@ export default function OrgApplicationPage() {
       <div className="mb-6 flex items-center gap-4">
         <Avatar name={String(p.full_name ?? "?")} size={58} />
         <PageHeader
-          title={<span className="flex items-center gap-2">{String(p.full_name)}{p.identity_verified && <BadgeCheck className="text-emerald-600" />}</span>}
+          title={<span className="flex items-center gap-2">{String(p.full_name)}{p.identity_verified && <BadgeCheck className="text-leaf-600" />}</span>}
           subtitle={<span className="flex flex-wrap items-center gap-2">Applied for <b>{a.opportunity.title}</b> · {fmtDate(a.created_at)} <Badge tone={APP_STATUS[a.status].tone}>{APP_STATUS[a.status].label}</Badge>{a.match_score != null && <Badge tone="gold">{a.match_score}% match</Badge>}</span>}
         />
       </div>
@@ -87,7 +87,7 @@ export default function OrgApplicationPage() {
               </div>
               {a.documents.length > 0 && (
                 <div className="mt-5 flex flex-wrap gap-2">
-                  {a.documents.map((d) => <a key={d.file_id} href={d.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-xl border border-sand-200 px-3 py-2 text-sm font-semibold hover:border-emerald-600"><FileText size={15} className="text-emerald-700" />{d.label}</a>)}
+                  {a.documents.map((d) => <a key={d.file_id} href={d.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-xl border border-sand-200 px-3 py-2 text-sm font-semibold hover:border-brand-600"><FileText size={15} className="text-brand-700" />{d.label}</a>)}
                 </div>
               )}
             </Card>
@@ -102,7 +102,7 @@ export default function OrgApplicationPage() {
               {p.county && <div className="flex items-center gap-2"><MapPin size={15} className="text-ink-400" />{[p.town, p.county].filter(Boolean).join(", ")}</div>}
             </div>
           </Card>
-          <Card className="border-emerald-600/30 ring-4 ring-emerald-600/5">
+          <Card className="border-brand-600/30 ring-4 ring-brand-600/5">
             <CardHeader title="Move this application" subtitle="The applicant is notified instantly." />
             <Textarea value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Optional message to the applicant (e.g. interview time)" className="min-h-[80px]" />
             <div className="mt-3 grid gap-2">

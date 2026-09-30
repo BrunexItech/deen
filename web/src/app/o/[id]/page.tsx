@@ -21,25 +21,22 @@ async function load(id: string): Promise<Preview | null> {
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const o = await load((await params).id);
   if (!o) return { title: "Opportunity" };
-  return { title: o.title, description: `${o.organization.name}: ${o.summary}`, openGraph: { title: o.title, description: o.summary, images: ["/deen-icon.png"] } };
+  return { title: o.title, description: `${o.organization.name}: ${o.summary}`, openGraph: { title: o.title, description: o.summary, images: ["/deen-logo.png"] } };
 }
 
 export default async function SharedOpportunity({ params }: { params: Promise<{ id: string }> }) {
   const o = await load((await params).id);
   return (
-    <div className="pattern-khatam flex min-h-screen items-center justify-center bg-gradient-to-br from-emerald-800 to-emerald-950 p-5">
+    <div className="pattern-khatam flex min-h-screen items-center justify-center bg-gradient-to-br from-brand-800 to-brand-950 p-5">
       <div className="w-full max-w-md rounded-3xl bg-white p-7 shadow-2xl">
-        <div className="mb-6 flex items-center gap-2.5">
-          <img src="/deen-icon.png" alt="" className="h-9 w-9 rounded-lg" />
-          <span className="font-extrabold tracking-[0.3em] text-emerald-800">DEEN</span>
-        </div>
+        <img src="/deen-logo.png" alt="DEEN" className="mx-auto mb-6 h-24 w-auto object-contain" />
         {o ? (
           <>
             <div className="flex items-center gap-1.5 text-sm font-semibold text-ink-500">
-              {o.organization.name}{o.organization.verification !== "pending" && <BadgeCheck size={16} className="text-emerald-600" />}
+              {o.organization.name}{o.organization.verification !== "pending" && <BadgeCheck size={16} className="text-leaf-600" />}
             </div>
             <h1 className="mt-1 text-2xl font-extrabold tracking-tight">{o.title}</h1>
-            {o.amount_label && <div className="mt-1 text-lg font-bold text-emerald-700">{o.amount_label}</div>}
+            {o.amount_label && <div className="mt-1 text-lg font-bold text-brand-700">{o.amount_label}</div>}
             <p className="mt-3 text-ink-700">{o.summary}</p>
             <div className="mt-5 space-y-2 text-sm text-ink-700">
               <div className="flex items-center gap-2"><MapPin size={16} className="text-ink-400" />{o.location}</div>
@@ -56,7 +53,7 @@ export default async function SharedOpportunity({ params }: { params: Promise<{ 
             <p className="mt-2 text-ink-500">But there are many more waiting for you on DEEN.</p>
           </>
         )}
-        <a href="/downloads/deen.apk" className="mt-7 flex items-center justify-center gap-2 rounded-2xl bg-emerald-700 py-4 font-bold text-white hover:bg-emerald-800">
+        <a href="/downloads/deen.apk" className="mt-7 flex items-center justify-center gap-2 rounded-2xl bg-brand-700 py-4 font-bold text-white hover:bg-brand-800">
           <Download size={18} /> Get DEEN to apply
         </a>
         <p className="mt-3 text-center text-xs text-ink-400">Verified opportunities for the Muslim community in Kenya.</p>

@@ -20,10 +20,10 @@ export default function ListingScreen() {
       <Header />
       <ScrollView contentContainerStyle={{ padding: 20, gap: 14, paddingBottom: 40 }}>
         <View style={{ alignItems: "center", gap: 8 }}>
-          <View style={styles.icon}><Store size={34} color={colors.emerald700} /></View>
+          <View style={styles.icon}><Store size={34} color={colors.brand700} /></View>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
             <T v="title" center>{d.name}</T>
-            {d.verified && <BadgeCheck size={20} color={colors.emerald600} />}
+            {d.verified && <BadgeCheck size={20} color={colors.brand600} />}
           </View>
           <T v="body" center style={{ color: colors.ink500 }}>{d.headline}</T>
           <View style={{ flexDirection: "row", gap: 6 }}>
@@ -40,9 +40,9 @@ export default function ListingScreen() {
           </Card>
         )}
         <Card style={{ gap: 12 }}>
-          {d.county && <View style={styles.line}><MapPin size={16} color={colors.emerald700} /><T v="small">{[d.town, d.county].filter(Boolean).join(", ")}</T></View>}
-          {d.email && <View style={styles.line}><Mail size={16} color={colors.emerald700} /><T v="small">{d.email}</T></View>}
-          {d.website && <View style={styles.line}><Globe size={16} color={colors.emerald700} /><T v="small">{d.website}</T></View>}
+          {d.county && <View style={styles.line}><MapPin size={16} color={colors.brand700} /><T v="small">{[d.town, d.county].filter(Boolean).join(", ")}</T></View>}
+          {d.email && <View style={styles.line}><Mail size={16} color={colors.brand700} /><T v="small">{d.email}</T></View>}
+          {d.website && <View style={styles.line}><Globe size={16} color={colors.brand700} /><T v="small">{d.website}</T></View>}
         </Card>
         <View style={{ gap: 10 }}>
           {wa && <Button title="WhatsApp" icon={MessageCircle} onPress={() => Linking.openURL(`https://wa.me/${wa.replace(/\D/g, "")}?text=${encodeURIComponent("Assalamu alaikum, I found you on DEEN.")}`)} />}
@@ -55,6 +55,6 @@ export default function ListingScreen() {
 }
 
 const styles = StyleSheet.create({
-  icon: { width: 76, height: 76, borderRadius: 24, backgroundColor: colors.emerald50, alignItems: "center", justifyContent: "center" },
+  icon: { width: 76, height: 76, borderRadius: 24, backgroundColor: colors.brand50, alignItems: "center", justifyContent: "center" },
   line: { flexDirection: "row", alignItems: "center", gap: 10 },
 });

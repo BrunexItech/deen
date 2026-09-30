@@ -15,7 +15,7 @@ import { colors, fonts } from "@/lib/theme";
 function Row({ icon: Icon, label, sub, onPress, right, danger }: { icon: LucideIcon; label: string; sub?: string; onPress: () => void; right?: React.ReactNode; danger?: boolean }) {
   return (
     <Tap onPress={onPress} style={styles.row} scale={0.99}>
-      <View style={[styles.rowIcon, danger && { backgroundColor: colors.rose50 }]}><Icon size={19} color={danger ? colors.rose600 : colors.emerald700} /></View>
+      <View style={[styles.rowIcon, danger && { backgroundColor: colors.rose50 }]}><Icon size={19} color={danger ? colors.rose600 : colors.brand700} /></View>
       <View style={{ flex: 1 }}>
         <T v="bodyStrong" color={danger ? colors.rose600 : undefined}>{label}</T>
         {sub && <T v="caption">{sub}</T>}
@@ -38,13 +38,13 @@ export default function Me() {
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 130 }} showsVerticalScrollIndicator={false}>
         <View style={styles.head}>
-          <LinearGradient colors={[colors.emerald600, colors.emerald900]} style={styles.avatar}>
+          <LinearGradient colors={[colors.brand600, colors.brand900]} style={styles.avatar}>
             <Text style={styles.initials}>{initials}</Text>
           </LinearGradient>
           <View style={{ flex: 1 }}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
               <T v="h2" numberOfLines={1} style={{ flexShrink: 1 }}>{user.full_name}</T>
-              {user.identity_status === "verified" && <BadgeCheck size={18} color={colors.emerald600} fill={colors.emerald50} />}
+              {user.identity_status === "verified" && <BadgeCheck size={18} color={colors.brand600} fill={colors.brand50} />}
             </View>
             <T v="small">{user.phone}</T>
           </View>
@@ -57,7 +57,7 @@ export default function Me() {
         </View>
 
         <Tap onPress={() => router.push("/membership")} style={{ marginTop: 16 }}>
-          <LinearGradient colors={m?.tier === "free" ? [colors.emerald700, colors.emerald950] : ["#3A2E12", "#15110A"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.member}>
+          <LinearGradient colors={m?.tier === "free" ? [colors.brand700, colors.brand950] : ["#3A2E12", "#15110A"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.member}>
             <Crown size={22} color={colors.gold400} />
             <View style={{ flex: 1 }}>
               <T v="overline" color={colors.gold400}>{m?.tier === "free" ? "Free plan" : "DEEN " + (m?.plan_name ?? "")}</T>
@@ -105,10 +105,10 @@ const styles = StyleSheet.create({
   initials: { fontFamily: fonts.extrabold, fontSize: 22, color: colors.gold400 },
   stats: { flexDirection: "row", gap: 10, marginTop: 18 },
   stat: { flex: 1, backgroundColor: colors.white, borderRadius: 16, paddingVertical: 12, alignItems: "center", borderWidth: 1, borderColor: colors.sand200 },
-  statN: { fontFamily: fonts.extrabold, fontSize: 20, color: colors.emerald800 },
+  statN: { fontFamily: fonts.extrabold, fontSize: 20, color: colors.brand800 },
   member: { flexDirection: "row", alignItems: "center", gap: 14, borderRadius: 20, padding: 18 },
   group: { marginTop: 24, marginBottom: 10, marginLeft: 4 },
   card: { backgroundColor: colors.white, borderRadius: 20, borderWidth: 1, borderColor: colors.sand200, overflow: "hidden" },
   row: { flexDirection: "row", alignItems: "center", gap: 14, paddingHorizontal: 16, paddingVertical: 13 },
-  rowIcon: { width: 38, height: 38, borderRadius: 12, backgroundColor: colors.emerald50, alignItems: "center", justifyContent: "center" },
+  rowIcon: { width: 38, height: 38, borderRadius: 12, backgroundColor: colors.brand50, alignItems: "center", justifyContent: "center" },
 });

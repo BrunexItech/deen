@@ -51,7 +51,7 @@ export default function SignUp() {
         <Input label="Password" icon={Lock} placeholder="At least 8 characters" secureTextEntry autoComplete="new-password" value={f.password} onChangeText={(v) => setF({ ...f, password: v })} />
         <View style={styles.meter}>
           {[0, 1, 2, 3].map((i) => (
-            <View key={i} style={[styles.bar, { backgroundColor: i < s ? (s < 2 ? colors.rose600 : s < 3 ? colors.gold500 : colors.emerald500) : colors.sand300 }]} />
+            <View key={i} style={[styles.bar, { backgroundColor: i < s ? (s < 2 ? colors.rose600 : s < 3 ? colors.gold500 : colors.brand500) : colors.sand300 }]} />
           ))}
         </View>
         <T v="caption">{f.password ? ["Too weak", "Weak", "Good", "Strong", "Excellent"][s] : "Use letters and numbers"}</T>
@@ -72,5 +72,5 @@ const styles = StyleSheet.create({
   bar: { flex: 1, height: 4, borderRadius: 2 },
   consent: { flexDirection: "row", gap: 12, alignItems: "flex-start", paddingVertical: 4 },
   box: { width: 22, height: 22, borderRadius: 7, borderWidth: 2, borderColor: colors.sand300, alignItems: "center", justifyContent: "center", marginTop: 1 },
-  boxOn: { backgroundColor: colors.emerald700, borderColor: colors.emerald700 },
+  boxOn: { backgroundColor: colors.brand700, borderColor: colors.brand700 },
 });

@@ -11,7 +11,7 @@ Organizations submit opportunities: scholarships, jobs, business funding, zakat 
 | Member app (Android, iOS-ready) | `mobile/` | Expo 57 · React Native 0.86 · Expo Router · TanStack Query · Reanimated 4 |
 | DEEN Control Center + Organization Portal | `web/` | Next.js 16 · React 19 · Tailwind 4 · TanStack Query · Recharts |
 | API + background worker | `backend/` | FastAPI · async SQLAlchemy 2 · PostgreSQL 16 · Redis (optional) |
-| Brand | `assets/brand/` | Generated mark (khatam + open doorway) in every size |
+| Brand | `assets/brand/` | Official DEEN logo (`deen-logo-original.png`) and every size derived from it by `build_assets.py` |
 
 ---
 

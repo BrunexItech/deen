@@ -88,7 +88,7 @@ export default function Membership() {
             <T v="caption" color="rgba(255,255,255,0.55)">&ldquo;Charity never decreases wealth.&rdquo; (Sahih Muslim 2588)</T>
           </LinearGradient>
         ) : (
-          <LinearGradient colors={m?.tier === "free" ? [colors.emerald700, colors.emerald950] : ["#3A2E12", "#15110A"]} style={styles.current}>
+          <LinearGradient colors={m?.tier === "free" ? [colors.brand700, colors.brand950] : ["#3A2E12", "#15110A"]} style={styles.current}>
             <Crown size={24} color={colors.gold400} />
             <T v="overline" color={colors.gold400} style={{ marginTop: 10 }}>Your plan</T>
             <T v="title" color={colors.white}>{m?.plan_name ?? "Free"}</T>
@@ -105,7 +105,7 @@ export default function Membership() {
             <Segmented value={billing} onChange={setBilling} options={[{ value: "monthly", label: "Monthly" }, { value: "yearly", label: "Yearly · save 17%" }]} />
           </View>
           <Tap onPress={() => setGift(!gift)} style={[styles.giftToggle, gift && { backgroundColor: colors.gold500, borderColor: colors.gold500 }]}>
-            <Gift size={18} color={gift ? colors.emerald950 : colors.gold600} />
+            <Gift size={18} color={gift ? colors.brand950 : colors.gold600} />
           </Tap>
         </View>
 
@@ -158,7 +158,7 @@ export default function Membership() {
           </View>
         ) : pay.status === "success" ? (
           <Animated.View entering={ZoomIn} style={styles.center}>
-            <CheckCircle2 size={64} color={colors.emerald600} />
+            <CheckCircle2 size={64} color={colors.brand600} />
             <T v="title" center style={{ marginTop: 12 }}>{gift ? "JazakAllahu khayran!" : "Welcome aboard!"}</T>
             <T v="small" center>{gift ? "Your gift is active. May Allah reward you." : "Your membership is now active."} Receipt {pay.receipt}</T>
           </Animated.View>
@@ -180,8 +180,8 @@ const styles = StyleSheet.create({
   plan: { backgroundColor: colors.white, borderRadius: 22, padding: 18, borderWidth: 1.5, borderColor: colors.sand200, overflow: "hidden" },
   planHi: { borderColor: colors.gold400, borderWidth: 2 },
   ribbon: { position: "absolute", top: 0, right: 0, backgroundColor: colors.gold500, paddingHorizontal: 12, paddingVertical: 4, borderBottomLeftRadius: 12 },
-  ribbonText: { fontFamily: fonts.extrabold, fontSize: 9.5, letterSpacing: 1, color: colors.emerald950 },
-  price: { fontFamily: fonts.extrabold, fontSize: 22, color: colors.emerald800 },
-  tick: { width: 20, height: 20, borderRadius: 10, backgroundColor: colors.emerald600, alignItems: "center", justifyContent: "center" },
+  ribbonText: { fontFamily: fonts.extrabold, fontSize: 9.5, letterSpacing: 1, color: colors.brand950 },
+  price: { fontFamily: fonts.extrabold, fontSize: 22, color: colors.brand800 },
+  tick: { width: 20, height: 20, borderRadius: 10, backgroundColor: colors.brand600, alignItems: "center", justifyContent: "center" },
   center: { alignItems: "center", paddingVertical: 20, gap: 4 },
 });

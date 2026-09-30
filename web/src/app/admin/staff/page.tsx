@@ -86,7 +86,7 @@ export default function StaffPage() {
               <div className="mb-2 text-[13px] font-semibold text-ink-700">Role</div>
               <div className="space-y-2">
                 {Object.entries(STAFF_ROLES).map(([r, desc]) => (
-                  <button key={r} type="button" onClick={() => setF({ ...f, role: r })} className={`block w-full rounded-xl border-2 px-4 py-2.5 text-left transition ${f.role === r ? "border-emerald-600 bg-emerald-50" : "border-sand-200"}`}>
+                  <button key={r} type="button" onClick={() => setF({ ...f, role: r })} className={`block w-full rounded-xl border-2 px-4 py-2.5 text-left transition ${f.role === r ? "border-brand-600 bg-brand-50" : "border-sand-200"}`}>
                     <div className="text-sm font-semibold">{ROLE_LABEL[r]}</div>
                     <div className="text-xs text-ink-500">{desc}</div>
                   </button>

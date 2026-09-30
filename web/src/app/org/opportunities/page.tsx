@@ -43,7 +43,7 @@ export default function OrgOpportunities() {
         ) : (
           <div className="divide-y divide-sand-200">
             {items.map((o) => (
-              <Link key={o.id} href={`/org/opportunities/${o.id}`} className="flex flex-col gap-2 px-5 py-4 hover:bg-emerald-50/40 sm:flex-row sm:items-center">
+              <Link key={o.id} href={`/org/opportunities/${o.id}`} className="flex flex-col gap-2 px-5 py-4 hover:bg-brand-50/40 sm:flex-row sm:items-center">
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-semibold">{o.title}</div>
                   <div className="text-xs text-ink-400">{cat(o.category)} · deadline {fmtDate(o.deadline)} · updated {fmtDate(o.updated_at)}</div>

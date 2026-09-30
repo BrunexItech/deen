@@ -10,7 +10,7 @@ import { Badge, Card, CardHeader, PageHeader, Stat, Tabs } from "@/components/ui
 import { get } from "@/lib/api";
 import { useMe } from "@/lib/auth";
 import { compact, kes, num, VERIFICATION } from "@/lib/format";
-import { useCategoryLabel } from "@/lib/hooks";
+import { useCategoryLabel, useTaxonomy } from "@/lib/hooks";
 import type { Verification } from "@/lib/types";
 
 interface Overview {
@@ -22,9 +22,34 @@ interface Overview {
   top_organizations: { id: string; name: string; verification: Verification; opportunities: number; applications: number }[];
   top_opportunities: { id: string; title: string; category: string; views: number; applications: number }[];
   plan_mix: { plan: string; count: number }[];
+  most_saved: { id: string; title: string; saves: number }[];
+  most_applied: { id: string; title: string; applications: number }[];
+  interests: { category: string; members: number }[];
+  user_types: { type: string; members: number }[];
 }
 
-const CAT_COLORS = ["#0f7a61", "#c9a34e", "#1d4ed8", "#be123c", "#7c3aed", "#047857"];
+function Ranked({ title, rows }: { title: string; rows: { id?: string; label: string; value: number }[] }) {
+  const max = Math.max(1, ...rows.map((r) => r.value));
+  return (
+    <Card>
+      <CardHeader title={title} />
+      <div className="space-y-2.5">
+        {rows.length === 0 && <p className="text-sm text-ink-400">No data yet.</p>}
+        {rows.map((r) => {
+          const body = (
+            <>
+              <div className="mb-1 flex justify-between gap-3 text-sm"><span className="truncate font-semibold">{r.label}</span><span className="tabular-nums text-ink-500">{num(r.value)}</span></div>
+              <div className="h-1.5 rounded-full bg-sand-200"><div className="h-full rounded-full bg-gradient-to-r from-brand-600 to-gold-500" style={{ width: `${(100 * r.value) / max}%` }} /></div>
+            </>
+          );
+          return r.id ? <Link key={r.label} href={`/admin/opportunities/${r.id}`} className="block hover:opacity-80">{body}</Link> : <div key={r.label}>{body}</div>;
+        })}
+      </div>
+    </Card>
+  );
+}
+
+const CAT_COLORS = ["#004485", "#e39d29", "#43b02a", "#2a72c2", "#7c3aed", "#be123c"];
 
 function greeting() {
   const h = Number(new Date().toLocaleString("en-KE", { hour: "numeric", hour12: false, timeZone: "Africa/Nairobi" }));
@@ -35,6 +60,7 @@ export default function OverviewPage() {
   const [days, setDays] = useState<"7" | "30" | "90">("30");
   const { data: me } = useMe();
   const cat = useCategoryLabel();
+  const { data: tax } = useTaxonomy();
   const { data, isLoading } = useQuery({ queryKey: ["admin", "overview", Number(days)], queryFn: () => get<Overview>(`/admin/overview?days=${days}`) });
 
   if (isLoading || !data) return <PageLoader label="Gathering the numbers" />;
@@ -71,7 +97,7 @@ export default function OverviewPage() {
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Stat label="Registered members" value={compact(k.members)} hint={`+${num(k.new_members)} in ${days} days · ${num(k.active_7d)} active this week`} icon={<Users size={20} />} />
-        <Stat label="Live opportunities" value={num(k.live_opportunities)} hint={`${num(k.organizations)} organizations · ${num(k.verified_orgs)} verified`} icon={<Sparkles size={20} />} tone="gold" />
+        <Stat label="Live opportunities" value={num(k.live_opportunities)} hint={`${num(k.expired_opportunities)} expired · ${num(k.verified_orgs)}/${num(k.organizations)} providers verified`} icon={<Sparkles size={20} />} tone="gold" />
         <Stat label="Successful connections" value={num(k.successful_connections)} hint={`${num(k.accepted)} accepted · ${num(k.outcomes)} success stories`} icon={<HeartHandshake size={20} />} />
         <Stat label="Revenue" value={kes(k.revenue_period)} hint={`${num(k.paying_members)} paying members · ${kes(k.revenue_all)} all-time`} icon={<Banknote size={20} />} tone="gold" />
       </div>
@@ -82,18 +108,18 @@ export default function OverviewPage() {
           <TrendChart
             data={data.series}
             series={[
-              { key: "views", label: "Views", color: "#c9a34e" },
-              { key: "applications", label: "Applications", color: "#0f7a61" },
-              { key: "signups", label: "New members", color: "#1d4ed8" },
+              { key: "views", label: "Views", color: "#e39d29" },
+              { key: "applications", label: "Applications", color: "#43b02a" },
+              { key: "signups", label: "New members", color: "#004485" },
             ]}
           />
         </Card>
         <Card>
           <CardHeader title="Impact" subtitle="What DEEN measures itself by" />
-          <div className="rounded-2xl bg-gradient-to-br from-emerald-800 to-emerald-950 p-5 text-white">
+          <div className="rounded-2xl bg-gradient-to-br from-brand-800 to-brand-950 p-5 text-white">
             <div className="text-xs font-semibold uppercase tracking-widest text-gold-400">People who benefited</div>
             <div className="mt-2 text-5xl font-extrabold">{num(k.successful_connections)}</div>
-            <p className="mt-2 text-sm text-emerald-50/70">Members accepted by organizations or who told us an opportunity changed their life.</p>
+            <p className="mt-2 text-sm text-brand-50/70">Members accepted by organizations or who told us an opportunity changed their life.</p>
           </div>
           <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
             <div className="rounded-xl bg-sand-100 p-3"><div className="text-ink-500">Applications</div><div className="text-xl font-bold">{num(k.applications)}</div></div>
@@ -125,7 +151,7 @@ export default function OverviewPage() {
                       <td className="py-2.5 font-semibold">{c.county}</td>
                       <td className="py-2.5 text-right tabular-nums">
                         <div className="flex items-center justify-end gap-2">
-                          <div className="h-1.5 w-20 overflow-hidden rounded-full bg-sand-200"><div className="h-full rounded-full bg-emerald-600" style={{ width: `${(100 * c.members) / max}%` }} /></div>
+                          <div className="h-1.5 w-20 overflow-hidden rounded-full bg-sand-200"><div className="h-full rounded-full bg-brand-600" style={{ width: `${(100 * c.members) / max}%` }} /></div>
                           {num(c.members)}
                         </div>
                       </td>
@@ -142,9 +168,16 @@ export default function OverviewPage() {
         </Card>
       </div>
 
+      <div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <Ranked title="Most saved" rows={data.most_saved.map((o) => ({ id: o.id, label: o.title, value: o.saves }))} />
+        <Ranked title="Most applied for" rows={data.most_applied.map((o) => ({ id: o.id, label: o.title, value: o.applications }))} />
+        <Ranked title="Member interests" rows={data.interests.map((i) => ({ label: cat(i.category), value: i.members }))} />
+        <Ranked title="Who our members are" rows={data.user_types.map((u) => ({ label: tax?.user_types.find((t) => t.key === u.type)?.name ?? u.type, value: u.members }))} />
+      </div>
+
       <div className="mt-5 grid gap-5 xl:grid-cols-2">
         <Card>
-          <CardHeader title="Top organizations" subtitle="By applications received" action={<Link href="/admin/organizations" className="text-sm font-semibold text-emerald-700">All</Link>} />
+          <CardHeader title="Top organizations" subtitle="By applications received" action={<Link href="/admin/organizations" className="text-sm font-semibold text-brand-700">All</Link>} />
           <div className="divide-y divide-sand-200">
             {data.top_organizations.map((o, i) => (
               <Link key={o.id} href={`/admin/organizations/${o.id}`} className="flex items-center gap-3 py-2.5 hover:bg-sand-50">

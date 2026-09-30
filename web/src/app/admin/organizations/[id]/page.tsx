@@ -70,7 +70,7 @@ export default function OrgDetailPage() {
             <div className="divide-y divide-sand-200">
               {o.opportunities.length === 0 && <p className="px-5 pb-5 text-sm text-ink-400">No opportunities submitted yet.</p>}
               {o.opportunities.map((x) => (
-                <Link key={x.id} href={`/admin/opportunities/${x.id}`} className="flex items-center gap-3 px-5 py-3 hover:bg-emerald-50/40">
+                <Link key={x.id} href={`/admin/opportunities/${x.id}`} className="flex items-center gap-3 px-5 py-3 hover:bg-brand-50/40">
                   <div className="min-w-0 flex-1"><div className="truncate font-semibold">{x.title}</div><div className="text-xs text-ink-400">Deadline {fmtDate(x.deadline)} · {num(x.views)} views · {num(x.applications)} apps</div></div>
                   <StatusBadge status={x.status} />
                 </Link>
@@ -107,9 +107,9 @@ export default function OrgDetailPage() {
               <div className="grid gap-2">
                 {(["pending", "verified", "trusted"] as Verification[]).map((lvl) => (
                   <button key={lvl} disabled={verify.isPending} onClick={() => verify.mutate(lvl)}
-                    className={`flex items-center justify-between rounded-xl border-2 px-4 py-3 text-left text-sm font-semibold transition ${o.verification === lvl ? "border-emerald-600 bg-emerald-50" : "border-sand-200 hover:border-sand-300"}`}>
+                    className={`flex items-center justify-between rounded-xl border-2 px-4 py-3 text-left text-sm font-semibold transition ${o.verification === lvl ? "border-brand-600 bg-brand-50" : "border-sand-200 hover:border-sand-300"}`}>
                     <span>{VERIFICATION[lvl].label}<span className="block text-xs font-normal text-ink-500">{lvl === "pending" ? "Can draft; can't be published" : lvl === "verified" ? "Documents checked by DEEN" : "Long-standing partner with a strong record"}</span></span>
-                    {o.verification === lvl && <CheckCircle2 size={18} className="text-emerald-700" />}
+                    {o.verification === lvl && <CheckCircle2 size={18} className="text-brand-700" />}
                   </button>
                 ))}
               </div>
@@ -119,7 +119,7 @@ export default function OrgDetailPage() {
             <CardHeader title="Details" />
             <dl className="space-y-2.5 text-sm">
               {o.county && <div className="flex items-center gap-2"><MapPin size={15} className="text-ink-400" />{o.county}{o.address && `, ${o.address}`}</div>}
-              {o.website && <a href={o.website} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-emerald-700"><Globe size={15} />{o.website}</a>}
+              {o.website && <a href={o.website} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-brand-700"><Globe size={15} />{o.website}</a>}
               {o.email && <div className="flex items-center gap-2"><Mail size={15} className="text-ink-400" />{o.email}</div>}
               {o.phone && <div className="flex items-center gap-2"><Phone size={15} className="text-ink-400" />{o.phone}</div>}
               {o.registration_number && <div className="text-ink-500">Reg. no. <b className="text-ink-900">{o.registration_number}</b></div>}

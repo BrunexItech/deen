@@ -85,8 +85,8 @@ export default function Onboarding() {
                 <View style={styles.row}>
                   {[["male", "Brother"], ["female", "Sister"]].map(([v, l]) => (
                     <Tap key={v} onPress={() => set("gender", v)} style={[styles.big, d.gender === v && styles.bigOn]}>
-                      <Text style={[styles.bigText, d.gender === v && { color: colors.emerald800 }]}>{l}</Text>
-                      {d.gender === v && <Check size={18} color={colors.emerald700} />}
+                      <Text style={[styles.bigText, d.gender === v && { color: colors.brand800 }]}>{l}</Text>
+                      {d.gender === v && <Check size={18} color={colors.brand700} />}
                     </Tap>
                   ))}
                 </View>
@@ -172,11 +172,11 @@ const styles = StyleSheet.create({
   row: { flexDirection: "row", gap: 10 },
   wrap: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   big: { flex: 1, height: 58, borderRadius: 16, borderWidth: 1.5, borderColor: colors.sand300, backgroundColor: colors.white, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 },
-  bigOn: { borderColor: colors.emerald600, backgroundColor: colors.emerald50 },
+  bigOn: { borderColor: colors.brand600, backgroundColor: colors.brand50 },
   bigText: { fontFamily: fonts.bold, fontSize: 16, color: colors.ink700 },
   dob: { height: 54, borderRadius: 14, borderWidth: 1.5, borderColor: colors.sand300, backgroundColor: colors.white, textAlign: "center", fontFamily: fonts.bold, fontSize: 18, color: colors.ink900 },
   addRow: { flexDirection: "row", gap: 10, alignItems: "flex-end" },
-  addBtn: { width: 54, height: 54, borderRadius: 14, backgroundColor: colors.emerald700, alignItems: "center", justifyContent: "center" },
+  addBtn: { width: 54, height: 54, borderRadius: 14, backgroundColor: colors.brand700, alignItems: "center", justifyContent: "center" },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
   cat: { width: "48%", borderRadius: 18, borderWidth: 1.5, borderColor: colors.sand300, backgroundColor: colors.white, padding: 16 },
   catCheck: { position: "absolute", top: 12, right: 12, width: 22, height: 22, borderRadius: 11, alignItems: "center", justifyContent: "center" },

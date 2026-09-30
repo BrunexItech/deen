@@ -22,9 +22,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLBut
         size === "sm" && "h-8 px-3 text-[13px]",
         size === "md" && "h-10 px-4 text-sm",
         size === "lg" && "h-12 px-6 text-[15px]",
-        variant === "primary" && "bg-emerald-700 text-white shadow-sm hover:bg-emerald-800",
-        variant === "gold" && "bg-gradient-to-b from-gold-400 to-gold-600 text-emerald-950 shadow-sm hover:brightness-105",
-        variant === "secondary" && "border border-sand-300 bg-white text-ink-900 hover:border-emerald-600/40 hover:bg-emerald-50",
+        variant === "primary" && "bg-brand-700 text-white shadow-sm hover:bg-brand-800",
+        variant === "gold" && "bg-gradient-to-b from-gold-400 to-gold-600 text-brand-950 shadow-sm hover:brightness-105",
+        variant === "secondary" && "border border-sand-300 bg-white text-ink-900 hover:border-brand-600/40 hover:bg-brand-50",
         variant === "ghost" && "text-ink-700 hover:bg-sand-200/60",
         variant === "danger" && "bg-rose-600 text-white hover:bg-rose-700",
         className,
@@ -73,7 +73,7 @@ export function PageHeader({ title, subtitle, actions, eyebrow }: { title: React
 const TONES: Record<Tone, string> = {
   neutral: "bg-sand-200/70 text-ink-700",
   info: "bg-sky-50 text-sky-800 ring-1 ring-sky-200/70",
-  good: "bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200/70",
+  good: "bg-leaf-50 text-leaf-800 ring-1 ring-leaf-200/70",
   warn: "bg-amber-50 text-amber-800 ring-1 ring-amber-200/70",
   bad: "bg-rose-50 text-rose-700 ring-1 ring-rose-200/70",
   gold: "bg-gold-50 text-gold-700 ring-1 ring-gold-400/40",
@@ -101,7 +101,7 @@ export function Field({ label, hint, error, children, className }: { label: Reac
   );
 }
 
-const control = "w-full rounded-xl border border-sand-300 bg-white px-3.5 text-ink-900 outline-none transition placeholder:text-ink-300 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10 disabled:bg-sand-100";
+const control = "w-full rounded-xl border border-sand-300 bg-white px-3.5 text-ink-900 outline-none transition placeholder:text-ink-300 focus:border-brand-600 focus:ring-4 focus:ring-brand-600/10 disabled:bg-sand-100";
 
 export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(function Input({ className, ...rest }, ref) {
   return <input ref={ref} className={clsx(control, "h-11", className)} {...rest} />;
@@ -122,7 +122,7 @@ export function Select({ className, children, ...rest }: SelectHTMLAttributes<HT
 export function Toggle({ checked, onChange, label, description }: { checked: boolean; onChange: (v: boolean) => void; label: ReactNode; description?: ReactNode }) {
   return (
     <button type="button" onClick={() => onChange(!checked)} className="flex w-full items-start gap-3 text-left">
-      <span className={clsx("mt-0.5 flex h-6 w-11 shrink-0 items-center rounded-full p-0.5 transition", checked ? "bg-emerald-600" : "bg-sand-300")}>
+      <span className={clsx("mt-0.5 flex h-6 w-11 shrink-0 items-center rounded-full p-0.5 transition", checked ? "bg-brand-600" : "bg-sand-300")}>
         <span className={clsx("h-5 w-5 rounded-full bg-white shadow transition", checked && "translate-x-5")} />
       </span>
       <span>
@@ -146,7 +146,7 @@ export function ChipSelect({ options, value, onChange, max }: { options: { value
             onClick={() => onChange(on ? value.filter((v) => v !== o.value) : max && value.length >= max ? value : [...value, o.value])}
             className={clsx(
               "rounded-full border px-3 py-1.5 text-[13px] font-medium transition",
-              on ? "border-emerald-700 bg-emerald-700 text-white" : "border-sand-300 bg-white text-ink-700 hover:border-emerald-600/50",
+              on ? "border-brand-700 bg-brand-700 text-white" : "border-sand-300 bg-white text-ink-700 hover:border-brand-600/50",
             )}
           >
             {o.label}
@@ -170,7 +170,7 @@ export function TagInput({ value, onChange, placeholder, suggestions = [] }: { v
     <div>
       <div className={clsx(control, "flex min-h-11 flex-wrap items-center gap-1.5 py-1.5")}>
         {value.map((t) => (
-          <span key={t} className="inline-flex items-center gap-1 rounded-lg bg-emerald-50 px-2 py-1 text-[13px] font-medium text-emerald-800">
+          <span key={t} className="inline-flex items-center gap-1 rounded-lg bg-brand-50 px-2 py-1 text-[13px] font-medium text-brand-800">
             {t}
             <button type="button" onClick={() => onChange(value.filter((v) => v !== t))} aria-label={`Remove ${t}`}>
               <X size={13} />
@@ -194,7 +194,7 @@ export function TagInput({ value, onChange, placeholder, suggestions = [] }: { v
       {matches.length > 0 && (
         <div className="mt-1.5 flex flex-wrap gap-1.5">
           {matches.map((m) => (
-            <button key={m} type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => add(m)} className="rounded-full bg-sand-200/70 px-2.5 py-1 text-xs text-ink-700 hover:bg-emerald-50">
+            <button key={m} type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => add(m)} className="rounded-full bg-sand-200/70 px-2.5 py-1 text-xs text-ink-700 hover:bg-brand-50">
               + {m}
             </button>
           ))}
@@ -215,7 +215,7 @@ export function Modal({ open, onClose, title, children, footer, wide }: { open: 
   }, [open, onClose]);
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-emerald-950/40 p-0 backdrop-blur-[2px] sm:items-center sm:p-6" onMouseDown={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-brand-950/40 p-0 backdrop-blur-[2px] sm:items-center sm:p-6" onMouseDown={onClose}>
       <div
         onMouseDown={(e) => e.stopPropagation()}
         className={clsx("max-h-[92vh] w-full animate-fade-up overflow-hidden rounded-t-3xl bg-white shadow-float sm:rounded-3xl", wide ? "sm:max-w-3xl" : "sm:max-w-lg")}
@@ -245,7 +245,7 @@ export function Stat({ label, value, hint, icon, tone = "emerald" }: { label: st
           {hint && <div className="mt-2 text-xs text-ink-400">{hint}</div>}
         </div>
         {icon && (
-          <div className={clsx("rounded-xl p-2.5", tone === "emerald" && "bg-emerald-50 text-emerald-700", tone === "gold" && "bg-gold-50 text-gold-600", tone === "ink" && "bg-sand-100 text-ink-700")}>
+          <div className={clsx("rounded-xl p-2.5", tone === "emerald" && "bg-brand-50 text-brand-700", tone === "gold" && "bg-gold-50 text-gold-600", tone === "ink" && "bg-sand-100 text-ink-700")}>
             {icon}
           </div>
         )}
@@ -257,7 +257,7 @@ export function Stat({ label, value, hint, icon, tone = "emerald" }: { label: st
 export function Empty({ icon, title, body, action }: { icon?: ReactNode; title: string; body?: ReactNode; action?: ReactNode }) {
   return (
     <div className="flex flex-col items-center justify-center px-6 py-14 text-center">
-      {icon && <div className="mb-4 rounded-2xl bg-emerald-50 p-4 text-emerald-700">{icon}</div>}
+      {icon && <div className="mb-4 rounded-2xl bg-brand-50 p-4 text-brand-700">{icon}</div>}
       <h3 className="text-base font-bold text-ink-900">{title}</h3>
       {body && <p className="mt-1 max-w-sm text-sm text-ink-500">{body}</p>}
       {action && <div className="mt-5">{action}</div>}
@@ -279,7 +279,7 @@ export function Tabs<T extends string>({ tabs, value, onChange }: { tabs: { valu
         >
           {t.label}
           {t.count !== undefined && (
-            <span className={clsx("rounded-full px-1.5 text-[11px]", value === t.value ? "bg-emerald-50 text-emerald-700" : "bg-sand-300/60")}>{t.count}</span>
+            <span className={clsx("rounded-full px-1.5 text-[11px]", value === t.value ? "bg-brand-50 text-brand-700" : "bg-sand-300/60")}>{t.count}</span>
           )}
         </button>
       ))}
@@ -291,7 +291,7 @@ export function Avatar({ name, src, size = 36 }: { name: string; src?: string | 
   const initials = name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase();
   if (src) return <img src={src} alt={name} width={size} height={size} className="rounded-xl object-cover" style={{ width: size, height: size }} />;
   return (
-    <div className="flex items-center justify-center rounded-xl bg-gradient-to-br from-emerald-600 to-emerald-800 font-bold text-white" style={{ width: size, height: size, fontSize: size * 0.36 }}>
+    <div className="flex items-center justify-center rounded-xl bg-gradient-to-br from-brand-600 to-brand-800 font-bold text-white" style={{ width: size, height: size, fontSize: size * 0.36 }}>
       {initials}
     </div>
   );

@@ -87,7 +87,7 @@ function Plans() {
           </Card>
         ))}
         {can("plans.manage") && (
-          <button onClick={() => open()} className="flex min-h-[200px] flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-sand-300 text-sm font-semibold text-ink-500 hover:border-emerald-600 hover:text-emerald-700">
+          <button onClick={() => open()} className="flex min-h-[200px] flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-sand-300 text-sm font-semibold text-ink-500 hover:border-brand-600 hover:text-brand-700">
             <Plus size={20} /> New plan
           </button>
         )}

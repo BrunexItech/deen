@@ -45,7 +45,7 @@ export default function MyListing() {
         <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
           {existing && (
             <Card style={{ flexDirection: "row", gap: 12, alignItems: "center" }}>
-              <Store size={20} color={colors.emerald700} />
+              <Store size={20} color={colors.brand700} />
               <T v="bodyStrong" style={{ flex: 1 }}>Status</T>
               <Badge label={existing.status === "approved" ? "Live" : existing.status === "rejected" ? "Needs changes" : "In review"} tone={existing.status === "approved" ? "good" : existing.status === "rejected" ? "bad" : "warn"} />
             </Card>
@@ -80,5 +80,5 @@ const styles = StyleSheet.create({
   wrap: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   check: { flexDirection: "row", alignItems: "center", gap: 12 },
   box: { width: 24, height: 24, borderRadius: 7, borderWidth: 2, borderColor: colors.sand300, alignItems: "center", justifyContent: "center" },
-  boxOn: { backgroundColor: colors.emerald700, borderColor: colors.emerald700 },
+  boxOn: { backgroundColor: colors.brand700, borderColor: colors.brand700 },
 });

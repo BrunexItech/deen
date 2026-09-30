@@ -23,7 +23,7 @@ export function Sheet({ open, onClose, title, children, footer }: { open: boolea
 }
 
 const styles = StyleSheet.create({
-  backdrop: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3,31,24,0.45)" },
+  backdrop: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,23,51,0.45)" },
   sheet: { position: "absolute", left: 0, right: 0, bottom: 0, maxHeight: "88%", backgroundColor: colors.sand100, borderTopLeftRadius: 28, borderTopRightRadius: 28, paddingTop: 10 },
   grip: { width: 42, height: 5, borderRadius: 3, backgroundColor: colors.sand300, alignSelf: "center", marginBottom: 14 },
 });

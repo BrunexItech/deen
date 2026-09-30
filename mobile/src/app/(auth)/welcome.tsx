@@ -42,14 +42,16 @@ export default function Welcome() {
   const list = useRef<FlatList>(null);
 
   return (
-    <LinearGradient colors={[colors.emerald800, colors.emerald950]} style={{ flex: 1 }}>
+    <LinearGradient colors={[colors.brand800, colors.brand950]} style={{ flex: 1 }}>
       <View style={styles.glow} />
       <SafeAreaView style={{ flex: 1 }}>
         <Animated.View entering={FadeIn.duration(700)} style={styles.brand}>
           <Pressable onLongPress={() => setServer(true)} delayLongPress={900}>
-            <Image source={require("../../../assets/icon.png")} style={styles.logo} />
+            <Image source={require("../../../assets/deen-emblem.png")} style={styles.logo} contentFit="contain" />
           </Pressable>
           <Text style={styles.wordmark}>DEEN</Text>
+          <Text style={styles.tagline}>The Muslim Opportunity Platform</Text>
+          <Text style={styles.motto}>Discover · Verify · Apply · Grow</Text>
           <Arabic size={20} color={colors.gold400} style={{ textAlign: "center", marginTop: 6 }}>وَتَعَاوَنُوا عَلَى الْبِرِّ وَالتَّقْوَىٰ</Arabic>
           <T v="caption" color="rgba(255,255,255,0.5)" center>&ldquo;Cooperate in righteousness and piety&rdquo; · Qur&apos;an 5:2</T>
         </Animated.View>
@@ -68,7 +70,7 @@ export default function Welcome() {
               <View style={{ width, paddingHorizontal: 32, justifyContent: "center" }}>
                 <View style={styles.slideIcon}><Icon size={26} color={colors.gold400} /></View>
                 <T v="title" color={colors.white} style={{ marginTop: 18 }}>{item.title}</T>
-                <T v="body" color="rgba(236,247,242,0.75)" style={{ marginTop: 8 }}>{item.body}</T>
+                <T v="body" color="rgba(236,242,252,0.75)" style={{ marginTop: 8 }}>{item.body}</T>
               </View>
             );
           }}
@@ -90,16 +92,18 @@ export default function Welcome() {
 }
 
 const styles = StyleSheet.create({
-  glow: { position: "absolute", width: 420, height: 420, borderRadius: 210, backgroundColor: "rgba(201,163,78,0.13)", top: -120, alignSelf: "center" },
+  glow: { position: "absolute", width: 420, height: 420, borderRadius: 210, backgroundColor: "rgba(227,157,41,0.13)", top: -120, alignSelf: "center" },
   brand: { alignItems: "center", paddingTop: 36 },
-  logo: { width: 88, height: 88, borderRadius: 24 },
-  wordmark: { fontFamily: fonts.extrabold, fontSize: 26, letterSpacing: 11, color: colors.white, marginTop: 16, marginLeft: 11 },
-  slideIcon: { width: 56, height: 56, borderRadius: 18, backgroundColor: "rgba(255,255,255,0.08)", borderWidth: 1, borderColor: "rgba(223,192,122,0.3)", alignItems: "center", justifyContent: "center" },
+  logo: { width: 116, height: 116 },
+  wordmark: { fontFamily: fonts.extrabold, fontSize: 30, letterSpacing: 10, color: colors.white, marginTop: 14, marginLeft: 10 },
+  tagline: { fontFamily: fonts.medium, fontSize: 13, color: "rgba(255,255,255,0.75)", marginTop: 2 },
+  motto: { fontFamily: fonts.bold, fontSize: 11, letterSpacing: 2.5, color: colors.gold400, marginTop: 10, textTransform: "uppercase" },
+  slideIcon: { width: 56, height: 56, borderRadius: 18, backgroundColor: "rgba(255,255,255,0.08)", borderWidth: 1, borderColor: "rgba(242,190,92,0.3)", alignItems: "center", justifyContent: "center" },
   dots: { flexDirection: "row", gap: 6, justifyContent: "center", marginBottom: 20 },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: "rgba(255,255,255,0.25)" },
   dotActive: { width: 22, backgroundColor: colors.gold400 },
   actions: { paddingHorizontal: 24, paddingBottom: 12 },
   legal: { fontFamily: fonts.regular, fontSize: 11, color: "rgba(255,255,255,0.4)", textAlign: "center", marginTop: 12 },
-  backdrop: { flex: 1, backgroundColor: "rgba(3,31,24,0.5)" },
+  backdrop: { flex: 1, backgroundColor: "rgba(0,23,51,0.5)" },
   sheet: { backgroundColor: colors.sand100, padding: 24, borderTopLeftRadius: 28, borderTopRightRadius: 28, paddingBottom: 40 },
 });

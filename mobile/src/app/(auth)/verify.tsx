@@ -70,7 +70,7 @@ export default function Verify() {
       {error && <T v="small" color={colors.rose600} center>{error}</T>}
       {!!devCode && <T v="caption" center>Development code: {devCode}</T>}
       <Pressable disabled={wait > 0} onPress={resend} style={{ alignSelf: "center" }}>
-        <T v="label" color={wait > 0 ? colors.ink400 : colors.emerald700}>{wait > 0 ? `Resend code in ${wait}s` : "Resend code"}</T>
+        <T v="label" color={wait > 0 ? colors.ink400 : colors.brand700}>{wait > 0 ? `Resend code in ${wait}s` : "Resend code"}</T>
       </Pressable>
     </AuthScaffold>
   );
@@ -79,8 +79,8 @@ export default function Verify() {
 const styles = StyleSheet.create({
   boxes: { flexDirection: "row", gap: 9, justifyContent: "center" },
   box: { width: 48, height: 58, borderRadius: 14, borderWidth: 1.5, borderColor: colors.sand300, backgroundColor: colors.white, alignItems: "center", justifyContent: "center" },
-  boxActive: { borderColor: colors.emerald600, borderWidth: 2 },
-  boxFilled: { borderColor: colors.emerald700, backgroundColor: colors.emerald50 },
+  boxActive: { borderColor: colors.brand600, borderWidth: 2 },
+  boxFilled: { borderColor: colors.brand700, backgroundColor: colors.brand50 },
   digit: { fontFamily: fonts.extrabold, fontSize: 24, color: colors.ink900 },
   hidden: { position: "absolute", opacity: 0, height: 1, width: 1 },
 });

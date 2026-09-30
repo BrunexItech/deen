@@ -19,7 +19,7 @@ function Progress({ status }: { status: string }) {
     <View style={styles.progress}>
       {PIPELINE.map((label, i) => (
         <View key={label} style={{ flex: 1 }}>
-          <View style={[styles.seg, i < s.step && { backgroundColor: status === "rejected" && i === 3 ? colors.ink300 : colors.emerald500 }]} />
+          <View style={[styles.seg, i < s.step && { backgroundColor: status === "rejected" && i === 3 ? colors.ink300 : colors.brand500 }]} />
         </View>
       ))}
     </View>
@@ -75,7 +75,7 @@ export default function Tracker() {
           contentContainerStyle={{ padding: 20, paddingBottom: 130, gap: 12 }}
           ListEmptyComponent={apps.isLoading ? <View style={{ gap: 12 }}><CardSkeleton /><CardSkeleton /></View>
             : <Empty icon={FileStack} title="No applications yet" body="When you apply, you can follow every step here, from sent to accepted." action="Find opportunities" onAction={() => router.push("/explore")} />}
-          refreshControl={<RefreshControl refreshing={q.isRefetching} onRefresh={() => q.refetch()} colors={[colors.emerald700]} tintColor={colors.emerald700} />}
+          refreshControl={<RefreshControl refreshing={q.isRefetching} onRefresh={() => q.refetch()} colors={[colors.brand700]} tintColor={colors.brand700} />}
         />
       ) : (
         <FlatList
@@ -84,7 +84,7 @@ export default function Tracker() {
           renderItem={({ item }) => <OpportunityCard o={item} />}
           contentContainerStyle={{ padding: 20, paddingBottom: 130, gap: 12 }}
           ListEmptyComponent={saved.isLoading ? <CardSkeleton /> : <Empty icon={Bookmark} title="Nothing saved" body="Tap the bookmark on any opportunity. We'll remind you 3 days before it closes." />}
-          refreshControl={<RefreshControl refreshing={q.isRefetching} onRefresh={() => q.refetch()} colors={[colors.emerald700]} tintColor={colors.emerald700} />}
+          refreshControl={<RefreshControl refreshing={q.isRefetching} onRefresh={() => q.refetch()} colors={[colors.brand700]} tintColor={colors.brand700} />}
         />
       )}
     </SafeAreaView>
@@ -102,5 +102,5 @@ const styles = StyleSheet.create({
   ext: { flexDirection: "row", alignItems: "center", gap: 4 },
   stats: { flexDirection: "row", gap: 10 },
   stat: { flex: 1, backgroundColor: colors.white, borderRadius: 16, paddingVertical: 12, alignItems: "center", borderWidth: 1, borderColor: colors.sand200 },
-  statN: { fontFamily: fonts.extrabold, fontSize: 22, color: colors.emerald800 },
+  statN: { fontFamily: fonts.extrabold, fontSize: 22, color: colors.brand800 },
 });

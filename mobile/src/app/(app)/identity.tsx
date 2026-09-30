@@ -20,7 +20,7 @@ function Shot({ label, hint, icon: Icon, uri, onPress }: { label: string; hint: 
     <Tap onPress={onPress} style={styles.shot}>
       {uri ? <Image source={{ uri }} style={StyleSheet.absoluteFill} contentFit="cover" /> : (
         <>
-          <Icon size={30} color={colors.emerald700} />
+          <Icon size={30} color={colors.brand700} />
           <T v="bodyStrong" style={{ marginTop: 8 }}>{label}</T>
           <T v="caption" center>{hint}</T>
         </>
@@ -71,7 +71,7 @@ export default function Identity() {
       <Header title="Verify your identity" />
       {status.isLoading ? <InlineLoader /> : s === "verified" || s === "pending" ? (
         <View style={styles.center}>
-          {s === "verified" ? <BadgeCheck size={70} color={colors.emerald600} /> : <Clock size={64} color={colors.gold500} />}
+          {s === "verified" ? <BadgeCheck size={70} color={colors.brand600} /> : <Clock size={64} color={colors.gold500} />}
           <T v="title" center style={{ marginTop: 16 }}>{s === "verified" ? "You're verified" : "Under review"}</T>
           <T v="body" center style={{ color: colors.ink500, marginTop: 6 }}>
             {s === "verified" ? "Your profile carries the verified badge, and you can apply for verified-only support." : "A DEEN verification officer is checking your documents. This usually takes less than 48 hours."}
@@ -79,8 +79,8 @@ export default function Identity() {
         </View>
       ) : (
         <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }}>
-          <Card style={{ gap: 6, backgroundColor: colors.emerald50, borderColor: colors.emerald100 }}>
-            <ShieldCheck size={22} color={colors.emerald700} />
+          <Card style={{ gap: 6, backgroundColor: colors.brand50, borderColor: colors.brand100 }}>
+            <ShieldCheck size={22} color={colors.brand700} />
             <T v="bodyStrong">Why verify?</T>
             <T v="small">Some zakat, sadaqah and emergency programmes accept verified members only, to make sure help reaches real people. Your documents are encrypted and seen only by DEEN&apos;s verification officers.</T>
           </Card>
@@ -102,5 +102,5 @@ export default function Identity() {
 
 const styles = StyleSheet.create({
   center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 32 },
-  shot: { flex: 1, height: 170, borderRadius: 18, borderWidth: 1.5, borderStyle: "dashed", borderColor: colors.emerald600, backgroundColor: colors.white, alignItems: "center", justifyContent: "center", padding: 12, overflow: "hidden" },
+  shot: { flex: 1, height: 170, borderRadius: 18, borderWidth: 1.5, borderStyle: "dashed", borderColor: colors.brand600, backgroundColor: colors.white, alignItems: "center", justifyContent: "center", padding: 12, overflow: "hidden" },
 });

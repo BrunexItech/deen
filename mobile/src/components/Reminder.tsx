@@ -13,15 +13,15 @@ export function ReminderCard({ r, dark = false }: { r: Reminder; dark?: boolean 
     <>
       <View style={styles.head}>
         <T v="overline" color={dark ? colors.gold400 : colors.gold600}>Today&apos;s reminder · {KIND[r.kind]}</T>
-        <Tap onPress={share} hitSlop={10}><Share2 size={17} color={dark ? colors.emerald100 : colors.ink400} /></Tap>
+        <Tap onPress={share} hitSlop={10}><Share2 size={17} color={dark ? colors.brand100 : colors.ink400} /></Tap>
       </View>
-      {r.arabic && <Arabic size={23} color={dark ? colors.gold400 : colors.emerald800} style={{ marginTop: 10 }}>{r.arabic}</Arabic>}
+      {r.arabic && <Arabic size={23} color={dark ? colors.gold400 : colors.brand800} style={{ marginTop: 10 }}>{r.arabic}</Arabic>}
       <T v="body" color={dark ? colors.white : colors.ink700} style={{ marginTop: 6, fontStyle: "italic" }}>&ldquo;{r.text}&rdquo;</T>
-      <T v="caption" color={dark ? colors.emerald100 : colors.ink400} style={{ marginTop: 8 }}>{r.reference}</T>
+      <T v="caption" color={dark ? colors.brand100 : colors.ink400} style={{ marginTop: 8 }}>{r.reference}</T>
     </>
   );
   return dark ? (
-    <LinearGradient colors={[colors.emerald800, colors.emerald950]} style={styles.card}>{body}</LinearGradient>
+    <LinearGradient colors={[colors.brand800, colors.brand950]} style={styles.card}>{body}</LinearGradient>
   ) : (
     <View style={[styles.card, styles.light]}>{body}</View>
   );

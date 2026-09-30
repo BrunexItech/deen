@@ -2,22 +2,32 @@
 
 /* DEEN design tokens. Emerald for trust, gold for light/opportunity, sand for calm. */
 @theme {
-  --color-emerald-950: #031f18;
-  --color-emerald-900: #062e25;
-  --color-emerald-800: #0a4034;
-  --color-emerald-700: #0b5d4b;
-  --color-emerald-600: #0f7a61;
-  --color-emerald-500: #16977a;
-  --color-emerald-400: #3db592;
-  --color-emerald-100: #dcefe7;
-  --color-emerald-50: #eef7f3;
+  /* DEEN brand, sampled from the official logo: navy wordmark, royal-blue sky, gold arch, green growth. */
+  --color-brand-950: #001733;
+  --color-brand-900: #00255f;
+  --color-brand-800: #00316f;
+  --color-brand-700: #004485;
+  --color-brand-600: #0b57a4;
+  --color-brand-500: #2a72c2;
+  --color-brand-400: #5b96d8;
+  --color-brand-200: #b9d0ee;
+  --color-brand-100: #dce8f7;
+  --color-brand-50: #eef4fc;
 
-  --color-gold-700: #8f6a1f;
-  --color-gold-600: #b7862c;
-  --color-gold-500: #c9a34e;
-  --color-gold-400: #dfc07a;
-  --color-gold-100: #f6ecd2;
-  --color-gold-50: #fbf6e9;
+  --color-gold-700: #9a6410;
+  --color-gold-600: #c98516;
+  --color-gold-500: #e39d29;
+  --color-gold-400: #f2be5c;
+  --color-gold-100: #fcebc8;
+  --color-gold-50: #fef7e8;
+
+  --color-leaf-800: #1d5f1f;
+  --color-leaf-700: #237a24;
+  --color-leaf-600: #2e9a2e;
+  --color-leaf-500: #43b02a;
+  --color-leaf-200: #bfe6ad;
+  --color-leaf-100: #ddf3d3;
+  --color-leaf-50: #f0faec;
 
   --color-sand-50: #fbfaf6;
   --color-sand-100: #f6f4ee;
@@ -35,7 +45,7 @@
   --font-arabic: var(--font-amiri), serif;
 
   --shadow-card: 0 1px 2px rgb(15 26 23 / 0.04), 0 4px 16px -8px rgb(15 26 23 / 0.08);
-  --shadow-float: 0 12px 40px -12px rgb(6 46 37 / 0.28);
+  --shadow-float: 0 12px 40px -12px rgb(0 37 95 / 0.28);
 
   --animate-fade-up: fade-up 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
   --animate-shimmer: shimmer 1.6s linear infinite;
@@ -79,18 +89,15 @@ textarea {
   border-radius: 10px;
 }
 
-/* ---------- The DEEN loader: counter-rotating khatam with a breathing light ---------- */
-.deen-loader .sq-a { animation: deen-spin 2.4s cubic-bezier(0.6, 0.1, 0.4, 0.9) infinite; transform-origin: 50% 50%; }
-.deen-loader .sq-b { animation: deen-spin-rev 2.4s cubic-bezier(0.6, 0.1, 0.4, 0.9) infinite; transform-origin: 50% 50%; }
-.deen-loader .trace { stroke-dasharray: 60 200; animation: deen-trace 1.6s linear infinite; }
-.deen-loader .light { animation: deen-breathe 1.6s ease-in-out infinite; transform-origin: 50% 50%; }
+/* ---------- The DEEN loader: the logo emblem inside a tri-colour orbit ---------- */
+.deen-loader .orbit { animation: deen-spin 1.4s cubic-bezier(0.5, 0.15, 0.5, 0.85) infinite; transform-origin: 50% 50%; }
+.deen-loader .orbit-slow { animation: deen-spin 2.8s linear infinite reverse; transform-origin: 50% 50%; }
+.deen-loader .emblem { animation: deen-breathe 1.8s ease-in-out infinite; transform-origin: 50% 50%; }
 
-@keyframes deen-spin { to { transform: rotate(90deg); } }
-@keyframes deen-spin-rev { from { transform: rotate(45deg); } to { transform: rotate(-45deg); } }
-@keyframes deen-trace { to { stroke-dashoffset: -260; } }
+@keyframes deen-spin { to { transform: rotate(360deg); } }
 @keyframes deen-breathe {
-  0%, 100% { opacity: 0.55; transform: scale(0.82); }
-  50% { opacity: 1; transform: scale(1.08); }
+  0%, 100% { transform: scale(0.92); opacity: 0.9; }
+  50% { transform: scale(1); opacity: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -108,5 +115,5 @@ textarea {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cg fill='none' stroke='%23c9a34e' stroke-opacity='0.14' stroke-width='1'%3E%3Crect x='16' y='16' width='24' height='24'/%3E%3Crect x='16' y='16' width='24' height='24' transform='rotate(45 28 28)'/%3E%3C/g%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cg fill='none' stroke='%23e39d29' stroke-opacity='0.14' stroke-width='1'%3E%3Crect x='16' y='16' width='24' height='24'/%3E%3Crect x='16' y='16' width='24' height='24' transform='rotate(45 28 28)'/%3E%3C/g%3E%3C/svg%3E");
 }

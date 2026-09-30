@@ -32,7 +32,7 @@ export default function Organization() {
 
   return (
     <ScrollView contentContainerStyle={{ paddingBottom: 40 }} style={{ backgroundColor: colors.sand100 }}>
-      <LinearGradient colors={[colors.emerald800, colors.emerald950]} style={{ paddingTop: insets.top, paddingBottom: 26 }}>
+      <LinearGradient colors={[colors.brand800, colors.brand950]} style={{ paddingTop: insets.top, paddingBottom: 26 }}>
         <Header dark />
         <View style={styles.hero}>
           <OrgLogo org={o} size={76} />
@@ -40,7 +40,7 @@ export default function Organization() {
             <T v="title" color={colors.white} center>{o.name}</T>
             <Verified org={o} size={20} />
           </View>
-          {o.tagline && <T v="small" color={colors.emerald100} center style={{ marginTop: 4 }}>{o.tagline}</T>}
+          {o.tagline && <T v="small" color={colors.brand100} center style={{ marginTop: 4 }}>{o.tagline}</T>}
           <View style={{ flexDirection: "row", gap: 8, marginTop: 12 }}>
             <Badge label={verif} tone={o.verification === "trusted" ? "gold" : "good"} />
             <Badge label={`${o.followers_count} following`} />
@@ -52,10 +52,10 @@ export default function Organization() {
       <View style={{ padding: 20, gap: 12 }}>
         {o.description && <T v="body">{o.description}</T>}
         <View style={styles.contacts}>
-          {o.county && <View style={styles.contact}><MapPin size={16} color={colors.emerald700} /><T v="small">{[o.address, o.county].filter(Boolean).join(", ")}</T></View>}
-          {o.website && <Tap onPress={() => WebBrowser.openBrowserAsync(o.website!)} style={styles.contact}><Globe size={16} color={colors.emerald700} /><T v="small" color={colors.emerald700}>{o.website.replace(/^https?:\/\//, "")}</T></Tap>}
-          {o.email && <Tap onPress={() => Linking.openURL(`mailto:${o.email}`)} style={styles.contact}><Mail size={16} color={colors.emerald700} /><T v="small">{o.email}</T></Tap>}
-          {o.phone && <Tap onPress={() => Linking.openURL(`tel:${o.phone}`)} style={styles.contact}><Phone size={16} color={colors.emerald700} /><T v="small">{o.phone}</T></Tap>}
+          {o.county && <View style={styles.contact}><MapPin size={16} color={colors.brand700} /><T v="small">{[o.address, o.county].filter(Boolean).join(", ")}</T></View>}
+          {o.website && <Tap onPress={() => WebBrowser.openBrowserAsync(o.website!)} style={styles.contact}><Globe size={16} color={colors.brand700} /><T v="small" color={colors.brand700}>{o.website.replace(/^https?:\/\//, "")}</T></Tap>}
+          {o.email && <Tap onPress={() => Linking.openURL(`mailto:${o.email}`)} style={styles.contact}><Mail size={16} color={colors.brand700} /><T v="small">{o.email}</T></Tap>}
+          {o.phone && <Tap onPress={() => Linking.openURL(`tel:${o.phone}`)} style={styles.contact}><Phone size={16} color={colors.brand700} /><T v="small">{o.phone}</T></Tap>}
         </View>
         <T v="h2" style={{ marginTop: 12 }}>Open opportunities ({o.opportunities.length})</T>
         {o.opportunities.length === 0 ? <Empty icon={BellPlus} title="Nothing open right now" body="Follow to be notified the moment they post." /> : o.opportunities.map((x) => <OpportunityCard key={x.id} o={x} />)}

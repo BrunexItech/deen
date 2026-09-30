@@ -35,14 +35,14 @@ export default function Zakat() {
       <Header title="Zakat calculator" />
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <ScrollView contentContainerStyle={{ padding: 20, gap: 14, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
-          <LinearGradient colors={[colors.emerald700, colors.emerald950]} style={styles.result}>
+          <LinearGradient colors={[colors.brand700, colors.brand950]} style={styles.result}>
             <T v="overline" color={colors.gold400}>Zakat due</T>
             <Text style={styles.due}>{kes(r.due)}</Text>
-            <T v="small" color={colors.emerald100}>
+            <T v="small" color={colors.brand100}>
               {r.eligible ? `2.5% of your zakatable wealth (${kes(r.net)})` : `Your wealth (${kes(r.net)}) is below the nisab of ${kes(r.nisab)}. No zakat is due.`}
             </T>
             <View style={styles.nisab}>
-              <T v="caption" color={colors.emerald100}>Nisab ({z.nisab_basis === "silver" ? "595 g silver" : "85 g gold"})</T>
+              <T v="caption" color={colors.brand100}>Nisab ({z.nisab_basis === "silver" ? "595 g silver" : "85 g gold"})</T>
               <T v="label" color={colors.white}>{kes(r.nisab)}</T>
             </View>
           </LinearGradient>

@@ -34,11 +34,11 @@ export default function Directory() {
         contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, gap: 10 }}
         renderItem={({ item: d }) => (
           <Tap onPress={() => router.push(`/directory/${d.id}`)} style={styles.card} scale={0.985}>
-            <View style={styles.icon}><Store size={20} color={colors.emerald700} /></View>
+            <View style={styles.icon}><Store size={20} color={colors.brand700} /></View>
             <View style={{ flex: 1 }}>
               <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
                 <T v="bodyStrong" numberOfLines={1} style={{ flexShrink: 1 }}>{d.name}</T>
-                {d.verified && <BadgeCheck size={15} color={colors.emerald600} />}
+                {d.verified && <BadgeCheck size={15} color={colors.brand600} />}
               </View>
               <T v="small" numberOfLines={1}>{d.headline}</T>
               <View style={{ flexDirection: "row", gap: 8, marginTop: 6, alignItems: "center" }}>
@@ -57,5 +57,5 @@ export default function Directory() {
 
 const styles = StyleSheet.create({
   card: { flexDirection: "row", gap: 12, backgroundColor: colors.white, borderRadius: 18, padding: 14, borderWidth: 1, borderColor: colors.sand200 },
-  icon: { width: 46, height: 46, borderRadius: 14, backgroundColor: colors.emerald50, alignItems: "center", justifyContent: "center" },
+  icon: { width: 46, height: 46, borderRadius: 14, backgroundColor: colors.brand50, alignItems: "center", justifyContent: "center" },
 });

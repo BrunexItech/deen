@@ -18,8 +18,8 @@ export interface NavItem {
   section?: string;
 }
 
-function Mark({ size = 30 }: { size?: number }) {
-  return <img src="/deen-icon.png" alt="" width={size} height={size} className="rounded-[9px] shadow-sm ring-1 ring-gold-400/30" />;
+function Mark({ size = 38 }: { size?: number }) {
+  return <img src="/deen-icon.png" alt="" width={size} height={size} className="object-contain drop-shadow" />;
 }
 
 export function Shell({ nav, children, context }: { nav: NavItem[]; children: ReactNode; context: "admin" | "org" }) {
@@ -33,12 +33,12 @@ export function Shell({ nav, children, context }: { nav: NavItem[]; children: Re
 
   let lastSection: string | undefined;
   const sidebar = (
-    <div className="flex h-full flex-col bg-gradient-to-b from-emerald-900 via-emerald-900 to-emerald-950 text-white">
+    <div className="flex h-full flex-col bg-gradient-to-b from-brand-900 via-brand-900 to-brand-950 text-white">
       <div className="pattern-khatam flex items-center gap-3 px-5 pb-5 pt-6">
         <Mark />
         <div>
           <div className="text-[17px] font-extrabold tracking-[0.28em]">DEEN</div>
-          <div className="text-[11px] font-medium text-emerald-100/60">{context === "admin" ? "Control Center" : "Organization Portal"}</div>
+          <div className="text-[11px] font-medium text-brand-100/60">{context === "admin" ? "Control Center" : "Organization Portal"}</div>
         </div>
       </div>
       {context === "org" && me?.organization && (
@@ -57,19 +57,19 @@ export function Shell({ nav, children, context }: { nav: NavItem[]; children: Re
           lastSection = n.section ?? lastSection;
           return (
             <div key={n.href}>
-              {header && <div className="px-3 pb-1.5 pt-4 text-[10.5px] font-bold uppercase tracking-[0.16em] text-emerald-100/40">{header}</div>}
+              {header && <div className="px-3 pb-1.5 pt-4 text-[10.5px] font-bold uppercase tracking-[0.16em] text-brand-100/40">{header}</div>}
               <Link
                 href={n.href}
                 onClick={() => setOpen(false)}
                 className={clsx(
                   "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13.5px] font-medium transition",
-                  active(n.href) ? "bg-white/10 text-white" : "text-emerald-50/70 hover:bg-white/5 hover:text-white",
+                  active(n.href) ? "bg-white/10 text-white" : "text-brand-50/70 hover:bg-white/5 hover:text-white",
                 )}
               >
                 {active(n.href) && <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-gold-400" />}
-                <span className={clsx(active(n.href) ? "text-gold-400" : "text-emerald-100/50 group-hover:text-emerald-100/80")}>{n.icon}</span>
+                <span className={clsx(active(n.href) ? "text-gold-400" : "text-brand-100/50 group-hover:text-brand-100/80")}>{n.icon}</span>
                 <span className="flex-1">{n.label}</span>
-                {!!n.badge && <span className="rounded-full bg-gold-500 px-2 py-0.5 text-[11px] font-bold text-emerald-950">{n.badge}</span>}
+                {!!n.badge && <span className="rounded-full bg-gold-500 px-2 py-0.5 text-[11px] font-bold text-brand-950">{n.badge}</span>}
               </Link>
             </div>
           );
@@ -80,9 +80,9 @@ export function Shell({ nav, children, context }: { nav: NavItem[]; children: Re
           <Avatar name={me.full_name} src={me.avatar_url} size={34} />
           <div className="min-w-0 flex-1">
             <div className="truncate text-[13px] font-semibold">{me.full_name}</div>
-            <div className="truncate text-[11px] text-emerald-100/50">{ROLE_LABEL[me.role] ?? me.role}</div>
+            <div className="truncate text-[11px] text-brand-100/50">{ROLE_LABEL[me.role] ?? me.role}</div>
           </div>
-          <button onClick={signOut} className="rounded-lg p-2 text-emerald-100/60 hover:bg-white/10 hover:text-white" title="Sign out">
+          <button onClick={signOut} className="rounded-lg p-2 text-brand-100/60 hover:bg-white/10 hover:text-white" title="Sign out">
             <LogOut size={16} />
           </button>
         </div>
@@ -95,7 +95,7 @@ export function Shell({ nav, children, context }: { nav: NavItem[]; children: Re
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-[264px] lg:block">{sidebar}</aside>
       {open && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-emerald-950/50" onClick={() => setOpen(false)} />
+          <div className="absolute inset-0 bg-brand-950/50" onClick={() => setOpen(false)} />
           <div className="absolute inset-y-0 left-0 w-[280px] animate-fade-up">{sidebar}</div>
           <button onClick={() => setOpen(false)} className="absolute right-4 top-4 rounded-full bg-white p-2 shadow" aria-label="Close menu">
             <X size={18} />
@@ -106,8 +106,8 @@ export function Shell({ nav, children, context }: { nav: NavItem[]; children: Re
         <button onClick={() => setOpen(true)} className="rounded-lg p-2 hover:bg-sand-200" aria-label="Open menu">
           <Menu size={20} />
         </button>
-        <Mark size={26} />
-        <span className="text-sm font-extrabold tracking-[0.25em] text-emerald-800">DEEN</span>
+        <Mark size={32} />
+        <span className="text-sm font-extrabold tracking-[0.25em] text-brand-800">DEEN</span>
       </header>
       <main className="mx-auto max-w-[1320px] px-4 py-6 sm:px-6 lg:px-10 lg:py-9">{children}</main>
     </div>

@@ -41,7 +41,7 @@ function ListingCard({ l, onDone }: { l: Listing; onDone: () => void }) {
       {l.status === "pending" && (
         <div className="mt-4 flex flex-col gap-2 border-t border-sand-200 pt-4 sm:flex-row sm:items-center">
           <Input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Note to owner (if changes needed)" />
-          <label className="flex shrink-0 items-center gap-2 text-sm"><input type="checkbox" checked={verified} onChange={(e) => setVerified(e.target.checked)} className="accent-emerald-700" /> Verified badge</label>
+          <label className="flex shrink-0 items-center gap-2 text-sm"><input type="checkbox" checked={verified} onChange={(e) => setVerified(e.target.checked)} className="accent-brand-700" /> Verified badge</label>
           <Button variant="secondary" disabled={!note} onClick={() => decide.mutate(false)}>Needs changes</Button>
           <Button onClick={() => decide.mutate(true)}>Approve</Button>
         </div>

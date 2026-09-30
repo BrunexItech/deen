@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import { BadgeCheck, Bookmark, BookmarkCheck, Briefcase, CalendarDays, Clock, Crown, GraduationCap, HeartHandshake, Lock, MapPin, Rocket, Sparkles, Users, type LucideIcon } from "lucide-react-native";
+import { BadgeCheck, Bookmark, BookmarkCheck, Briefcase, CalendarDays, Clock, Crown, GraduationCap, HeartHandshake, Landmark, Lock, MapPin, Rocket, Sparkles, Users, type LucideIcon } from "lucide-react-native";
 import { StyleSheet, Text, View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import { apiConfig } from "@/lib/api";
@@ -11,14 +11,15 @@ import { Badge, T, Tap } from "./ui";
 import { Image } from "expo-image";
 
 export const CATEGORY_ICON: Record<string, LucideIcon> = {
-  education: GraduationCap, employment: Briefcase, business: Rocket, support: HeartHandshake, learning: Sparkles, community: Users,
+  education: GraduationCap, career: Briefcase, entrepreneurship: Rocket, community: Users, islamic_economy: Landmark,
+  support: HeartHandshake,
 };
 
 export function MatchRing({ score, size = 46, dark = false }: { score: number; size?: number; dark?: boolean }) {
   const stroke = 4;
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
-  const color = score >= 70 ? colors.emerald500 : score >= 45 ? colors.gold500 : colors.ink300;
+  const color = score >= 70 ? colors.brand500 : score >= 45 ? colors.gold500 : colors.ink300;
   return (
     <View style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}>
       <Svg width={size} height={size} style={StyleSheet.absoluteFill}>
@@ -36,7 +37,7 @@ export function OrgLogo({ org, size = 40 }: { org: Pick<OrgMini, "name" | "logo_
   if (uri) return <Image source={{ uri }} style={{ width: size, height: size, borderRadius: size * 0.3 }} contentFit="cover" transition={200} />;
   const initials = org.name.split(" ").filter((w) => /[A-Za-z]/.test(w[0])).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
   return (
-    <LinearGradient colors={[colors.emerald600, colors.emerald800]} style={{ width: size, height: size, borderRadius: size * 0.3, alignItems: "center", justifyContent: "center" }}>
+    <LinearGradient colors={[colors.brand600, colors.brand800]} style={{ width: size, height: size, borderRadius: size * 0.3, alignItems: "center", justifyContent: "center" }}>
       <Text style={{ fontFamily: fonts.bold, color: colors.gold400, fontSize: size * 0.36 }}>{initials}</Text>
     </LinearGradient>
   );
@@ -44,7 +45,7 @@ export function OrgLogo({ org, size = 40 }: { org: Pick<OrgMini, "name" | "logo_
 
 export function Verified({ org, size = 14 }: { org: Pick<OrgMini, "verification">; size?: number }) {
   if (org.verification === "pending") return null;
-  return <BadgeCheck size={size} color={org.verification === "trusted" ? colors.gold500 : colors.emerald500} fill={org.verification === "trusted" ? colors.gold50 : colors.emerald50} />;
+  return <BadgeCheck size={size} color={org.verification === "trusted" ? colors.gold500 : colors.brand500} fill={org.verification === "trusted" ? colors.gold50 : colors.brand50} />;
 }
 
 function deadlineLabel(o: OppCard) {
@@ -106,7 +107,7 @@ export function OpportunityCard({ o, compact = false }: { o: OppCard; compact?: 
           <Badge label={o.access_tier === "premium" ? "Premium" : "Members"} tone="gold" icon={o.access_tier === "premium" ? Crown : Lock} />
         ) : (
           <Tap onPress={() => save.mutate(o)} hitSlop={10} haptic>
-            {o.saved ? <BookmarkCheck size={20} color={colors.emerald700} fill={colors.emerald100} /> : <Bookmark size={20} color={colors.ink400} />}
+            {o.saved ? <BookmarkCheck size={20} color={colors.brand700} fill={colors.brand100} /> : <Bookmark size={20} color={colors.ink400} />}
           </Tap>
         )}
       </View>
@@ -120,7 +121,7 @@ export function FeaturedCard({ o }: { o: OppCard }) {
   const Icon = CATEGORY_ICON[o.category] ?? Sparkles;
   return (
     <Tap onPress={() => router.push(`/opportunity/${o.id}`)} scale={0.98} style={{ width: 300 }}>
-      <LinearGradient colors={[colors.emerald700, colors.emerald950]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.featured}>
+      <LinearGradient colors={[colors.brand700, colors.brand950]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.featured}>
         <View style={styles.featuredGlow} />
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
           <View style={[styles.cat, { backgroundColor: "rgba(255,255,255,0.12)" }]}>
@@ -134,8 +135,8 @@ export function FeaturedCard({ o }: { o: OppCard }) {
         <View style={{ flex: 1 }} />
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
           <OrgLogo org={o.organization} size={26} />
-          <T v="caption" color={colors.emerald100} numberOfLines={1} style={{ flex: 1 }}>{o.organization.name}</T>
-          <T v="caption" color={o.closing_soon ? colors.gold400 : colors.emerald100}>{deadlineLabel(o)}</T>
+          <T v="caption" color={colors.brand100} numberOfLines={1} style={{ flex: 1 }}>{o.organization.name}</T>
+          <T v="caption" color={o.closing_soon ? colors.gold400 : colors.brand100}>{deadlineLabel(o)}</T>
         </View>
       </LinearGradient>
     </Tap>
@@ -146,7 +147,7 @@ const styles = StyleSheet.create({
   card: { backgroundColor: colors.white, borderRadius: radius.lg, padding: 16, borderWidth: 1, borderColor: colors.sand200, ...shadow.card },
   top: { flexDirection: "row", gap: 12, alignItems: "flex-start" },
   orgRow: { flexDirection: "row", alignItems: "center", gap: 4 },
-  amount: { fontFamily: fonts.bold, fontSize: 14, color: colors.emerald700, marginTop: 10 },
+  amount: { fontFamily: fonts.bold, fontSize: 14, color: colors.brand700, marginTop: 10 },
   reason: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 10, backgroundColor: colors.gold50, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 7 },
   footer: { flexDirection: "row", alignItems: "center", gap: 10, marginTop: 12 },
   cat: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 },
@@ -154,5 +155,5 @@ const styles = StyleSheet.create({
   metaItem: { flexDirection: "row", alignItems: "center", gap: 4 },
   metaText: { fontFamily: fonts.medium, fontSize: 12, color: colors.ink500 },
   featured: { height: 200, borderRadius: 24, padding: 18, overflow: "hidden", ...shadow.float },
-  featuredGlow: { position: "absolute", width: 220, height: 220, borderRadius: 110, backgroundColor: "rgba(201,163,78,0.14)", top: -90, right: -70 },
+  featuredGlow: { position: "absolute", width: 220, height: 220, borderRadius: 110, backgroundColor: "rgba(227,157,41,0.14)", top: -90, right: -70 },
 });

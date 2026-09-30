@@ -18,7 +18,7 @@ export async function registerForPush() {
       await Notifications.setNotificationChannelAsync("default", {
         name: "DEEN",
         importance: Notifications.AndroidImportance.HIGH,
-        lightColor: "#C9A34E",
+        lightColor: "#E39D29",
         vibrationPattern: [0, 180, 120, 180],
       });
     }

@@ -37,16 +37,16 @@ export default function Deen() {
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <ScrollView contentContainerStyle={{ paddingBottom: 130 }} showsVerticalScrollIndicator={false}>
         <View style={{ paddingHorizontal: 20, paddingTop: 10 }}>
-          <LinearGradient colors={[colors.emerald700, colors.emerald950]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
+          <LinearGradient colors={[colors.brand700, colors.brand950]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
             <View style={styles.glow} />
             <T v="overline" color={colors.gold400}>{now.toLocaleDateString("en-KE", { weekday: "long", day: "numeric", month: "long" })}</T>
             <Text style={styles.hijri}>{h.day} {h.monthName}</Text>
-            <T v="body" color={colors.emerald100}>{h.year} AH{ramadan ? " · Ramadan Mubarak" : ""}</T>
+            <T v="body" color={colors.brand100}>{h.year} AH{ramadan ? " · Ramadan Mubarak" : ""}</T>
 
             {prayer ? (
               <View style={styles.next}>
                 <View>
-                  <T v="caption" color={colors.emerald100}>Next prayer</T>
+                  <T v="caption" color={colors.brand100}>Next prayer</T>
                   <Text style={styles.nextName}>{prayer.next.name}</Text>
                 </View>
                 <View style={{ alignItems: "flex-end" }}>
@@ -78,9 +78,9 @@ export default function Deen() {
                   return (
                     <View key={p.key} style={[styles.row, i > 0 && styles.rowBorder, isNext && styles.rowNext]}>
                       <View style={[styles.bullet, isNext && { backgroundColor: colors.gold500 }, past && { backgroundColor: colors.sand300 }]} />
-                      <Text style={[styles.pName, past && { color: colors.ink400 }, isNext && { color: colors.emerald800 }]}>{p.name}</Text>
-                      <Arabic size={16} color={past ? colors.ink300 : colors.emerald700} style={{ flex: 1, lineHeight: 26 }}>{p.arabic}</Arabic>
-                      <Text style={[styles.pTime, past && { color: colors.ink400 }, isNext && { color: colors.emerald800 }]}>{fmtTime(at)}</Text>
+                      <Text style={[styles.pName, past && { color: colors.ink400 }, isNext && { color: colors.brand800 }]}>{p.name}</Text>
+                      <Arabic size={16} color={past ? colors.ink300 : colors.brand700} style={{ flex: 1, lineHeight: 26 }}>{p.arabic}</Arabic>
+                      <Text style={[styles.pTime, past && { color: colors.ink400 }, isNext && { color: colors.brand800 }]}>{fmtTime(at)}</Text>
                     </View>
                   );
                 })}
@@ -97,7 +97,7 @@ export default function Deen() {
           <View style={styles.grid}>
             {TOOLS.map(({ title, body, icon: Icon, href }) => (
               <Tap key={title} onPress={() => router.push(href)} style={styles.tool}>
-                <View style={styles.toolIcon}><Icon size={22} color={colors.emerald700} /></View>
+                <View style={styles.toolIcon}><Icon size={22} color={colors.brand700} /></View>
                 <T v="bodyStrong" style={{ marginTop: 12 }}>{title}</T>
                 <T v="caption">{body}</T>
               </Tap>
@@ -117,19 +117,19 @@ export default function Deen() {
 
 const styles = StyleSheet.create({
   hero: { borderRadius: 28, padding: 22, overflow: "hidden" },
-  glow: { position: "absolute", width: 280, height: 280, borderRadius: 140, backgroundColor: "rgba(201,163,78,0.15)", top: -130, right: -90 },
+  glow: { position: "absolute", width: 280, height: 280, borderRadius: 140, backgroundColor: "rgba(227,157,41,0.15)", top: -130, right: -90 },
   hijri: { fontFamily: fonts.extrabold, fontSize: 34, color: colors.white, marginTop: 6, letterSpacing: -0.5 },
-  next: { marginTop: 22, flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end", backgroundColor: "rgba(255,255,255,0.08)", borderRadius: 18, padding: 16, borderWidth: 1, borderColor: "rgba(223,192,122,0.25)" },
+  next: { marginTop: 22, flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end", backgroundColor: "rgba(255,255,255,0.08)", borderRadius: 18, padding: 16, borderWidth: 1, borderColor: "rgba(242,190,92,0.25)" },
   nextName: { fontFamily: fonts.extrabold, fontSize: 24, color: colors.white },
   nextTime: { fontFamily: fonts.extrabold, fontSize: 26, color: colors.gold400 },
   row: { flexDirection: "row", alignItems: "center", gap: 12, paddingHorizontal: 18, paddingVertical: 12 },
   rowBorder: { borderTopWidth: 1, borderTopColor: colors.sand200 },
-  rowNext: { backgroundColor: colors.emerald50 },
-  bullet: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.emerald500 },
+  rowNext: { backgroundColor: colors.brand50 },
+  bullet: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.brand500 },
   pName: { fontFamily: fonts.bold, fontSize: 15, color: colors.ink900, width: 74 },
   pTime: { fontFamily: fonts.bold, fontSize: 16, color: colors.ink900, fontVariant: ["tabular-nums"] },
   src: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 8, paddingHorizontal: 4 },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: 12, paddingHorizontal: 20 },
   tool: { width: "47.8%", backgroundColor: colors.white, borderRadius: 20, padding: 16, borderWidth: 1, borderColor: colors.sand200 },
-  toolIcon: { width: 46, height: 46, borderRadius: 15, backgroundColor: colors.emerald50, alignItems: "center", justifyContent: "center" },
+  toolIcon: { width: 46, height: 46, borderRadius: 15, backgroundColor: colors.brand50, alignItems: "center", justifyContent: "center" },
 });

@@ -36,14 +36,14 @@ function TabBar({ state, navigation }: BottomTabBarProps) {
             >
               {center ? (
                 <View style={[styles.center, focused && styles.centerOn]}>
-                  <Icon size={22} color={focused ? colors.emerald950 : colors.gold400} fill={focused ? colors.emerald950 : "transparent"} />
+                  <Icon size={22} color={focused ? colors.brand950 : colors.gold400} fill={focused ? colors.brand950 : "transparent"} />
                 </View>
               ) : (
                 <>
                   <View style={[styles.pill, focused && styles.pillOn]}>
-                    <Icon size={21} color={focused ? colors.emerald700 : colors.ink400} strokeWidth={focused ? 2.4 : 2} />
+                    <Icon size={21} color={focused ? colors.brand700 : colors.ink400} strokeWidth={focused ? 2.4 : 2} />
                   </View>
-                  <Text style={[styles.label, focused && { color: colors.emerald800, fontFamily: fonts.bold }]}>{LABELS[name]}</Text>
+                  <Text style={[styles.label, focused && { color: colors.brand800, fontFamily: fonts.bold }]}>{LABELS[name]}</Text>
                 </>
               )}
             </Tap>
@@ -71,8 +71,8 @@ const styles = StyleSheet.create({
   bar: { flexDirection: "row", backgroundColor: colors.white, borderRadius: 26, paddingVertical: 8, paddingHorizontal: 6, borderWidth: 1, borderColor: colors.sand200, ...shadow.float },
   item: { flex: 1, alignItems: "center", justifyContent: "center", gap: 2 },
   pill: { width: 48, height: 30, borderRadius: 15, alignItems: "center", justifyContent: "center" },
-  pillOn: { backgroundColor: colors.emerald50 },
+  pillOn: { backgroundColor: colors.brand50 },
   label: { fontFamily: fonts.medium, fontSize: 10.5, color: colors.ink400 },
-  center: { width: 52, height: 52, borderRadius: 18, backgroundColor: colors.emerald800, alignItems: "center", justifyContent: "center", marginTop: -22, borderWidth: 3, borderColor: colors.sand100, ...shadow.float },
+  center: { width: 52, height: 52, borderRadius: 18, backgroundColor: colors.brand800, alignItems: "center", justifyContent: "center", marginTop: -22, borderWidth: 3, borderColor: colors.sand100, ...shadow.float },
   centerOn: { backgroundColor: colors.gold400 },
 });

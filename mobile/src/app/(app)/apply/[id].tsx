@@ -138,19 +138,19 @@ export default function Apply() {
             <T v="label">Documents{o.required_documents.length ? `: ${o.required_documents.join(", ")}` : ""}</T>
             {docs.map((d) => (
               <View key={d.file_id} style={styles.doc}>
-                <FileText size={18} color={colors.emerald700} />
+                <FileText size={18} color={colors.brand700} />
                 <T v="bodyStrong" numberOfLines={1} style={styles.flex}>{d.label}</T>
                 <Tap onPress={() => setDocs(docs.filter((x) => x.file_id !== d.file_id))} hitSlop={10}><X size={18} color={colors.ink400} /></Tap>
               </View>
             ))}
             <Tap onPress={attach} disabled={uploading} style={styles.attach}>
-              {uploading ? <DeenLoader size={26} /> : <Paperclip size={18} color={colors.emerald700} />}
-              <T v="label" color={colors.emerald700}>{uploading ? "Uploading securely…" : "Attach PDF or photo"}</T>
+              {uploading ? <DeenLoader size={26} /> : <Paperclip size={18} color={colors.brand700} />}
+              <T v="label" color={colors.brand700}>{uploading ? "Uploading securely…" : "Attach PDF or photo"}</T>
             </Tap>
           </View>
 
           <View style={styles.privacy}>
-            <ShieldCheck size={18} color={colors.emerald700} />
+            <ShieldCheck size={18} color={colors.brand700} />
             <View style={styles.flex}>
               <T v="label">Shared with {o.organization.name}</T>
               <T v="caption">{shared || "Your name and contact details"}. Only this organization can see your application and documents.</T>
@@ -169,8 +169,8 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   wrap: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   doc: { flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: colors.white, borderRadius: 14, padding: 14, borderWidth: 1, borderColor: colors.sand200 },
-  attach: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, height: 54, borderRadius: 14, borderWidth: 1.5, borderStyle: "dashed", borderColor: colors.emerald600 },
-  privacy: { flexDirection: "row", gap: 12, backgroundColor: colors.emerald50, borderRadius: 16, padding: 14 },
+  attach: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, height: 54, borderRadius: 14, borderWidth: 1.5, borderStyle: "dashed", borderColor: colors.brand600 },
+  privacy: { flexDirection: "row", gap: 12, backgroundColor: colors.brand50, borderRadius: 16, padding: 14 },
   done: { alignItems: "center", justifyContent: "center", padding: 28 },
-  tick: { width: 96, height: 96, borderRadius: 48, backgroundColor: colors.emerald600, alignItems: "center", justifyContent: "center" },
+  tick: { width: 96, height: 96, borderRadius: 48, backgroundColor: colors.brand600, alignItems: "center", justifyContent: "center" },
 });

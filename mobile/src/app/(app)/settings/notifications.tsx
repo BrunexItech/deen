@@ -37,7 +37,7 @@ export default function NotificationSettings() {
             <T v="bodyStrong">Quiet hours (10pm – 6am)</T>
             <T v="caption">Notifications arrive silently overnight</T>
           </View>
-          <Switch value={p.quiet_hours.enabled} onValueChange={(v) => save.mutate({ ...p, quiet_hours: { ...p.quiet_hours, enabled: v } })} trackColor={{ true: colors.emerald600, false: colors.sand300 }} thumbColor={colors.white} />
+          <Switch value={p.quiet_hours.enabled} onValueChange={(v) => save.mutate({ ...p, quiet_hours: { ...p.quiet_hours, enabled: v } })} trackColor={{ true: colors.brand600, false: colors.sand300 }} thumbColor={colors.white} />
         </Card>
         {Object.entries(KINDS).map(([kind, [title, sub]]) => (
           <Card key={kind} style={{ gap: 10 }}>
@@ -46,7 +46,7 @@ export default function NotificationSettings() {
               {(["push", "email", "sms"] as const).map((ch) => (
                 <View key={ch} style={styles.channel}>
                   <T v="label">{ch === "sms" ? "SMS" : ch[0].toUpperCase() + ch.slice(1)}</T>
-                  <Switch value={!!p[ch]?.[kind]} onValueChange={(v) => set(ch, kind, v)} trackColor={{ true: colors.emerald600, false: colors.sand300 }} thumbColor={colors.white} />
+                  <Switch value={!!p[ch]?.[kind]} onValueChange={(v) => set(ch, kind, v)} trackColor={{ true: colors.brand600, false: colors.sand300 }} thumbColor={colors.white} />
                 </View>
               ))}
             </View>

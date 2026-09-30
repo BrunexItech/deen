@@ -42,7 +42,7 @@ export default function Home() {
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <ScrollView
         contentContainerStyle={{ paddingBottom: 130 }}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={colors.emerald700} colors={[colors.emerald700]} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={colors.brand700} colors={[colors.brand700]} />}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.top}>
@@ -67,11 +67,11 @@ export default function Home() {
         {feed.isLoading ? <FeedSkeleton /> : feed.isError ? <ErrorState message={(feed.error as Error).message} onRetry={() => feed.refetch()} /> : f && (
           <>
             <Animated.View entering={FadeInDown.duration(500)} style={{ paddingHorizontal: 20, marginTop: 16 }}>
-              <LinearGradient colors={[colors.emerald700, colors.emerald950]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
+              <LinearGradient colors={[colors.brand700, colors.brand950]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
                 <View style={styles.heroGlow} />
                 <T v="overline" color={colors.gold400}>Matched for you today</T>
                 <Text style={styles.heroNumber}>{f.total_matches}</Text>
-                <T v="body" color={colors.emerald100}>
+                <T v="body" color={colors.brand100}>
                   {f.total_matches === 1 ? "opportunity matches" : "opportunities match"} your profile
                 </T>
                 <View style={styles.heroChips}>
@@ -91,7 +91,7 @@ export default function Home() {
             {(!f.profile_ready || (profile.data && profile.data.completeness < 70)) && (
               <View style={{ paddingHorizontal: 20, marginTop: 14 }}>
                 <Card onPress={() => router.push("/onboarding")} style={styles.prompt}>
-                  <View style={styles.promptIcon}><UserRoundPen size={20} color={colors.emerald700} /></View>
+                  <View style={styles.promptIcon}><UserRoundPen size={20} color={colors.brand700} /></View>
                   <View style={{ flex: 1 }}>
                     <T v="bodyStrong">Complete your profile ({profile.data?.completeness ?? 0}%)</T>
                     <T v="small">Better matches, fewer irrelevant opportunities.</T>
@@ -125,12 +125,12 @@ export default function Home() {
               <View style={{ paddingHorizontal: 20, marginTop: 22 }}>
                 <Tap onPress={() => router.push("/membership")}>
                   <LinearGradient colors={["#F3DD9E", colors.gold500]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.upsell}>
-                    <Crown size={22} color={colors.emerald950} />
+                    <Crown size={22} color={colors.brand950} />
                     <View style={{ flex: 1 }}>
-                      <T v="bodyStrong" color={colors.emerald950}>Unlock every opportunity</T>
-                      <T v="small" color={colors.emerald900}>Unlimited applications, member-only listings and smart alerts.</T>
+                      <T v="bodyStrong" color={colors.brand950}>Unlock every opportunity</T>
+                      <T v="small" color={colors.brand900}>Unlimited applications, member-only listings and smart alerts.</T>
                     </View>
-                    <ChevronRight size={18} color={colors.emerald950} />
+                    <ChevronRight size={18} color={colors.brand950} />
                   </LinearGradient>
                 </Tap>
               </View>
@@ -167,12 +167,12 @@ const styles = StyleSheet.create({
   prayerText: { flex: 1, fontFamily: fonts.medium, fontSize: 13, color: colors.ink700 },
   prayerPlace: { fontFamily: fonts.medium, fontSize: 11, color: colors.ink400 },
   hero: { borderRadius: 26, padding: 22, overflow: "hidden" },
-  heroGlow: { position: "absolute", width: 260, height: 260, borderRadius: 130, backgroundColor: "rgba(201,163,78,0.16)", top: -120, right: -80 },
+  heroGlow: { position: "absolute", width: 260, height: 260, borderRadius: 130, backgroundColor: "rgba(227,157,41,0.16)", top: -120, right: -80 },
   heroNumber: { fontFamily: fonts.extrabold, fontSize: 56, lineHeight: 64, color: colors.white, marginTop: 4 },
   heroChips: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 16 },
-  heroChip: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "rgba(255,255,255,0.1)", borderRadius: 12, paddingHorizontal: 11, paddingVertical: 7, borderWidth: 1, borderColor: "rgba(223,192,122,0.25)" },
+  heroChip: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "rgba(255,255,255,0.1)", borderRadius: 12, paddingHorizontal: 11, paddingVertical: 7, borderWidth: 1, borderColor: "rgba(242,190,92,0.25)" },
   heroChipText: { fontFamily: fonts.semibold, fontSize: 12.5, color: colors.white },
   prompt: { flexDirection: "row", alignItems: "center", gap: 12 },
-  promptIcon: { width: 44, height: 44, borderRadius: 14, backgroundColor: colors.emerald50, alignItems: "center", justifyContent: "center" },
+  promptIcon: { width: 44, height: 44, borderRadius: 14, backgroundColor: colors.brand50, alignItems: "center", justifyContent: "center" },
   upsell: { flexDirection: "row", alignItems: "center", gap: 14, borderRadius: 20, padding: 16 },
 });

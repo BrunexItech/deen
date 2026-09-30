@@ -13,6 +13,7 @@ import { useTaxonomy } from "@/lib/hooks";
 interface MemberRow {
   id: string; full_name: string; phone: string; email: string | null; status: string; identity_status: string;
   created_at: string; last_active_at: string | null; county: string | null; education_level: string | null; age: number | null;
+  user_types: string[];
 }
 
 export default function MembersPage() {
@@ -20,10 +21,11 @@ export default function MembersPage() {
   const [q, setQ] = useState("");
   const [county, setCounty] = useState("");
   const [identity, setIdentity] = useState("");
+  const [userType, setUserType] = useState("");
   const [page, setPage] = useState(1);
   const { data, isLoading } = useQuery({
-    queryKey: ["admin", "members", q, county, identity, page],
-    queryFn: () => get<{ items: MemberRow[]; total: number }>(`/admin/members${qs({ q, county, identity, page, limit: 30 })}`),
+    queryKey: ["admin", "members", q, county, identity, userType, page],
+    queryFn: () => get<{ items: MemberRow[]; total: number }>(`/admin/members${qs({ q, county, identity, user_type: userType, page, limit: 30 })}`),
     placeholderData: (prev) => prev,
   });
   const pages = Math.max(1, Math.ceil((data?.total ?? 0) / 30));
@@ -32,12 +34,13 @@ export default function MembersPage() {
     <>
       <PageHeader eyebrow="Community" title="Members" subtitle={`${num(data?.total ?? 0)} Muslims on DEEN. Profiles, memberships, applications and account safety.`} />
       <Card pad={false}>
-        <div className="grid gap-3 border-b border-sand-200 p-4 sm:grid-cols-[1fr_200px_200px]">
+        <div className="grid gap-3 border-b border-sand-200 p-4 sm:grid-cols-[1fr_180px_180px_180px]">
           <div className="relative">
             <Search size={16} className="absolute left-3 top-3.5 text-ink-300" />
             <Input value={q} onChange={(e) => { setQ(e.target.value); setPage(1); }} placeholder="Name, phone or email" className="pl-9" />
           </div>
           <Select value={county} onChange={(e) => { setCounty(e.target.value); setPage(1); }}><option value="">All counties</option>{tax?.counties.map((c) => <option key={c}>{c}</option>)}</Select>
+          <Select value={userType} onChange={(e) => { setUserType(e.target.value); setPage(1); }}><option value="">All member types</option>{tax?.user_types.map((t) => <option key={t.key} value={t.key}>{t.name}</option>)}</Select>
           <Select value={identity} onChange={(e) => { setIdentity(e.target.value); setPage(1); }}>
             <option value="">Any identity status</option><option value="verified">Verified ID</option><option value="pending">Pending ID check</option><option value="none">Not verified</option>
           </Select>
@@ -50,13 +53,13 @@ export default function MembersPage() {
               </thead>
               <tbody className="divide-y divide-sand-200">
                 {data.items.map((m) => (
-                  <tr key={m.id} className="hover:bg-emerald-50/40">
+                  <tr key={m.id} className="hover:bg-brand-50/40">
                     <td className="px-5 py-3">
                       <Link href={`/admin/members/${m.id}`} className="flex items-center gap-3">
                         <Avatar name={m.full_name} size={34} />
                         <div>
-                          <div className="flex items-center gap-1.5 font-semibold">{m.full_name}{m.identity_status === "verified" && <BadgeCheck size={15} className="text-emerald-600" />}</div>
-                          <div className="text-xs text-ink-400">{m.phone}</div>
+                          <div className="flex items-center gap-1.5 font-semibold">{m.full_name}{m.identity_status === "verified" && <BadgeCheck size={15} className="text-leaf-600" />}</div>
+                          <div className="text-xs text-ink-400">{m.phone}{m.user_types.length > 0 && ` · ${m.user_types.map((t) => tax?.user_types.find((x) => x.key === t)?.name ?? t).join(", ")}`}</div>
                         </div>
                       </Link>
                     </td>

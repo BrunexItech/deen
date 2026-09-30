@@ -17,7 +17,7 @@ export type Verification = "pending" | "verified" | "trusted";
 
 export type OppStatus =
   | "draft" | "submitted" | "under_review" | "info_requested" | "verification"
-  | "approved" | "published" | "rejected" | "expired" | "archived";
+  | "approved" | "published" | "rejected" | "expired" | "suspended" | "archived";
 
 export interface Flag {
   code: string;
@@ -45,11 +45,38 @@ export interface Opportunity {
   benefits: string;
   requirements: string;
   application_process: string | null;
+  country: string;
   counties: string[];
   location: string;
   location_label: string | null;
+  work_mode: "physical" | "remote" | "hybrid";
   is_remote: boolean;
   is_international: boolean;
+  eligible_countries: string[];
+  industry: string | null;
+  department: string | null;
+  responsibilities: string;
+  duration_label: string | null;
+  duration_weeks: number | null;
+  time_commitment: string | null;
+  compensation: "paid" | "stipend" | "unpaid" | "undisclosed";
+  allowances: string | null;
+  certificate_provided: boolean;
+  weekend: boolean;
+  student_friendly: boolean;
+  causes: string[];
+  contact_email: string | null;
+  contact_phone: string | null;
+  fields_of_study: string[];
+  min_experience_years: number | null;
+  target_user_types: string[];
+  islamic_tags: string[];
+  shariah_basis: string | null;
+  sponsored: boolean;
+  status_label: string;
+  verified_by_deen: boolean;
+  verification_checklist?: Record<string, "yes" | "na" | "no">;
+  checklist_complete?: boolean;
   education_levels: string[];
   min_age: number | null;
   max_age: number | null;
@@ -86,13 +113,24 @@ export interface Opportunity {
   updated_at: string;
 }
 
+type KeyName = { key: string; name: string };
+
 export interface Taxonomy {
   categories: { key: string; name: string; tab_label: string; color: string; icon: string; live_count?: number; active?: boolean; description?: string; types: { key: string; name: string; active?: boolean }[] }[];
   counties: string[];
-  education_levels: { key: string; name: string }[];
-  employment_statuses: { key: string; name: string }[];
+  education_levels: KeyName[];
+  employment_statuses: KeyName[];
   languages: string[];
   skills: string[];
+  countries: string[];
+  industries: string[];
+  user_types: KeyName[];
+  work_modes: KeyName[];
+  compensation: KeyName[];
+  causes: KeyName[];
+  islamic_tags: KeyName[];
+  verification_checklist: KeyName[];
+  student_hub: { key: string; label: string; types: string[] }[];
 }
 
 export interface AdminOrg {

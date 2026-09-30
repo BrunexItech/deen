@@ -54,9 +54,9 @@ export default function AnnouncementsPage() {
               <ChipSelect options={[{ value: "push", label: "Push" }, { value: "email", label: "Email" }, { value: "sms", label: "SMS" }]} value={f.channels} onChange={(v) => setF({ ...f, channels: v.length ? v : ["push"] })} />
             </Field>
             {/* A live preview of the phone notification. */}
-            <div className="rounded-2xl bg-emerald-950 p-3">
+            <div className="rounded-2xl bg-brand-950 p-3">
               <div className="flex gap-3 rounded-xl bg-white/10 p-3 text-white backdrop-blur">
-                <img src="/deen-icon.png" alt="" className="h-9 w-9 rounded-lg" />
+                <img src="/deen-icon.png" alt="" className="h-9 w-9 object-contain" />
                 <div className="min-w-0">
                   <div className="text-[13px] font-semibold">{f.title || "Title"}</div>
                   <div className="line-clamp-2 text-xs text-white/70">{f.body || "Your message appears here."}</div>

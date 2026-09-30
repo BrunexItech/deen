@@ -27,7 +27,7 @@ function CheckCard({ c, onDone }: { c: Check; onDone: () => void }) {
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div><div className="font-bold">{c.user.full_name}</div><div className="text-xs text-ink-400">{c.user.phone} · submitted {ago(c.created_at)}</div></div>
         <div className="text-sm">{titleCase(c.id_type)} <b className="font-mono">{number ?? c.id_number_masked}</b>
-          {!number && c.status === "pending" && <button onClick={() => reveal.mutate()} className="ml-2 inline-flex items-center gap-1 text-xs font-semibold text-emerald-700"><Eye size={13} /> Reveal (audited)</button>}
+          {!number && c.status === "pending" && <button onClick={() => reveal.mutate()} className="ml-2 inline-flex items-center gap-1 text-xs font-semibold text-brand-700"><Eye size={13} /> Reveal (audited)</button>}
         </div>
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">

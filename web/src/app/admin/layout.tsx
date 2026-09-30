@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import {
-  BadgeCheck, BarChart3, BookOpen, Building2, ClipboardCheck, CreditCard, Flag, LayoutGrid, Megaphone, ScrollText,
+  BadgeCheck, BarChart3, MessageCircleQuestion, BookOpen, Building2, ClipboardCheck, CreditCard, Flag, LayoutGrid, Megaphone, ScrollText,
   Shield, Store, UserCog, Users,
 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -29,6 +29,7 @@ function AdminShell({ children }: { children: ReactNode }) {
     { href: "/admin/opportunities", label: "Opportunities", icon: <LayoutGrid size={18} />, perm: "opps.view", section: "Trust & review" },
     { href: "/admin/organizations", label: "Organizations", icon: <Building2 size={18} />, perm: "orgs.view", badge: a?.pending_orgs, section: "Trust & review" },
     { href: "/admin/identity", label: "Identity checks", icon: <BadgeCheck size={18} />, perm: "identity.review", badge: a?.identity_pending, section: "Trust & review" },
+    { href: "/admin/questions", label: "Member questions", icon: <MessageCircleQuestion size={18} />, perm: "opps.view", section: "Trust & review" },
     { href: "/admin/reports", label: "Reports", icon: <Flag size={18} />, perm: "reports.manage", badge: a?.open_reports, section: "Trust & review" },
     { href: "/admin/members", label: "Members", icon: <Users size={18} />, perm: "users.view", section: "Community" },
     { href: "/admin/directory", label: "Directory", icon: <Store size={18} />, perm: "directory.manage", badge: a?.directory_pending, section: "Community" },

@@ -18,7 +18,7 @@ function Dial() {
   const ticks = Array.from({ length: 72 }, (_, i) => i * 5);
   return (
     <Svg width={SIZE} height={SIZE}>
-      <Circle cx={c} cy={c} r={c - 4} fill="rgba(255,255,255,0.04)" stroke="rgba(223,192,122,0.35)" strokeWidth={1.5} />
+      <Circle cx={c} cy={c} r={c - 4} fill="rgba(255,255,255,0.04)" stroke="rgba(242,190,92,0.35)" strokeWidth={1.5} />
       {ticks.map((d) => {
         const major = d % 90 === 0;
         const r1 = c - 8, r2 = c - (major ? 26 : d % 30 === 0 ? 20 : 14);
@@ -83,18 +83,18 @@ export default function Qibla() {
   const rotate = useAnimatedStyle(() => ({ transform: [{ rotate: withSpring(`${-heading}deg`, { damping: 20, stiffness: 90 }) }] }));
 
   return (
-    <LinearGradient colors={[colors.emerald800, colors.emerald950]} style={{ flex: 1 }}>
+    <LinearGradient colors={[colors.brand800, colors.brand950]} style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1 }}>
         <Header title="Qibla" dark />
         {perm !== "granted" ? (
           <View style={styles.center}>
             <T v="h2" color={colors.white} center>Find the direction of the Ka&apos;bah</T>
-            <T v="body" color={colors.emerald100} center style={{ marginTop: 8, marginBottom: 24 }}>DEEN needs your location once to calculate the Qibla accurately. It isn&apos;t stored.</T>
+            <T v="body" color={colors.brand100} center style={{ marginTop: 8, marginBottom: 24 }}>DEEN needs your location once to calculate the Qibla accurately. It isn&apos;t stored.</T>
             <Button title="Allow location" variant="gold" onPress={start} />
-            {perm === "denied" && <T v="caption" color={colors.emerald100} center style={{ marginTop: 12 }}>Location is off. Enable it in your phone settings.</T>}
+            {perm === "denied" && <T v="caption" color={colors.brand100} center style={{ marginTop: 12 }}>Location is off. Enable it in your phone settings.</T>}
           </View>
         ) : !pos ? (
-          <View style={styles.center}><DeenLoader size={64} tone="dark" /><T v="small" color={colors.emerald100} style={{ marginTop: 14 }}>Finding your location…</T></View>
+          <View style={styles.center}><DeenLoader size={64} tone="dark" /><T v="small" color={colors.brand100} style={{ marginTop: 14 }}>Finding your location…</T></View>
         ) : (
           <View style={styles.center}>
             <View style={styles.compass}>
@@ -106,7 +106,7 @@ export default function Qibla() {
               </Animated.View>
             </View>
             <Text style={[styles.status, isAligned && { color: colors.gold400 }]}>{isAligned ? "You are facing the Qibla" : `Turn ${diff > 0 ? "right" : "left"} ${Math.round(Math.abs(diff))}°`}</Text>
-            <T v="small" color={colors.emerald100} center>Qibla is {Math.round(bearing)}° from true north · {distanceToMakkahKm(pos.lat, pos.lng).toLocaleString()} km to Makkah</T>
+            <T v="small" color={colors.brand100} center>Qibla is {Math.round(bearing)}° from true north · {distanceToMakkahKm(pos.lat, pos.lng).toLocaleString()} km to Makkah</T>
             <T v="caption" color="rgba(255,255,255,0.45)" center style={{ marginTop: 10 }}>Hold your phone flat, away from metal and magnets.</T>
           </View>
         )}
@@ -118,8 +118,8 @@ export default function Qibla() {
 const styles = StyleSheet.create({
   center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 28 },
   compass: { width: SIZE + 40, height: SIZE + 40, alignItems: "center", justifyContent: "center" },
-  glow: { position: "absolute", width: SIZE + 40, height: SIZE + 40, borderRadius: (SIZE + 40) / 2, backgroundColor: "rgba(201,163,78,0.05)" },
-  glowOn: { backgroundColor: "rgba(201,163,78,0.22)" },
+  glow: { position: "absolute", width: SIZE + 40, height: SIZE + 40, borderRadius: (SIZE + 40) / 2, backgroundColor: "rgba(227,157,41,0.05)" },
+  glowOn: { backgroundColor: "rgba(227,157,41,0.22)" },
   // Fixed marker at 12 o'clock: the direction the phone is pointing.
   pointer: { position: "absolute", top: 0, zIndex: 2, width: 0, height: 0, borderLeftWidth: 10, borderRightWidth: 10, borderTopWidth: 16, borderLeftColor: "transparent", borderRightColor: "transparent", borderTopColor: colors.white },
   status: { fontFamily: fonts.extrabold, fontSize: 22, color: colors.white, marginTop: 30, marginBottom: 6 },

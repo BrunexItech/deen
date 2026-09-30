@@ -53,7 +53,7 @@ export default function Explore() {
             <Text style={styles.searchText}>Scholarships, jobs, grants…</Text>
           </Tap>
           <View>
-            <IconButton icon={SlidersHorizontal} label="Filters" onPress={() => { setDraft(filters); setOpen(true); }} bg={activeCount ? colors.emerald700 : colors.white} color={activeCount ? colors.white : colors.ink900} size={50} />
+            <IconButton icon={SlidersHorizontal} label="Filters" onPress={() => { setDraft(filters); setOpen(true); }} bg={activeCount ? colors.brand700 : colors.white} color={activeCount ? colors.white : colors.ink900} size={50} />
             {activeCount > 0 && <View style={styles.count}><Text style={styles.countText}>{activeCount}</Text></View>}
           </View>
         </View>
@@ -70,7 +70,7 @@ export default function Explore() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.tabs, { paddingTop: 0 }]}>
             {types.map((t) => (
               <Tap key={t.key} onPress={() => setFilters((f) => ({ ...f, type: f.type === t.key ? "" : t.key }))} style={[styles.sub, filters.type === t.key && styles.subOn]}>
-                <Text style={[styles.subText, filters.type === t.key && { color: colors.emerald800 }]}>{t.name}</Text>
+                <Text style={[styles.subText, filters.type === t.key && { color: colors.brand800 }]}>{t.name}</Text>
               </Tap>
             ))}
           </ScrollView>
@@ -93,7 +93,7 @@ export default function Explore() {
         ListFooterComponent={query.isFetchingNextPage ? <InlineLoader /> : null}
         onEndReached={() => query.hasNextPage && !query.isFetchingNextPage && query.fetchNextPage()}
         onEndReachedThreshold={0.4}
-        refreshControl={<RefreshControl refreshing={query.isRefetching && !query.isFetchingNextPage} onRefresh={() => query.refetch()} tintColor={colors.emerald700} colors={[colors.emerald700]} />}
+        refreshControl={<RefreshControl refreshing={query.isRefetching && !query.isFetchingNextPage} onRefresh={() => query.refetch()} tintColor={colors.brand700} colors={[colors.brand700]} />}
         showsVerticalScrollIndicator={false}
       />
 
@@ -130,10 +130,10 @@ const styles = StyleSheet.create({
   search: { flex: 1, flexDirection: "row", alignItems: "center", gap: 10, height: 50, backgroundColor: colors.white, borderRadius: 16, paddingHorizontal: 16, borderWidth: 1, borderColor: colors.sand200 },
   searchText: { fontFamily: fonts.medium, fontSize: 15, color: colors.ink300 },
   count: { position: "absolute", top: -4, right: -4, backgroundColor: colors.gold500, borderRadius: 9, minWidth: 18, height: 18, alignItems: "center", justifyContent: "center", borderWidth: 2, borderColor: colors.sand100 },
-  countText: { fontFamily: fonts.bold, fontSize: 10, color: colors.emerald950 },
+  countText: { fontFamily: fonts.bold, fontSize: 10, color: colors.brand950 },
   tabs: { paddingHorizontal: 20, paddingVertical: 14, gap: 8 },
   sub: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10, backgroundColor: colors.sand200 },
-  subOn: { backgroundColor: colors.emerald100 },
+  subOn: { backgroundColor: colors.brand100 },
   subText: { fontFamily: fonts.semibold, fontSize: 12.5, color: colors.ink500 },
   resultRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 2 },
   clear: { flexDirection: "row", alignItems: "center", gap: 4 },

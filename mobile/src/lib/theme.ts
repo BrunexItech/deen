@@ -1,21 +1,29 @@
 /** DEEN design tokens: shared with the web portal so the brand reads as one system. */
 export const colors = {
-  emerald950: "#031F18",
-  emerald900: "#062E25",
-  emerald800: "#0A4034",
-  emerald700: "#0B5D4B",
-  emerald600: "#0F7A61",
-  emerald500: "#16977A",
-  emerald400: "#3DB592",
-  emerald100: "#DCEFE7",
-  emerald50: "#EEF7F3",
+  // DEEN brand, sampled from the official logo: navy wordmark, royal-blue sky,
+  // gold arch and green growth bars.
+  brand950: "#001733",
+  brand900: "#00255F",
+  brand800: "#00316F",
+  brand700: "#004485",
+  brand600: "#0B57A4",
+  brand500: "#2A72C2",
+  brand400: "#5B96D8",
+  brand100: "#DCE8F7",
+  brand50: "#EEF4FC",
 
-  gold700: "#8F6A1F",
-  gold600: "#B7862C",
-  gold500: "#C9A34E",
-  gold400: "#DFC07A",
-  gold100: "#F6ECD2",
-  gold50: "#FBF6E9",
+  gold700: "#9A6410",
+  gold600: "#C98516",
+  gold500: "#E39D29",
+  gold400: "#F2BE5C",
+  gold100: "#FCEBC8",
+  gold50: "#FEF7E8",
+
+  leaf700: "#237A24",
+  leaf600: "#2E9A2E",
+  leaf500: "#43B02A",
+  leaf100: "#DDF3D3",
+  leaf50: "#F0FAEC",
 
   sand50: "#FBFAF6",
   sand100: "#F6F4EE",
@@ -52,14 +60,14 @@ export const space = (n: number) => n * 4;
 
 export const shadow = {
   card: { shadowColor: "#0F1A17", shadowOpacity: 0.06, shadowRadius: 14, shadowOffset: { width: 0, height: 6 }, elevation: 2 },
-  float: { shadowColor: "#062E25", shadowOpacity: 0.22, shadowRadius: 24, shadowOffset: { width: 0, height: 12 }, elevation: 8 },
+  float: { shadowColor: "#00255F", shadowOpacity: 0.22, shadowRadius: 24, shadowOffset: { width: 0, height: 12 }, elevation: 8 },
 };
 
 export const CATEGORY_META: Record<string, { color: string; tint: string; icon: string; label: string }> = {
-  education: { color: "#0F766E", tint: "#E6F4F2", icon: "graduation", label: "Scholarships" },
-  employment: { color: "#1D4ED8", tint: "#EAF0FE", icon: "briefcase", label: "Jobs" },
-  business: { color: "#B45309", tint: "#FDF3E4", icon: "rocket", label: "Business" },
+  education: { color: "#004485", tint: "#E6EEF8", icon: "graduation", label: "Education" },
+  career: { color: "#0B57A4", tint: "#E8F0FA", icon: "briefcase", label: "Career" },
+  entrepreneurship: { color: "#C98516", tint: "#FDF3E1", icon: "rocket", label: "Business" },
+  community: { color: "#2E9A2E", tint: "#E9F6E4", icon: "users", label: "Community" },
+  islamic_economy: { color: "#7C3AED", tint: "#F1EBFE", icon: "landmark", label: "Islamic Economy" },
   support: { color: "#BE123C", tint: "#FDECF0", icon: "heart", label: "Support" },
-  learning: { color: "#7C3AED", tint: "#F1EBFE", icon: "sparkles", label: "Learning" },
-  community: { color: "#047857", tint: "#E5F4EE", icon: "users", label: "Community" },
 };

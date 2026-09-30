@@ -62,7 +62,7 @@ export default function Notifications() {
         ListEmptyComponent={q.isLoading ? <InlineLoader /> : <Empty icon={Bell} title="All caught up" body="New matches, deadline reminders and application updates will appear here." />}
         ListFooterComponent={q.isFetchingNextPage ? <InlineLoader /> : null}
         onEndReached={() => q.hasNextPage && q.fetchNextPage()}
-        refreshControl={<RefreshControl refreshing={q.isRefetching} onRefresh={() => q.refetch()} colors={[colors.emerald700]} tintColor={colors.emerald700} />}
+        refreshControl={<RefreshControl refreshing={q.isRefetching} onRefresh={() => q.refetch()} colors={[colors.brand700]} tintColor={colors.brand700} />}
       />
     </SafeAreaView>
   );

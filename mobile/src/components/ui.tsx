@@ -31,7 +31,7 @@ export function T({ v = "body", style, color, center, ...rest }: TextProps & { v
   return <Text {...rest} style={[TYPE[v], color ? { color } : null, center ? { textAlign: "center" } : null, style]} />;
 }
 
-export function Arabic({ children, size = 24, color = colors.emerald800, style }: { children: ReactNode; size?: number; color?: string; style?: StyleProp<TextStyle> }) {
+export function Arabic({ children, size = 24, color = colors.brand800, style }: { children: ReactNode; size?: number; color?: string; style?: StyleProp<TextStyle> }) {
   return <Text style={[{ fontFamily: fonts.arabic, fontSize: size, lineHeight: size * 1.9, color, textAlign: "right", writingDirection: "rtl" }, style]}>{children}</Text>;
 }
 
@@ -64,7 +64,7 @@ export function Button({ title, onPress, variant = "primary", loading, disabled,
   title: string; onPress?: () => void; variant?: BtnVariant; loading?: boolean; disabled?: boolean; icon?: LucideIcon; style?: StyleProp<ViewStyle>; size?: "md" | "lg";
 }) {
   const height = size === "lg" ? 54 : 44;
-  const fg = variant === "primary" || variant === "danger" ? colors.white : variant === "gold" ? colors.emerald950 : colors.ink900;
+  const fg = variant === "primary" || variant === "danger" ? colors.white : variant === "gold" ? colors.brand950 : colors.ink900;
   const content = (
     <View style={[styles.btnInner, { height }]}>
       {loading ? <ActivityIndicator color={fg} /> : Icon ? <Icon size={18} color={fg} strokeWidth={2.2} /> : null}
@@ -75,9 +75,9 @@ export function Button({ title, onPress, variant = "primary", loading, disabled,
   return (
     <Tap onPress={onPress} disabled={off} style={[{ opacity: off ? 0.55 : 1, borderRadius: radius.md, overflow: "hidden" }, style]}>
       {variant === "primary" ? (
-        <LinearGradient colors={[colors.emerald600, colors.emerald800]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>{content}</LinearGradient>
+        <LinearGradient colors={[colors.brand600, colors.brand800]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>{content}</LinearGradient>
       ) : variant === "gold" ? (
-        <LinearGradient colors={["#EBCB82", colors.gold600]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>{content}</LinearGradient>
+        <LinearGradient colors={["#F5C96E", colors.gold600]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>{content}</LinearGradient>
       ) : (
         <View style={variant === "secondary" ? styles.btnSecondary : variant === "danger" ? { backgroundColor: colors.rose600 } : null}>{content}</View>
       )}
@@ -108,7 +108,7 @@ export function Section({ title, action, onAction, children, style }: { title: s
     <View style={[{ marginTop: 26 }, style]}>
       <View style={styles.sectionHead}>
         <T v="h2">{title}</T>
-        {action && <Pressable onPress={onAction} hitSlop={10}><T v="label" color={colors.emerald700}>{action}</T></Pressable>}
+        {action && <Pressable onPress={onAction} hitSlop={10}><T v="label" color={colors.brand700}>{action}</T></Pressable>}
       </View>
       {children}
     </View>
@@ -128,7 +128,7 @@ export function Chip({ label, active, onPress, icon: Icon }: { label: string; ac
 
 type Tone = "neutral" | "good" | "gold" | "warn" | "bad" | "info";
 const TONES: Record<Tone, [string, string]> = {
-  neutral: [colors.sand200, colors.ink700], good: [colors.emerald50, colors.emerald700], gold: [colors.gold50, colors.gold700],
+  neutral: [colors.sand200, colors.ink700], good: [colors.brand50, colors.brand700], gold: [colors.gold50, colors.gold700],
   warn: [colors.amber50, colors.amber800], bad: [colors.rose50, colors.rose600], info: [colors.sky50, colors.sky800],
 };
 
@@ -176,7 +176,7 @@ export function Segmented<V extends string>({ options, value, onChange }: { opti
 export function Empty({ icon: Icon, title, body, action, onAction }: { icon: LucideIcon; title: string; body?: string; action?: string; onAction?: () => void }) {
   return (
     <View style={styles.empty}>
-      <View style={styles.emptyIcon}><Icon size={28} color={colors.emerald700} /></View>
+      <View style={styles.emptyIcon}><Icon size={28} color={colors.brand700} /></View>
       <T v="h3" center>{title}</T>
       {body && <T v="small" center style={{ maxWidth: 280 }}>{body}</T>}
       {action && <Button title={action} onPress={onAction} size="md" style={{ marginTop: 12, minWidth: 180 }} />}
@@ -198,7 +198,7 @@ export function Header({ title, subtitle, right, back = true, dark = false }: { 
       ) : <View style={{ width: 42 }} />}
       <View style={{ flex: 1, alignItems: "center" }}>
         {title && <T v="h3" numberOfLines={1} color={dark ? colors.white : undefined}>{title}</T>}
-        {subtitle && <T v="caption" numberOfLines={1} color={dark ? colors.emerald100 : undefined}>{subtitle}</T>}
+        {subtitle && <T v="caption" numberOfLines={1} color={dark ? colors.brand100 : undefined}>{subtitle}</T>}
       </View>
       <View style={{ minWidth: 42, alignItems: "flex-end" }}>{right}</View>
     </View>
@@ -215,11 +215,11 @@ const styles = StyleSheet.create({
   btnSecondary: { backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.sand300, borderRadius: radius.md },
   iconBtn: { borderRadius: 14, alignItems: "center", justifyContent: "center", ...shadow.card },
   dot: { position: "absolute", top: -3, right: -3, minWidth: 18, height: 18, borderRadius: 9, backgroundColor: colors.gold500, alignItems: "center", justifyContent: "center", paddingHorizontal: 4, borderWidth: 2, borderColor: colors.sand100 },
-  dotText: { fontFamily: fonts.bold, fontSize: 9, color: colors.emerald950 },
+  dotText: { fontFamily: fonts.bold, fontSize: 9, color: colors.brand950 },
   card: { backgroundColor: colors.white, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.sand200, ...shadow.card },
   sectionHead: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12, paddingHorizontal: 20 },
   chip: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 14, height: 36, borderRadius: radius.pill, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.sand300 },
-  chipActive: { backgroundColor: colors.emerald700, borderColor: colors.emerald700 },
+  chipActive: { backgroundColor: colors.brand700, borderColor: colors.brand700 },
   chipText: { fontFamily: fonts.semibold, fontSize: 13, color: colors.ink700 },
   badge: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 9, paddingVertical: 3.5, borderRadius: radius.pill, alignSelf: "flex-start" },
   badgeText: { fontFamily: fonts.bold, fontSize: 11 },
@@ -230,6 +230,6 @@ const styles = StyleSheet.create({
   segmentActive: { backgroundColor: colors.white, ...shadow.card },
   segmentText: { fontFamily: fonts.semibold, fontSize: 13, color: colors.ink500 },
   empty: { alignItems: "center", paddingVertical: 48, paddingHorizontal: 30, gap: 8 },
-  emptyIcon: { width: 68, height: 68, borderRadius: 22, backgroundColor: colors.emerald50, alignItems: "center", justifyContent: "center", marginBottom: 8 },
+  emptyIcon: { width: 68, height: 68, borderRadius: 22, backgroundColor: colors.brand50, alignItems: "center", justifyContent: "center", marginBottom: 8 },
   header: { flexDirection: "row", alignItems: "center", paddingHorizontal: 16, paddingVertical: 8, gap: 12 },
 });

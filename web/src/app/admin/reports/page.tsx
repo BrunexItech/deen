@@ -37,7 +37,7 @@ function Row({ r, onDone }: { r: Report; onDone: () => void }) {
             {r.reports_on_target > 1 && <Badge tone="bad">{r.reports_on_target} members reported this</Badge>}
             <span className="text-xs text-ink-400">{titleCase(r.target_type)} · {ago(r.created_at)} · by {r.reporter ?? "a member"}</span>
           </div>
-          <Link href={HREF[r.target_type](r.target_id)} className="mt-1.5 block font-bold hover:text-emerald-700">{r.target_name}</Link>
+          <Link href={HREF[r.target_type](r.target_id)} className="mt-1.5 block font-bold hover:text-brand-700">{r.target_name}</Link>
           {r.details && <p className="mt-1 max-w-2xl text-sm text-ink-700">&ldquo;{r.details}&rdquo;</p>}
         </div>
       </div>

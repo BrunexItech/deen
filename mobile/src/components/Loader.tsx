@@ -1,70 +1,55 @@
-/** The DEEN loader, the app's signature motion: the khatam's two squares
- * counter-rotate while a trace of gold light runs around the star and the light at
- * the centre (the open door) breathes. Everything runs on the UI thread (Reanimated),
- * so it stays smooth even while the JS thread is busy fetching and parsing data. */
+/** The DEEN loader: the official emblem breathes at the centre while two arcs in the
+ * logo's colours orbit it: gold and green on the inside, royal blue on the outside.
+ * Everything runs on the UI thread (Reanimated), so it stays smooth while the JS
+ * thread is busy fetching and parsing data. */
+import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View, type ViewStyle } from "react-native";
 import Animated, {
-  Easing, useAnimatedProps, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming,
+  Easing, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming,
 } from "react-native-reanimated";
-import Svg, { Defs, LinearGradient as SvgGradient, RadialGradient, Rect, Circle, Stop } from "react-native-svg";
+import Svg, { Circle } from "react-native-svg";
 import { colors, fonts } from "@/lib/theme";
 
-const AnimatedRect = Animated.createAnimatedComponent(Rect);
-const EASE = Easing.bezier(0.6, 0.1, 0.4, 0.9);
+const EMBLEM = require("../../assets/deen-emblem.png");
 
 export function DeenLoader({ size = 64, tone = "light" }: { size?: number; tone?: "light" | "dark" }) {
-  const spin = useSharedValue(0);
-  const trace = useSharedValue(0);
+  const fast = useSharedValue(0);
+  const slow = useSharedValue(0);
   const breathe = useSharedValue(0);
 
   useEffect(() => {
-    spin.value = withRepeat(withTiming(1, { duration: 2400, easing: EASE }), -1, false);
-    trace.value = withRepeat(withTiming(1, { duration: 1600, easing: Easing.linear }), -1, false);
-    breathe.value = withRepeat(withSequence(withTiming(1, { duration: 800 }), withTiming(0, { duration: 800 })), -1, false);
-  }, [spin, trace, breathe]);
+    fast.value = withRepeat(withTiming(1, { duration: 1400, easing: Easing.bezier(0.5, 0.15, 0.5, 0.85) }), -1, false);
+    slow.value = withRepeat(withTiming(1, { duration: 2800, easing: Easing.linear }), -1, false);
+    breathe.value = withRepeat(withSequence(withTiming(1, { duration: 900 }), withTiming(0, { duration: 900 })), -1, false);
+  }, [fast, slow, breathe]);
 
-  const squareA = useAnimatedStyle(() => ({ transform: [{ rotate: `${spin.value * 90}deg` }] }));
-  const squareB = useAnimatedStyle(() => ({ transform: [{ rotate: `${45 - spin.value * 90}deg` }] }));
-  const light = useAnimatedStyle(() => ({ opacity: 0.55 + breathe.value * 0.45, transform: [{ scale: 0.82 + breathe.value * 0.26 }] }));
-  const traceProps = useAnimatedProps(() => ({ strokeDashoffset: -trace.value * 208 }));
+  const inner = useAnimatedStyle(() => ({ transform: [{ rotate: `${fast.value * 360}deg` }] }));
+  const outer = useAnimatedStyle(() => ({ transform: [{ rotate: `${-slow.value * 360}deg` }] }));
+  const emblem = useAnimatedStyle(() => ({ opacity: 0.9 + breathe.value * 0.1, transform: [{ scale: 0.92 + breathe.value * 0.08 }] }));
 
-  const frame = tone === "dark" ? colors.emerald400 : colors.emerald700;
   const s = size;
   const layer: ViewStyle = { position: "absolute", width: s, height: s };
-
+  const track = tone === "dark" ? "rgba(255,255,255,0.14)" : "rgba(0,68,133,0.12)";
+  const blue = tone === "dark" ? colors.brand400 : colors.brand700;
+  // Circumferences for r=46 (outer) and r=38 (inner) in a 100-unit viewBox.
   return (
     <View style={{ width: s, height: s }} accessibilityRole="progressbar" accessibilityLabel="Loading">
-      <Animated.View style={[layer, squareA]}>
+      <Animated.View style={[layer, outer]}>
         <Svg width={s} height={s} viewBox="0 0 100 100">
-          <Rect x={24} y={24} width={52} height={52} rx={5} fill="none" stroke={frame} strokeWidth={5} strokeOpacity={0.9} />
+          <Circle cx={50} cy={50} r={46} fill="none" stroke={track} strokeWidth={4} />
+          <Circle cx={50} cy={50} r={46} fill="none" stroke={blue} strokeWidth={4} strokeLinecap="round" strokeDasharray="70 219" />
         </Svg>
       </Animated.View>
-      <Animated.View style={[layer, squareB]}>
+      <Animated.View style={[layer, inner]}>
         <Svg width={s} height={s} viewBox="0 0 100 100">
-          <Defs>
-            <SvgGradient id="g" x1="0" y1="0" x2="1" y2="1">
-              <Stop offset="0" stopColor="#F1D78A" />
-              <Stop offset="1" stopColor="#B7862C" />
-            </SvgGradient>
-          </Defs>
-          <Rect x={24} y={24} width={52} height={52} rx={5} fill="none" stroke="url(#g)" strokeWidth={5} />
-          <AnimatedRect animatedProps={traceProps} x={24} y={24} width={52} height={52} rx={5} fill="none"
-            stroke="#FFF6D6" strokeWidth={5} strokeLinecap="round" strokeDasharray="44 164" />
+          <Circle cx={50} cy={50} r={38} fill="none" stroke={colors.gold500} strokeWidth={4.5} strokeLinecap="round" strokeDasharray="52 187" />
+          <Circle cx={50} cy={50} r={38} fill="none" stroke={colors.leaf500} strokeWidth={4.5} strokeLinecap="round" strokeDasharray="26 213" strokeDashoffset={-119} />
         </Svg>
       </Animated.View>
-      <Animated.View style={[layer, light]}>
-        <Svg width={s} height={s} viewBox="0 0 100 100">
-          <Defs>
-            <RadialGradient id="l" cx="50" cy="50" r="16" gradientUnits="userSpaceOnUse">
-              <Stop offset="0" stopColor="#FFF3C9" stopOpacity={1} />
-              <Stop offset="1" stopColor="#E2B654" stopOpacity={0} />
-            </RadialGradient>
-          </Defs>
-          <Circle cx={50} cy={50} r={16} fill="url(#l)" />
-          <Circle cx={50} cy={50} r={4.5} fill="#E2B654" />
-        </Svg>
+      <Animated.View style={[{ position: "absolute", left: s * 0.22, top: s * 0.22, width: s * 0.56, height: s * 0.56 }, emblem]}>
+        <Image source={EMBLEM} style={{ width: "100%", height: "100%" }} contentFit="contain" />
       </Animated.View>
     </View>
   );
@@ -81,9 +66,9 @@ export function LoadingScreen({ label, dark = false }: { label?: string; dark?: 
     return () => clearInterval(t);
   }, [label]);
   return (
-    <View style={[styles.center, { backgroundColor: dark ? colors.emerald900 : colors.sand100 }]}>
-      <DeenLoader size={72} tone={dark ? "dark" : "light"} />
-      <Text style={[styles.label, { color: dark ? colors.emerald100 : colors.ink400 }]}>{label ?? MESSAGES[i]}</Text>
+    <View style={[styles.center, { backgroundColor: dark ? colors.brand900 : colors.sand100 }]}>
+      <DeenLoader size={84} tone={dark ? "dark" : "light"} />
+      <Text style={[styles.label, { color: dark ? colors.brand100 : colors.ink400 }]}>{label ?? MESSAGES[i]}</Text>
     </View>
   );
 }
@@ -92,7 +77,7 @@ export function LoadingScreen({ label, dark = false }: { label?: string; dark?: 
 export function InlineLoader({ label }: { label?: string }) {
   return (
     <View style={styles.inline}>
-      <DeenLoader size={44} />
+      <DeenLoader size={48} />
       {label ? <Text style={styles.inlineLabel}>{label}</Text> : null}
     </View>
   );
@@ -137,6 +122,7 @@ export function CardSkeleton() {
 export function FeedSkeleton() {
   return (
     <View style={{ gap: 14, padding: 20 }}>
+      <View style={{ alignItems: "center", paddingVertical: 8 }}><DeenLoader size={56} /></View>
       <Skeleton height={150} radius={24} />
       <CardSkeleton />
       <CardSkeleton />

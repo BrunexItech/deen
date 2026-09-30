@@ -70,11 +70,11 @@ export function AppLock() {
   if (!locked || !biometric || status !== "ready") return null;
   return (
     <View style={StyleSheet.absoluteFill}>
-      <LinearGradient colors={[colors.emerald800, colors.emerald950]} style={styles.lock}>
+      <LinearGradient colors={[colors.brand800, colors.brand950]} style={styles.lock}>
         <DeenLoader size={86} tone="dark" />
         <Text style={styles.brand}>DEEN</Text>
         <Arabic size={22} color={colors.gold400} style={{ textAlign: "center", marginTop: 18 }}>بِسْمِ ٱللَّٰهِ</Arabic>
-        <T v="body" color={colors.emerald100} center style={{ marginTop: 4 }}>
+        <T v="body" color={colors.brand100} center style={{ marginTop: 4 }}>
           Assalamu alaikum{user ? `, ${user.full_name.split(" ")[0]}` : ""}
         </T>
         <T v="caption" color="rgba(255,255,255,0.45)" center>{hijriLabel()}</T>
@@ -88,7 +88,7 @@ export function AppLock() {
 }
 
 const styles = StyleSheet.create({
-  toast: { position: "absolute", left: 16, right: 16, zIndex: 100, flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: colors.emerald950, paddingHorizontal: 16, paddingVertical: 14, borderRadius: 16, shadowColor: "#000", shadowOpacity: 0.25, shadowRadius: 20, elevation: 12 },
+  toast: { position: "absolute", left: 16, right: 16, zIndex: 100, flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: colors.brand950, paddingHorizontal: 16, paddingVertical: 14, borderRadius: 16, shadowColor: "#000", shadowOpacity: 0.25, shadowRadius: 20, elevation: 12 },
   toastText: { flex: 1, color: colors.white, fontFamily: fonts.semibold, fontSize: 14 },
   lock: { flex: 1, alignItems: "center", justifyContent: "center", padding: 32 },
   brand: { fontFamily: fonts.extrabold, fontSize: 22, letterSpacing: 9, color: colors.white, marginTop: 22 },

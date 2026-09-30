@@ -65,7 +65,7 @@ export default function LoginPage() {
             <Field label="Email">
               <Input autoFocus type="email" autoComplete="username" value={identifier} onChange={(e) => setIdentifier(e.target.value)} placeholder="you@organization.org" required />
             </Field>
-            <Field label={<span className="flex justify-between">Password <Link href="/forgot" className="font-medium text-emerald-700 hover:underline">Forgot?</Link></span>}>
+            <Field label={<span className="flex justify-between">Password <Link href="/forgot" className="font-medium text-brand-700 hover:underline">Forgot?</Link></span>}>
               <Input type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
             </Field>
           </>
@@ -80,8 +80,8 @@ export default function LoginPage() {
           </button>
         )}
       </form>
-      <div className="mt-10 flex items-start gap-3 rounded-2xl bg-emerald-50 p-4 text-[13px] text-emerald-900">
-        <ShieldCheck className="mt-0.5 shrink-0 text-emerald-700" size={18} />
+      <div className="mt-10 flex items-start gap-3 rounded-2xl bg-brand-50 p-4 text-[13px] text-brand-900">
+        <ShieldCheck className="mt-0.5 shrink-0 text-brand-700" size={18} />
         <p>Members sign in with the DEEN mobile app. Organizations are onboarded by DEEN. Use the invitation link we sent you to set up your account.</p>
       </div>
     </AuthLayout>
