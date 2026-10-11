@@ -31,7 +31,7 @@ Section numbers follow the "DEEN APP" document. ✅ built · 🔜 prepared for, 
 | 26 | Student & Graduate Hub (Study, Experience, Career, Growth) | ✅ | Hub screen |
 | 27 | Experience Builder → CV | ✅ | My DEEN Experience + PDF CV |
 | 28 | AI assistants | 🔜 | Spec: Version 3. Profiles, eligibility data and matching are already structured for it |
-| 29 | Premium membership, provider premium, sponsored (clearly labelled), services, partnerships | ✅ | Plans editable in Control Center; "Sponsored" label separate from "Featured" |
+| 29 | Membership, provider premium, sponsored (clearly labelled), services, partnerships | ✅ | One community maintenance fee set by the super admin (Control Center → Billing); paid on the website by M-Pesa, never in the app; members can pay for each other. "Sponsored" label separate from "Featured" |
 | 30 | Security: strong passwords, 2FA, RBAC, encryption, secure documents, consent, privacy policy, data protection, admin logs, scam reporting, secure payments | ✅ | Biometric lock, new-device SMS 2FA, staff TOTP, 9 roles, audit log, DPA consent/export/delete, `/privacy` |
 | 31 | MVP list (1–17) | ✅ | All included |
 | 32 | Version 2 items (in-app applications, tracking, advanced matching, org accounts, WhatsApp, digest, Experience Builder) | ✅ | Already built |

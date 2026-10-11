@@ -3,10 +3,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
-import { BadgeCheck, FileDown, Plus, Sparkles, Trash2 } from "lucide-react-native";
+import { BadgeCheck, Briefcase, FileDown, Lightbulb, Plus, Trash2 } from "lucide-react-native";
 import { useState } from "react";
-import { Alert, ScrollView, StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { FormScroll } from "@/components/Keyboard";
 import { InlineLoader } from "@/components/Loader";
 import { Sheet } from "@/components/Sheet";
 import { Badge, Button, Card, Chip, Empty, Header, IconButton, Input, T, Tap } from "@/components/ui";
@@ -90,7 +91,7 @@ export default function ExperienceScreen() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Header title="My DEEN Experience" right={<IconButton icon={Plus} label="Add experience" onPress={() => setF(blank)} />} />
-      <ScrollView contentContainerStyle={{ padding: 20, gap: 14, paddingBottom: 40 }}>
+      <FormScroll contentContainerStyle={{ padding: 20, gap: 14, paddingBottom: 40 }}>
         <Card style={{ backgroundColor: colors.brand50, borderColor: colors.brand100, gap: 6 }}>
           <T v="bodyStrong">Education → Experience → Skills → Opportunity</T>
           <T v="small">Record your volunteering, attachments, internships, trainings and more. Experience gained through DEEN is marked as verified. Turn it all into a clean CV in one tap.</T>
@@ -99,13 +100,13 @@ export default function ExperienceScreen() {
 
         {q.data?.suggestions.map((s) => (
           <Tap key={s.opportunity_id} onPress={() => setF({ ...blank, kind: KIND_LABEL[s.type] ? s.type : "other", title: s.title, organization: s.organization, opportunity_id: s.opportunity_id })} style={styles.suggest}>
-            <Sparkles size={18} color={colors.gold600} />
+            <Lightbulb size={18} color={colors.gold600} />
             <View style={{ flex: 1 }}><T v="bodyStrong">Add &ldquo;{s.title}&rdquo;</T><T v="caption">You were accepted through DEEN. It will show as verified.</T></View>
           </Tap>
         ))}
 
         {q.isLoading ? <InlineLoader /> : !items.length ? (
-          <Empty icon={Sparkles} title="Start your experience profile" body="Add anything you've done, even volunteering at your masjid counts." action="Add experience" onAction={() => setF(blank)} />
+          <Empty icon={Briefcase} title="Start your experience profile" body="Add anything you've done, even volunteering at your masjid counts." action="Add experience" onAction={() => setF(blank)} />
         ) : items.map((x) => (
           <Card key={x.id} style={{ gap: 4 }}>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
@@ -120,7 +121,7 @@ export default function ExperienceScreen() {
             {x.description && <T v="small" style={{ color: colors.ink700 }}>{x.description}</T>}
           </Card>
         ))}
-      </ScrollView>
+      </FormScroll>
 
       <Sheet open={!!f} onClose={() => setF(null)} title="Add experience"
         footer={<Button title="Save" loading={save.isPending} disabled={!f || f.title.length < 2 || f.organization.length < 2} onPress={() => save.mutate()} />}>

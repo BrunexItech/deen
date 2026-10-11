@@ -2,7 +2,7 @@ import { router } from "expo-router";
 import { Lock, Phone } from "lucide-react-native";
 import { useState } from "react";
 import { Pressable } from "react-native";
-import { AuthScaffold } from "@/components/AuthScaffold";
+import { AuthScaffold, SwitchLink } from "@/components/AuthScaffold";
 import { Button, Input, T } from "@/components/ui";
 import { ApiError, deviceInfo, post, type TokenResponse } from "@/lib/api";
 import { useSession } from "@/lib/session";
@@ -33,7 +33,7 @@ export default function SignIn() {
         await signIn(r as TokenResponse, "/biometric-setup");
       }
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : "Couldn't sign in");
+      setError(e instanceof ApiError ? e.message : "Couldn't log in");
     } finally {
       setBusy(false);
     }
@@ -41,14 +41,15 @@ export default function SignIn() {
 
   return (
     <AuthScaffold
-      title="Welcome back"
-      subtitle="Sign in with your phone number."
-      footer={<Button title="Sign in" loading={busy} disabled={phone.length < 9 || password.length < 1} onPress={submit} />}
+      title="Log in"
+      subtitle="Welcome back. Use your phone number and password."
+      footer={<Button title="Log in" loading={busy} disabled={phone.length < 9 || password.length < 1} onPress={submit} />}
     >
       <Input label="Phone number" icon={Phone} placeholder="07xx xxx xxx" keyboardType="phone-pad" autoComplete="tel" value={phone} onChangeText={setPhone} />
       <Input label="Password" icon={Lock} placeholder="Your password" secureTextEntry autoComplete="current-password" value={password} onChangeText={setPassword} onSubmitEditing={submit} />
       {error && <T v="small" color={colors.rose600}>{error}</T>}
-      <Pressable onPress={() => router.push("/forgot")} hitSlop={10}><T v="label" color={colors.brand700}>Forgot password?</T></Pressable>
+      <Pressable onPress={() => router.push("/forgot")} hitSlop={10} style={{ alignSelf: "flex-end" }}><T v="label" color={colors.brand700}>Forgot password?</T></Pressable>
+      <SwitchLink question="New to DEEN?" action="Create a free account" onPress={() => router.replace("/sign-up")} />
     </AuthScaffold>
   );
 }

@@ -1,8 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import {
-  BadgeCheck, Bell, ChevronRight, Crown, FileLock2, Fingerprint, Gift, GraduationCap, HeartHandshake, LogOut, Shield, Sparkles, Store,
+  BadgeCheck, Bell, Briefcase, ChevronRight, CircleDashed, FileLock2, Fingerprint, GraduationCap, HeartHandshake, LogOut, Shield, Store,
   UserRoundPen, type LucideIcon,
 } from "lucide-react-native";
 import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -39,9 +38,9 @@ export default function Me() {
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 130 }} showsVerticalScrollIndicator={false}>
         <View style={styles.head}>
-          <LinearGradient colors={[colors.brand600, colors.brand900]} style={styles.avatar}>
+          <View style={styles.avatar}>
             <Text style={styles.initials}>{initials}</Text>
-          </LinearGradient>
+          </View>
           <View style={{ flex: 1 }}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
               <T v="h2" numberOfLines={1} style={{ flexShrink: 1 }}>{user.full_name}</T>
@@ -57,17 +56,15 @@ export default function Me() {
           ))}
         </View>
 
-        <Tap onPress={() => router.push("/membership")} style={{ marginTop: 16 }}>
-          <LinearGradient colors={m?.tier === "free" ? [colors.brand700, colors.brand950] : ["#3A2E12", "#15110A"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.member}>
-            <Crown size={22} color={colors.gold400} />
-            <View style={{ flex: 1 }}>
-              <T v="overline" color={colors.gold400}>{m?.tier === "free" ? "Free plan" : "DEEN " + (m?.plan_name ?? "")}</T>
-              <T v="bodyStrong" color={colors.white}>
-                {m?.tier === "free" ? "Upgrade for unlimited applications" : m?.ends_at ? `Active until ${new Date(m.ends_at).toLocaleDateString("en-KE", { day: "numeric", month: "short", year: "numeric" })}` : "Active"}
-              </T>
-            </View>
-            <ChevronRight size={18} color={colors.gold400} />
-          </LinearGradient>
+        <Tap onPress={() => router.push("/membership")} style={[styles.member, { marginTop: 16 }]}>
+          <View style={[styles.memberIcon, { backgroundColor: m?.paid ? colors.leaf50 : colors.sand100 }]}>
+            {m?.paid ? <BadgeCheck size={20} color={colors.leaf600} /> : <CircleDashed size={20} color={colors.ink400} />}
+          </View>
+          <View style={{ flex: 1 }}>
+            <T v="bodyStrong">Membership</T>
+            <T v="caption">{m?.paid ? (m.ends_at ? `Paid up until ${new Date(m.ends_at).toLocaleDateString("en-KE", { day: "numeric", month: "short", year: "numeric" })}` : "Paid up") : "Not paid"}</T>
+          </View>
+          <ChevronRight size={18} color={colors.ink300} />
         </Tap>
 
         <T v="overline" style={styles.group}>Profile</T>
@@ -75,7 +72,7 @@ export default function Me() {
           <Row icon={UserRoundPen} label="Edit profile" sub="Education, skills, interests" onPress={() => router.push("/onboarding")} />
           <Row icon={BadgeCheck} label="Verify your identity" sub={{ none: "Unlock verified-only support", pending: "Under review", verified: "Verified ✓", rejected: "Needs attention" }[user.identity_status]}
             onPress={() => router.push("/identity")} right={user.identity_status === "verified" ? <Badge label="Verified" tone="good" /> : undefined} />
-          <Row icon={Sparkles} label="My DEEN Experience" sub="Build your experience profile and CV" onPress={() => router.push("/experience")} />
+          <Row icon={Briefcase} label="My DEEN Experience" sub="Build your experience profile and CV" onPress={() => router.push("/experience")} />
           <Row icon={GraduationCap} label="Student & Graduate Hub" sub="Study · Experience · Career · Growth" onPress={() => router.push("/hub")} />
           <Row icon={Store} label="My business or practice" sub="List it in the halal directory" onPress={() => router.push("/directory/mine")} />
           <Row icon={HeartHandshake} label="Share a success story" sub="Tell us when an opportunity changed your life" onPress={() => router.push("/applications")} />
@@ -85,15 +82,14 @@ export default function Me() {
         <View style={styles.card}>
           <Row icon={Fingerprint} label="Security" sub={biometric ? "Biometric lock on" : "Biometric lock off"} onPress={() => router.push("/settings/security")} />
           <Row icon={Bell} label="Notifications" sub="What we send and when" onPress={() => router.push("/settings/notifications")} />
-          <Row icon={Gift} label="Sponsor a membership" sub="Gift DEEN to someone in need" onPress={() => router.push({ pathname: "/membership", params: { gift: "1" } })} />
           <Row icon={FileLock2} label="Privacy & data" sub="Download or delete your data" onPress={() => router.push("/settings/privacy")} />
           <Row icon={Shield} label="Safety tips" sub="Legitimate opportunities never ask you to pay" onPress={() => Alert.alert("Stay safe",
             "• DEEN verifies organizations, but never send money to apply for any opportunity.\n• DEEN staff will never ask for your password or M-Pesa PIN.\n• Report anything suspicious with the flag on the opportunity page.")} />
         </View>
 
         <View style={[styles.card, { marginTop: 16 }]}>
-          <Row icon={LogOut} label="Sign out" danger onPress={() => Alert.alert("Sign out?", "You'll need your password to sign in again.", [
-            { text: "Cancel", style: "cancel" }, { text: "Sign out", style: "destructive", onPress: () => signOut() },
+          <Row icon={LogOut} label="Log out" danger onPress={() => Alert.alert("Log out?", "You'll need your password to sign in again.", [
+            { text: "Cancel", style: "cancel" }, { text: "Log out", style: "destructive", onPress: () => signOut() },
           ])} right={<View />} />
         </View>
         <T v="caption" center style={{ marginTop: 20 }}>DEEN · Development and Education Empowerment Network · v1.0</T>
@@ -104,12 +100,13 @@ export default function Me() {
 
 const styles = StyleSheet.create({
   head: { flexDirection: "row", alignItems: "center", gap: 14, paddingTop: 6 },
-  avatar: { width: 64, height: 64, borderRadius: 22, alignItems: "center", justifyContent: "center" },
+  avatar: { width: 64, height: 64, borderRadius: 22, alignItems: "center", justifyContent: "center", backgroundColor: colors.brand800 },
   initials: { fontFamily: fonts.extrabold, fontSize: 22, color: colors.gold400 },
   stats: { flexDirection: "row", gap: 10, marginTop: 18 },
   stat: { flex: 1, backgroundColor: colors.white, borderRadius: 16, paddingVertical: 12, alignItems: "center", borderWidth: 1, borderColor: colors.sand200 },
   statN: { fontFamily: fonts.extrabold, fontSize: 20, color: colors.brand800 },
-  member: { flexDirection: "row", alignItems: "center", gap: 14, borderRadius: 20, padding: 18 },
+  member: { flexDirection: "row", alignItems: "center", gap: 14, borderRadius: 20, padding: 16, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.sand200 },
+  memberIcon: { width: 40, height: 40, borderRadius: 12, alignItems: "center", justifyContent: "center" },
   group: { marginTop: 24, marginBottom: 10, marginLeft: 4 },
   card: { backgroundColor: colors.white, borderRadius: 20, borderWidth: 1, borderColor: colors.sand200, overflow: "hidden" },
   row: { flexDirection: "row", alignItems: "center", gap: 14, paddingHorizontal: 16, paddingVertical: 13 },

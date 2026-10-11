@@ -15,7 +15,7 @@ export default function Privacy() {
         <li><b>Identity verification (optional):</b> a photo of your ID and a selfie, encrypted at rest and seen only by DEEN verification officers.</li>
         <li><b>Applications:</b> answers and documents you choose to send to an organization. Only that organization and DEEN can see them.</li>
         <li><b>Location (optional):</b> used on your phone for prayer times and the Qibla. It is not stored on our servers.</li>
-        <li><b>Payments:</b> M-Pesa number, amount and receipt, to activate memberships.</li>
+        <li><b>Payments:</b> M-Pesa number, amount and receipt for the community fee, which is paid on the DEEN website.</li>
       </ul>
       <h2>How we protect it</h2>
       <p>Encryption in transit and at rest for sensitive files, biometric app lock, rotating session tokens, role-based staff access with two-step verification, and an audit log of every sensitive access.</p>

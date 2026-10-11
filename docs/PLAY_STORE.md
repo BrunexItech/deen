@@ -8,17 +8,17 @@
 - **Upload format:** `./gradlew bundleRelease` → `.aab` signed with the upload key in `~/.deen-keys/`.
   Enrol in **Play App Signing**; keep the upload key backed up offline.
 
-## Policies that need a decision before submission
-1. **Payments policy.** Google requires **Google Play Billing** for in-app purchases of *digital* features
-   (the Member / Premium tiers unlock digital content). Selling them inside the Android app through
-   M-Pesa STK Push can get the app rejected. Options:
-   - a) Keep M-Pesa as it is and sell memberships only on the web (the app then shows the membership status and
-     links to the web page, as many "reader"-style apps do), or
-   - b) Add Google Play Billing for the Android store build (M-Pesa can be a payment method *inside*
-     Play Billing in Kenya through carrier/M-Pesa options), or
-   - c) Apply for Google's user choice / alternative billing programme where available.
-   Sponsored memberships ("gift"), organization fees and **donations to verified charities** can use external
-   payments. Donations have their own exemption.
+## Payments (decided)
+DEEN charges one **community maintenance fee**. The super admin sets its amount and period in the Control Center
+(Billing → Fee). Members pay it **on the website** (`/pay`) by M-Pesa, never inside the app, so no Google Play Billing
+is needed and Google takes no share.
+
+To stay within Google Play's payments policy, the Android app must:
+- show **membership status only** (Me → Membership: paid up / not paid, until when, receipts),
+- show **no prices, pay buttons, or links or instructions to pay elsewhere**. Keep it that way in future changes.
+
+## Policies to complete before submission
+1. **Payments:** decided, see above.
 2. **Data safety form.** Declare: name, phone, email, approximate and precise location (prayer times/Qibla,
    optional), photos (ID verification, optional), religious beliefs (implied by the service: sensitive data),
    app activity. Data is encrypted in transit and at rest, and users can request deletion (in the app: Me → Privacy & data).

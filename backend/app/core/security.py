@@ -74,6 +74,12 @@ def create_mfa_token(user_id: str, device: dict) -> str:
                       algorithm=settings.jwt_algorithm)
 
 
+def create_pay_token(user_id: str) -> str:
+    """Short-lived proof that someone holds a member's phone, for paying on the website."""
+    exp = utcnow() + timedelta(minutes=20)
+    return jwt.encode({"sub": user_id, "typ": "pay", "exp": exp}, settings.jwt_secret, algorithm=settings.jwt_algorithm)
+
+
 def decode_token(token: str, typ: str) -> dict:
     payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
     if payload.get("typ") != typ:

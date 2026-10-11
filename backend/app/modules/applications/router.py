@@ -76,7 +76,7 @@ async def apply(opp_id: str, body: ApplyIn, p: Member, session: DB):
         raise HTTPException(409, "Apply on the organization's website for this one")
     ctx = await member_context(session, p.user)
     if is_locked(opp, ctx):
-        raise HTTPException(402, "Upgrade your membership to apply for this opportunity")
+        raise HTTPException(402, "This opportunity is for paid-up DEEN members")
     await _check_quota(session, p.id, ctx.tier)
     if opp.requires_verified_identity and p.user.identity_status != IdentityStatus.verified:
         raise HTTPException(409, "Verify your identity first: this organization only accepts verified members")
@@ -111,8 +111,8 @@ async def _check_quota(session, user_id: str, tier: str) -> None:
 
     limit = (await current_membership(session, user_id))["features"].get("monthly_applications")
     if limit is not None and await applications_this_month(session, user_id) >= int(limit):
-        raise HTTPException(402, f"You've used your {limit} applications for this month. "
-                                 "Become a member for unlimited applications.")
+        raise HTTPException(402, f"You've used your {limit} applications through DEEN this month. "
+                                 "Paid-up members apply without a limit.")
 
 
 async def _own_documents(session, user_id: str, docs: list[dict], org_id: str) -> list[dict]:

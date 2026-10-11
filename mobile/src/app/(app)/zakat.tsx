@@ -2,8 +2,9 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { Info } from "lucide-react-native";
 import { useMemo, useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { FormScroll } from "@/components/Keyboard";
 import { LoadingScreen } from "@/components/Loader";
 import { Arabic, Button, Card, Header, Input, T } from "@/components/ui";
 import { computeZakat, type ZakatInput } from "@/lib/faith";
@@ -33,8 +34,7 @@ export default function Zakat() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Header title="Zakat calculator" />
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <ScrollView contentContainerStyle={{ padding: 20, gap: 14, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
+        <FormScroll contentContainerStyle={{ padding: 20, gap: 14, paddingBottom: 40 }}>
           <LinearGradient colors={[colors.brand700, colors.brand950]} style={styles.result}>
             <T v="overline" color={colors.gold400}>Zakat due</T>
             <Text style={styles.due}>{kes(r.due)}</Text>
@@ -63,8 +63,7 @@ export default function Zakat() {
             <T v="small" style={{ fontStyle: "italic" }}>&ldquo;And establish prayer and give zakat.&rdquo; (Qur&apos;an 2:43)</T>
           </Card>
           {r.due > 0 && <Button title="Find verified zakat programmes" onPress={() => router.push({ pathname: "/explore", params: { category: "support" } })} />}
-        </ScrollView>
-      </KeyboardAvoidingView>
+        </FormScroll>
     </SafeAreaView>
   );
 }

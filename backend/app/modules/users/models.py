@@ -76,6 +76,7 @@ class OtpPurpose(str, enum.Enum):
     reset_password = "reset_password"
     verify_email = "verify_email"
     new_device = "new_device"
+    payment = "payment"
 
 
 class OtpCode(Base):

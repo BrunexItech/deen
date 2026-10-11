@@ -3,8 +3,9 @@ import { router, useLocalSearchParams } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { ExternalLink, Heart, MessageSquareQuote, Trash2 } from "lucide-react-native";
 import { useState } from "react";
-import { Alert, ScrollView, StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { FormScroll } from "@/components/Keyboard";
 import { LoadingScreen } from "@/components/Loader";
 import { OpportunityCard } from "@/components/OpportunityCard";
 import { Sheet } from "@/components/Sheet";
@@ -49,7 +50,7 @@ export default function ApplicationScreen() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Header title="Application" />
-      <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }}>
+      <FormScroll contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }}>
         {a.opportunity ? <OpportunityCard o={a.opportunity} /> : a.manual && (
           <Card style={{ gap: 4 }}>
             <T v="caption">{a.manual.organization} · recorded by you</T>
@@ -120,7 +121,7 @@ export default function ApplicationScreen() {
             { text: "Cancel", style: "cancel" }, { text: "Remove", style: "destructive", onPress: () => remove.mutate() },
           ])} />
         )}
-      </ScrollView>
+      </FormScroll>
       <Sheet open={open} onClose={() => setOpen(false)} title="Your story" footer={<Button title="Share" loading={outcome.isPending} onPress={() => outcome.mutate()} />}>
         <Input value={story} onChangeText={setStory} multiline placeholder="How did this opportunity change things for you?" style={{ minHeight: 140, textAlignVertical: "top" }} />
         <T v="caption">Only the DEEN team sees this unless you give permission later.</T>

@@ -1,9 +1,8 @@
 export interface Membership {
-  tier: "free" | "member" | "premium";
-  plan_code: string;
-  plan_name: string;
+  tier: "free" | "member";
+  paid: boolean;
   ends_at: string | null;
-  features: { monthly_applications: number | null; advanced_matching?: boolean; premium_opportunities?: boolean; mentorship?: boolean };
+  features: { monthly_applications: number | null };
   sponsored: boolean;
   applications_this_month?: number;
 }
@@ -64,7 +63,7 @@ export interface OppCard {
   islamic_tags: string[];
   starts_at: string | null;
   amount_label: string | null;
-  access_tier: "free" | "member" | "premium";
+  access_tier: "free" | "member";
   locked: boolean;
   featured: boolean;
   saved: boolean;
@@ -221,18 +220,6 @@ export interface QA {
   answered_by: string | null;
   mine: boolean;
   created_at: string;
-}
-
-export interface Plan {
-  id: string;
-  code: string;
-  name: string;
-  tagline: string | null;
-  tier: string;
-  price_kes: number;
-  interval_months: number;
-  benefits: string[];
-  highlight: boolean;
 }
 
 export interface Reminder {

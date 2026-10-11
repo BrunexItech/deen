@@ -46,7 +46,7 @@ EXPO_PUBLIC_API_URL=http://<your-LAN-IP>:8020 npx expo run:android
 
 In development, SMS codes are shown on screen ("Development code") and M-Pesa payments settle themselves after about 5 seconds. Long-press the logo on the app's welcome screen to point it at a different API server.
 
-Tests: `cd backend && .venv/bin/pytest` (27 tests: auth and security, the full review/matching/apply loop, payments, privacy and the engines).
+Tests: `cd backend && .venv/bin/pytest` (43 tests: auth and security, the full review/matching/apply loop, the community fee and website payments, privacy and the engines).
 
 ---
 
@@ -60,7 +60,7 @@ web (Next.js) ──httpOnly cookies, /api─────┘            │     
 ```
 
 Each backend module lives in `backend/app/modules/<name>/` (`models`, `service`, `router`):
-`users` (auth, sessions, profiles) · `orgs` · `opportunities` (matching, risk scanner, review workflow) · `applications` · `subscriptions` (plans, M-Pesa) · `notifications` (in-app, Expo push, email, SMS) · `moderation` · `directory` · `identity` · `content` (Qur'an/hadith/du'a reminders, zakat) · `files` · `admin` · `audit` · `jobs`.
+`users` (auth, sessions, profiles) · `orgs` · `opportunities` (matching, risk scanner, review workflow) · `applications` · `subscriptions` (community fee, website M-Pesa payments) · `notifications` (in-app, Expo push, email, SMS) · `moderation` · `directory` · `identity` · `content` (Qur'an/hadith/du'a reminders, zakat) · `files` · `admin` · `audit` · `jobs`.
 
 ### Core loops
 
@@ -115,4 +115,4 @@ docker compose -f deploy/docker-compose.prod.yml exec api python -m app.seed
 Before launch:
 - Register with the ODPC as a data controller.
 - Get an Africa's Talking sender ID and M-Pesa Daraja production credentials (callback URL: `/api/v1/payments/mpesa/callback/<MPESA_CALLBACK_TOKEN>`).
-- Check the Google Play payments policy for how the membership is sold (see the notes in `docs/PLAY_STORE.md`).
+- The community fee is paid on the website (`/pay`), never in the app. See `docs/PLAY_STORE.md`.

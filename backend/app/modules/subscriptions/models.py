@@ -18,11 +18,11 @@ class Plan(Base):
     code: Mapped[str] = mapped_column(String(40), unique=True)
     name: Mapped[str] = mapped_column(String(80))
     tagline: Mapped[str | None] = mapped_column(String(200))
-    tier: Mapped[str] = mapped_column(String(20), default="member")  # free | member | premium
+    tier: Mapped[str] = mapped_column(String(20), default="member")  # legacy; the community fee is "member"
     price_kes: Mapped[float] = mapped_column(Numeric(10, 2), default=0)
     interval_months: Mapped[int] = mapped_column(Integer, default=1)
     benefits: Mapped[list[str]] = mapped_column(ARRAY(String(200)), default=list)
-    # {"advanced_matching": true, "premium_opportunities": true, "monthly_applications": null, ...}
+    # community fee: {"free_monthly_applications": 3 | null}
     features: Mapped[dict | None] = mapped_column(JSON, default=dict)
     highlight: Mapped[bool] = mapped_column(Boolean, default=False)
     active: Mapped[bool] = mapped_column(Boolean, default=True)

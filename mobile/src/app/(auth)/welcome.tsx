@@ -1,25 +1,23 @@
 import { Image } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { BadgeCheck, Fingerprint, Sparkles } from "lucide-react-native";
-import { useRef, useState } from "react";
-import { Alert, Dimensions, FlatList, Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { BadgeCheck, Fingerprint, Target, type LucideIcon } from "lucide-react-native";
+import { useState } from "react";
+import { Alert, Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Arabic, Button, Input, T } from "@/components/ui";
+import { Button, Input, T } from "@/components/ui";
 import { apiConfig } from "@/lib/api";
 import { colors, fonts } from "@/lib/theme";
 
-const { width } = Dimensions.get("window");
-
-const SLIDES = [
-  { icon: Sparkles, title: "Opportunities, matched to you", body: "Scholarships, jobs, business funding and support: DEEN shows you what fits your profile, and why." },
-  { icon: BadgeCheck, title: "Every organization verified", body: "No more scams in WhatsApp groups. DEEN reviews each organization and every opportunity before you see it." },
-  { icon: Fingerprint, title: "Secure by design", body: "Your account is locked with your fingerprint or face, and your data is encrypted and protected by Kenyan law." },
+const POINTS: [LucideIcon, string, string][] = [
+  [BadgeCheck, "Checked by DEEN", "Every organization and opportunity is verified first."],
+  [Target, "Matched to you", "See what fits your studies, skills and location."],
+  [Fingerprint, "Safe and private", "Locked with your fingerprint. Your data stays protected."],
 ];
 
 function ServerSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [url, setUrl] = useState(apiConfig.baseUrl);
+  const [testing, setTesting] = useState(false);
   return (
     <Modal visible={open} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose} />
@@ -29,7 +27,16 @@ function ServerSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
         <Input value={url} onChangeText={setUrl} autoCapitalize="none" autoCorrect={false} keyboardType="url" />
         <View style={{ flexDirection: "row", gap: 10, marginTop: 16 }}>
           <Button title="Reset" variant="secondary" size="md" style={{ flex: 1 }} onPress={async () => { await apiConfig.setServer(null); setUrl(apiConfig.defaultUrl); }} />
-          <Button title="Save" size="md" style={{ flex: 1 }} onPress={async () => { await apiConfig.setServer(url.trim()); Alert.alert("Saved", `Using ${url.trim()}`); onClose(); }} />
+          <Button title="Save" size="md" style={{ flex: 1 }} loading={testing} onPress={async () => {
+            setTesting(true);
+            const ok = await apiConfig.ping(url);
+            setTesting(false);
+            await apiConfig.setServer(url);
+            setUrl(apiConfig.baseUrl);
+            Alert.alert(ok ? "Connected" : "Saved, but not reachable",
+              ok ? `Using ${apiConfig.baseUrl}` : `${apiConfig.baseUrl} did not answer. Check the address and that the phone and server are on the same network.`);
+            if (ok) onClose();
+          }} />
         </View>
       </View>
     </Modal>
@@ -37,73 +44,67 @@ function ServerSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
 }
 
 export default function Welcome() {
-  const [index, setIndex] = useState(0);
   const [server, setServer] = useState(false);
-  const list = useRef<FlatList>(null);
 
   return (
-    <LinearGradient colors={[colors.brand800, colors.brand950]} style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: colors.brand900 }}>
       <View style={styles.glow} />
       <SafeAreaView style={{ flex: 1 }}>
-        <Animated.View entering={FadeIn.duration(700)} style={styles.brand}>
-          <Pressable onLongPress={() => setServer(true)} delayLongPress={900}>
+        <Animated.View entering={FadeIn.duration(500)} style={styles.brand}>
+          <Pressable onLongPress={() => setServer(true)} delayLongPress={900} accessibilityLabel="DEEN">
             <Image source={require("../../../assets/deen-emblem.png")} style={styles.logo} contentFit="contain" />
           </Pressable>
-          <Text style={styles.wordmark}>DEEN</Text>
-          <Text style={styles.tagline}>The Muslim Opportunity Platform</Text>
-          <Text style={styles.motto}>Discover · Verify · Apply · Grow</Text>
-          <Arabic size={20} color={colors.gold400} style={{ textAlign: "center", marginTop: 6 }}>وَتَعَاوَنُوا عَلَى الْبِرِّ وَالتَّقْوَىٰ</Arabic>
-          <T v="caption" color="rgba(255,255,255,0.5)" center>&ldquo;Cooperate in righteousness and piety&rdquo; · Qur&apos;an 5:2</T>
+          <View>
+            <Text style={styles.wordmark}>DEEN</Text>
+            <Text style={styles.expansion}>Development and Education{"\n"}Empowerment Network</Text>
+          </View>
         </Animated.View>
 
-        <FlatList
-          ref={list}
-          data={SLIDES}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(s) => s.title}
-          onMomentumScrollEnd={(e) => setIndex(Math.round(e.nativeEvent.contentOffset.x / width))}
-          renderItem={({ item }) => {
-            const Icon = item.icon;
-            return (
-              <View style={{ width, paddingHorizontal: 32, justifyContent: "center" }}>
-                <View style={styles.slideIcon}><Icon size={26} color={colors.gold400} /></View>
-                <T v="title" color={colors.white} style={{ marginTop: 18 }}>{item.title}</T>
-                <T v="body" color="rgba(236,242,252,0.75)" style={{ marginTop: 8 }}>{item.body}</T>
+        <View style={styles.middle}>
+          <Animated.View entering={FadeInDown.delay(100).duration(500)}>
+            <Text style={styles.headline}>Real opportunities for our community.</Text>
+            <Text style={styles.sub}>Scholarships, jobs, attachments, business funding and support. All in one safe app.</Text>
+          </Animated.View>
+          <Animated.View entering={FadeInDown.delay(220).duration(500)} style={{ marginTop: 28, gap: 18 }}>
+            {POINTS.map(([Icon, title, body]) => (
+              <View key={title} style={styles.point}>
+                <View style={styles.pointIcon}><Icon size={20} color={colors.gold400} /></View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.pointTitle}>{title}</Text>
+                  <Text style={styles.pointBody}>{body}</Text>
+                </View>
               </View>
-            );
-          }}
-        />
-
-        <View style={styles.dots}>
-          {SLIDES.map((s, i) => <View key={s.title} style={[styles.dot, i === index && styles.dotActive]} />)}
+            ))}
+          </Animated.View>
         </View>
 
-        <Animated.View entering={FadeInDown.delay(300)} style={styles.actions}>
-          <Button title="Create free account" variant="gold" onPress={() => router.push("/sign-up")} />
-          <Button title="I already have an account" variant="ghost" onPress={() => router.push("/sign-in")} style={{ marginTop: 6 }} />
+        <Animated.View entering={FadeInDown.delay(320).duration(500)} style={styles.actions}>
+          <Button title="Log in" variant="gold" onPress={() => router.push("/sign-in")} />
+          <Button title="Create free account" variant="outlineLight" onPress={() => router.push("/sign-up")} style={{ marginTop: 12 }} />
           <Text style={styles.legal}>By continuing you agree to DEEN&apos;s Terms and Privacy Policy.</Text>
         </Animated.View>
       </SafeAreaView>
-      <ServerSheet open={server} onClose={() => setServer(false)} />
-    </LinearGradient>
+      {/* Remounted on open, so it always starts from the address in use. */}
+      {server && <ServerSheet open onClose={() => setServer(false)} />}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  glow: { position: "absolute", width: 420, height: 420, borderRadius: 210, backgroundColor: "rgba(227,157,41,0.13)", top: -120, alignSelf: "center" },
-  brand: { alignItems: "center", paddingTop: 36 },
-  logo: { width: 116, height: 116 },
-  wordmark: { fontFamily: fonts.extrabold, fontSize: 30, letterSpacing: 10, color: colors.white, marginTop: 14, marginLeft: 10 },
-  tagline: { fontFamily: fonts.medium, fontSize: 13, color: "rgba(255,255,255,0.75)", marginTop: 2 },
-  motto: { fontFamily: fonts.bold, fontSize: 11, letterSpacing: 2.5, color: colors.gold400, marginTop: 10, textTransform: "uppercase" },
-  slideIcon: { width: 56, height: 56, borderRadius: 18, backgroundColor: "rgba(255,255,255,0.08)", borderWidth: 1, borderColor: "rgba(242,190,92,0.3)", alignItems: "center", justifyContent: "center" },
-  dots: { flexDirection: "row", gap: 6, justifyContent: "center", marginBottom: 20 },
-  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: "rgba(255,255,255,0.25)" },
-  dotActive: { width: 22, backgroundColor: colors.gold400 },
-  actions: { paddingHorizontal: 24, paddingBottom: 12 },
-  legal: { fontFamily: fonts.regular, fontSize: 11, color: "rgba(255,255,255,0.4)", textAlign: "center", marginTop: 12 },
+  glow: { position: "absolute", width: 460, height: 460, borderRadius: 230, backgroundColor: "rgba(11,87,164,0.35)", top: -180, right: -160 },
+  brand: { flexDirection: "row", alignItems: "center", gap: 12, paddingHorizontal: 24, paddingTop: 20 },
+  logo: { width: 52, height: 52 },
+  wordmark: { fontFamily: fonts.extrabold, fontSize: 20, letterSpacing: 6, color: colors.white },
+  expansion: { fontFamily: fonts.medium, fontSize: 11, lineHeight: 15, color: "rgba(255,255,255,0.65)", marginTop: 2 },
+  middle: { flex: 1, justifyContent: "center", paddingHorizontal: 24 },
+  headline: { fontFamily: fonts.extrabold, fontSize: 32, lineHeight: 38, letterSpacing: -0.6, color: colors.white },
+  sub: { fontFamily: fonts.regular, fontSize: 16, lineHeight: 24, color: "rgba(255,255,255,0.75)", marginTop: 12 },
+  point: { flexDirection: "row", alignItems: "center", gap: 14 },
+  pointIcon: { width: 42, height: 42, borderRadius: 12, backgroundColor: "rgba(255,255,255,0.08)", alignItems: "center", justifyContent: "center" },
+  pointTitle: { fontFamily: fonts.bold, fontSize: 15, color: colors.white },
+  pointBody: { fontFamily: fonts.regular, fontSize: 13, lineHeight: 18, color: "rgba(255,255,255,0.65)", marginTop: 1 },
+  actions: { paddingHorizontal: 24, paddingBottom: 16 },
+  legal: { fontFamily: fonts.regular, fontSize: 11, color: "rgba(255,255,255,0.45)", textAlign: "center", marginTop: 14 },
   backdrop: { flex: 1, backgroundColor: "rgba(0,23,51,0.5)" },
-  sheet: { backgroundColor: colors.sand100, padding: 24, borderTopLeftRadius: 28, borderTopRightRadius: 28, paddingBottom: 40 },
+  sheet: { backgroundColor: colors.white, padding: 24, borderTopLeftRadius: 28, borderTopRightRadius: 28, paddingBottom: 40 },
 });

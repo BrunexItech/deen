@@ -13,7 +13,7 @@ class Announcement(Base):
 
     title: Mapped[str] = mapped_column(String(160))
     body: Mapped[str] = mapped_column(Text)
-    # all | members | premium | free | county | organizations
+    # all | members (paid) | free (not paid) | county | organizations
     audience: Mapped[str] = mapped_column(String(20), default="all")
     counties: Mapped[list[str]] = mapped_column(ARRAY(String(40)), default=list)
     channels: Mapped[list[str]] = mapped_column(ARRAY(String(10)), default=list)

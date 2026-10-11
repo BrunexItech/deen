@@ -25,16 +25,17 @@ export const colors = {
   leaf100: "#DDF3D3",
   leaf50: "#F0FAEC",
 
-  sand50: "#FBFAF6",
-  sand100: "#F6F4EE",
-  sand200: "#ECE8DD",
-  sand300: "#DDD7C8",
+  // Neutrals: cool and clean (names kept so every screen picks them up).
+  sand50: "#FAFBFC",
+  sand100: "#F4F6F9",
+  sand200: "#E6EAF0",
+  sand300: "#D3D9E2",
 
-  ink900: "#0F1A17",
-  ink700: "#2C3A35",
-  ink500: "#5E6B66",
-  ink400: "#7F8A86",
-  ink300: "#A7B0AC",
+  ink900: "#0B1526",
+  ink700: "#334155",
+  ink500: "#5B6B80",
+  ink400: "#8492A6",
+  ink300: "#B6C0CD",
 
   white: "#FFFFFF",
   rose600: "#E11D48",
@@ -59,14 +60,14 @@ export const radius = { sm: 10, md: 14, lg: 20, xl: 28, pill: 999 };
 export const space = (n: number) => n * 4;
 
 export const shadow = {
-  card: { shadowColor: "#0F1A17", shadowOpacity: 0.06, shadowRadius: 14, shadowOffset: { width: 0, height: 6 }, elevation: 2 },
+  card: { shadowColor: "#0B1526", shadowOpacity: 0.04, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 1 },
   float: { shadowColor: "#00255F", shadowOpacity: 0.22, shadowRadius: 24, shadowOffset: { width: 0, height: 12 }, elevation: 8 },
 };
 
 export const CATEGORY_META: Record<string, { color: string; tint: string; icon: string; label: string }> = {
   education: { color: "#004485", tint: "#E6EEF8", icon: "graduation", label: "Education" },
   career: { color: "#0B57A4", tint: "#E8F0FA", icon: "briefcase", label: "Career" },
-  entrepreneurship: { color: "#C98516", tint: "#FDF3E1", icon: "rocket", label: "Business" },
+  entrepreneurship: { color: "#C98516", tint: "#FDF3E1", icon: "trending", label: "Business" },
   community: { color: "#2E9A2E", tint: "#E9F6E4", icon: "users", label: "Community" },
   islamic_economy: { color: "#7C3AED", tint: "#F1EBFE", icon: "landmark", label: "Islamic Economy" },
   support: { color: "#BE123C", tint: "#FDECF0", icon: "heart", label: "Support" },

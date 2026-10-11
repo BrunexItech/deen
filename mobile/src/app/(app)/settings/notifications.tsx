@@ -12,11 +12,11 @@ type Prefs = Record<Channel, Record<string, boolean>> & { quiet_hours: { enabled
 
 const KINDS: Record<string, [string, string]> = {
   matches: ["New matches", "Opportunities that fit your profile"],
-  deadlines: ["Deadline reminders", "3 days before saved opportunities close"],
+  deadlines: ["Deadline reminders", "7, 3 and 1 day before saved opportunities close"],
   applications: ["Application updates", "When an organization moves your application"],
   digest: ["Weekly opportunities digest", "Every Monday: what's new this week"],
   questions: ["Answers to my questions", "When DEEN or an organization replies"],
-  subscription: ["Membership", "Payments and renewals"],
+  subscription: ["Membership", "When your membership changes"],
   announcements: ["Community announcements", "News from DEEN"],
   organizations: ["Organizations you follow", "New posts from them"],
 };
@@ -24,6 +24,7 @@ const KINDS: Record<string, [string, string]> = {
 export default function NotificationSettings() {
   const qc = useQueryClient();
   const { data } = useQuery({ queryKey: ["prefs"], queryFn: () => get<{ prefs: Prefs }>("/notifications/preferences") });
+  const profile = useProfile();
   const save = useMutation({
     mutationFn: (prefs: Prefs) => put<{ prefs: Prefs }>("/notifications/preferences", { prefs }),
     onMutate: (prefs) => qc.setQueryData(["prefs"], { prefs }),
@@ -31,7 +32,6 @@ export default function NotificationSettings() {
   if (!data) return <SafeAreaView style={{ flex: 1 }}><Header title="Notifications" /><InlineLoader /></SafeAreaView>;
   const p = data.prefs;
   const set = (ch: Channel, kind: string, v: boolean) => save.mutate({ ...p, [ch]: { ...p[ch], [kind]: v } });
-  const profile = useProfile();
   const whatsapp = !!profile.data?.whatsapp_opt_in;
   const consent = async (v: boolean) => {
     await put("/me/profile", { whatsapp_opt_in: v });

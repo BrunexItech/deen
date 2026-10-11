@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Bell, BellRing, CalendarClock, CheckCheck, Crown, FileStack, Megaphone, Sparkles, type LucideIcon } from "lucide-react-native";
+import { BadgeCheck, Bell, BellRing, CalendarClock, CheckCheck, FileStack, Megaphone, Target, type LucideIcon } from "lucide-react-native";
 import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { InlineLoader } from "@/components/Loader";
@@ -11,7 +11,7 @@ import { colors } from "@/lib/theme";
 import type { Notification } from "@/lib/types";
 
 const ICON: Record<string, LucideIcon> = {
-  matches: Sparkles, deadlines: CalendarClock, applications: FileStack, subscription: Crown, announcements: Megaphone, organizations: BellRing,
+  matches: Target, deadlines: CalendarClock, applications: FileStack, subscription: BadgeCheck, announcements: Megaphone, organizations: BellRing,
 };
 
 function ago(iso: string) {

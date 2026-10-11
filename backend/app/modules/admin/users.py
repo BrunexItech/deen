@@ -17,7 +17,7 @@ from app.modules.opportunities.models import Opportunity
 from app.modules.orgs.models import Invite
 from app.modules.orgs.service import create_invite
 from app.modules.subscriptions.models import Payment, Plan, Subscription
-from app.modules.subscriptions.service import activate, current_membership
+from app.modules.subscriptions.service import activate, current_membership, fee_plan
 from app.modules.users.models import IdentityStatus, MemberProfile, User, UserSession, UserStatus
 from app.modules.users.router import profile_out
 from app.modules.users.service import revoke_all
@@ -107,22 +107,23 @@ async def member_status(user_id: str, body: StatusIn, session: DB, p: Principal 
 
 
 class GrantIn(BaseModel):
-    plan_code: str
     reason: str = Field(min_length=3, max_length=300)
 
 
 @router.post("/members/{user_id}/grant")
 async def grant(user_id: str, body: GrantIn, session: DB, p: Principal = require(Perm.plans_manage)):
-    """Complimentary membership (scholarship students, partners, community leaders)."""
+    """Waive one fee period (students in need, partners, community leaders)."""
     u = await session.get(User, user_id)
-    plan = await session.scalar(select(Plan).where(Plan.code == body.plan_code))
-    if not u or u.role != Role.member or not plan:
-        raise HTTPException(404, "Member or plan not found")
+    plan = await fee_plan(session)
+    if not u or u.role != Role.member:
+        raise HTTPException(404, "Member not found")
+    if not plan:
+        raise HTTPException(409, "Set the community fee first")
     sub = await activate(session, u.id, plan)
-    await notify(session, [u.id], kind="subscription", title=f"You've been granted DEEN {plan.name}",
-                 body=f"Enjoy your membership until {sub.ends_at:%d %b %Y}.", data={"screen": "membership"})
+    await notify(session, [u.id], kind="subscription", title="DEEN has covered your membership",
+                 body=f"Your membership is active until {sub.ends_at:%d %b %Y}.", data={"screen": "membership"})
     record(session, actor_id=p.id, action="member.granted", entity="user", entity_id=u.id, ip=p.ip,
-           plan=plan.code, reason=body.reason)
+           reason=body.reason)
     await session.commit()
     return {"ok": True, "ends_at": sub.ends_at}
 

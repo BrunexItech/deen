@@ -32,7 +32,7 @@ export default function Forgot() {
     setError(null);
     try {
       await post("/auth/reset", { identifier: phone, code, new_password: password });
-      toast("Password updated. Sign in with your new password.");
+      toast("Password updated. Log in with your new password.");
       router.replace("/sign-in");
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Couldn't reset password");

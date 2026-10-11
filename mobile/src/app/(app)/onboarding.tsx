@@ -1,10 +1,11 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { Check, Plus } from "lucide-react-native";
+import { Check, CircleAlert, Plus } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 import Animated, { FadeInRight, useAnimatedStyle, withTiming } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { FormScroll, StickyFooter } from "@/components/Keyboard";
 import { LoadingScreen } from "@/components/Loader";
 import { CATEGORY_ICON } from "@/components/OpportunityCard";
 import { Button, Chip, Header, Input, T, Tap } from "@/components/ui";
@@ -53,7 +54,14 @@ export default function Onboarding() {
   const inKenya = (d.country ?? "Kenya") === "Kenya";
   const entrepreneur = d.user_types.some((t) => t === "entrepreneur" || t === "woman_entrepreneur");
   const num = (v: string) => (v.replace(/\D/g, "") === "" ? null : Number(v.replace(/\D/g, "")));
-  const canNext = [d.user_types.length > 0 && (!inKenya || !!d.county) && !!d.gender, !!d.education_level, d.skills.length > 0, d.interests.length > 0][step];
+  // What still blocks Continue, in plain words, so nobody is left guessing.
+  const missing = [
+    [d.user_types.length === 0 && "what you are (I am…)", !d.gender && "Brother or Sister", inKenya && !d.county && "your county"],
+    [!d.education_level && "your education level"],
+    [d.skills.length === 0 && "at least one skill"],
+    [d.interests.length === 0 && "at least one type of opportunity"],
+  ][step].filter(Boolean) as string[];
+  const canNext = missing.length === 0;
 
   async function next() {
     setSaving(true);
@@ -78,20 +86,19 @@ export default function Onboarding() {
     <SafeAreaView style={{ flex: 1 }}>
       <Header title={STEPS[step]} subtitle={`Step ${step + 1} of ${STEPS.length}`} back={step > 0 || router.canGoBack()} />
       <View style={{ paddingHorizontal: 20 }}><Progress step={step} /></View>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <ScrollView contentContainerStyle={{ padding: 20, gap: 18, paddingBottom: 30 }} keyboardShouldPersistTaps="handled">
+      <FormScroll contentContainerStyle={{ padding: 20, gap: 18, paddingBottom: 30 }} footerSpace={110}>
           <Animated.View key={step} entering={FadeInRight.duration(300)} style={{ gap: 18 }}>
             {step === 0 && (
               <>
                 <T v="body" style={{ color: colors.ink500 }}>This helps DEEN show you opportunities near you and ones you&apos;re eligible for.</T>
-                <T v="label">I am… (choose all that apply)</T>
+                <T v="label">I am… (choose all that apply) <Text style={styles.req}>Required</Text></T>
                 <View style={styles.wrap}>
                   {tax.user_types.map((u) => (
                     <Chip key={u.key} label={u.name} active={d.user_types.includes(u.key)}
                       onPress={() => set("user_types", d.user_types.includes(u.key) ? d.user_types.filter((x) => x !== u.key) : [...d.user_types, u.key])} />
                   ))}
                 </View>
-                <T v="label">Gender</T>
+                <T v="label">Gender <Text style={styles.req}>Required</Text></T>
                 <View style={styles.row}>
                   {[["male", "Brother"], ["female", "Sister"]].map(([v, l]) => (
                     <Tap key={v} onPress={() => set("gender", v)} style={[styles.big, d.gender === v && styles.bigOn]}>
@@ -113,7 +120,7 @@ export default function Onboarding() {
                 </View>
                 {inKenya && (
                   <>
-                    <T v="label">County {d.county ? `· ${d.county}` : ""}</T>
+                    <T v="label">County {d.county ? `· ${d.county}` : <Text style={styles.req}>Required</Text>}</T>
                     <Input placeholder="Search counties" value={countyQ} onChangeText={setCountyQ} />
                     <View style={styles.wrap}>
                       {counties.slice(0, countyQ ? 47 : 14).map((c) => <Chip key={c} label={c} active={d.county === c} onPress={() => set("county", c)} />)}
@@ -125,7 +132,7 @@ export default function Onboarding() {
             )}
             {step === 1 && (
               <>
-                <T v="label">Highest education level</T>
+                <T v="label">Highest education level <Text style={styles.req}>Required</Text></T>
                 <View style={styles.wrap}>{tax.education_levels.map((e) => <Chip key={e.key} label={e.name} active={d.education_level === e.key} onPress={() => set("education_level", e.key)} />)}</View>
                 <Input label="Field of study" value={d.field_of_study ?? ""} onChangeText={(v) => set("field_of_study", v)} placeholder="e.g. Computer Science, Nursing, Islamic Studies" />
                 <Input label="School / university (optional)" value={d.institution ?? ""} onChangeText={(v) => set("institution", v)} />
@@ -186,16 +193,25 @@ export default function Onboarding() {
               </>
             )}
           </Animated.View>
-        </ScrollView>
-        <View style={{ padding: 20, paddingTop: 8 }}>
-          <Button title={step === STEPS.length - 1 ? "Show my matches" : "Continue"} loading={saving} disabled={!canNext} onPress={next} />
-        </View>
-      </KeyboardAvoidingView>
+      </FormScroll>
+      <StickyFooter style={styles.footer}>
+        {!canNext && (
+          <View style={styles.missing}>
+            <CircleAlert size={16} color={colors.amber800} />
+            <Text style={styles.missingText}>Still needed: {missing.join(", ")}</Text>
+          </View>
+        )}
+        <Button title={step === STEPS.length - 1 ? "Show my matches" : "Continue"} loading={saving} disabled={!canNext} onPress={next} />
+      </StickyFooter>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  req: { fontFamily: fonts.semibold, fontSize: 11, color: colors.gold700 },
+  footer: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 16, gap: 10, backgroundColor: colors.sand100, borderTopWidth: 1, borderTopColor: colors.sand200 },
+  missing: { flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: colors.amber50, borderRadius: 12, paddingHorizontal: 12, paddingVertical: 9 },
+  missingText: { flex: 1, fontFamily: fonts.medium, fontSize: 13, color: colors.amber800 },
   track: { height: 6, borderRadius: 3, backgroundColor: colors.sand200, overflow: "hidden" },
   fill: { height: 6, borderRadius: 3, backgroundColor: colors.gold500 },
   row: { flexDirection: "row", gap: 10 },

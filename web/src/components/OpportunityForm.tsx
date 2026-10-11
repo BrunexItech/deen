@@ -19,7 +19,7 @@ export type OppDraft = {
   min_experience_years: string; skills: string[]; target_user_types: string[];
   requires_verified_identity: boolean; deadline: string; starts_at: string; ends_at: string; venue: string;
   is_event: boolean; amount_label: string; slots: string; apply_mode: "external" | "internal"; external_url: string;
-  form_questions: Question[]; required_documents: string[]; access_tier: "free" | "member" | "premium";
+  form_questions: Question[]; required_documents: string[]; access_tier: "free" | "member";
   feature_requested: boolean; islamic_tags: string[]; shariah_basis: string;
 };
 
@@ -297,7 +297,7 @@ export function OpportunityForm({ value, onChange, staff = false }: { value: Opp
         {staff ? (
           <Field label="Who can apply" hint="Member and Premium opportunities are shown to everyone but only paying members can apply.">
             <Select value={value.access_tier} onChange={(e) => set("access_tier", e.target.value as OppDraft["access_tier"])}>
-              <option value="free">Everyone (free)</option><option value="member">Members</option><option value="premium">Premium members</option>
+              <option value="free">Everyone</option><option value="member">Paid-up members only</option>
             </Select>
           </Field>
         ) : (

@@ -4,8 +4,9 @@ import { Image } from "expo-image";
 import { usePreventScreenCapture } from "expo-screen-capture";
 import { BadgeCheck, Camera, Clock, IdCard, ScanFace, ShieldCheck } from "lucide-react-native";
 import { useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { FormScroll } from "@/components/Keyboard";
 import { InlineLoader } from "@/components/Loader";
 import { Button, Card, Chip, Header, Input, T, Tap } from "@/components/ui";
 import { get, post, uploadFile } from "@/lib/api";
@@ -78,7 +79,7 @@ export default function Identity() {
           </T>
         </View>
       ) : (
-        <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }}>
+        <FormScroll contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }}>
           <Card style={{ gap: 6, backgroundColor: colors.brand50, borderColor: colors.brand100 }}>
             <ShieldCheck size={22} color={colors.brand700} />
             <T v="bodyStrong">Why verify?</T>
@@ -94,7 +95,7 @@ export default function Identity() {
             <Shot label="Selfie" hint="Face the camera in good light" icon={ScanFace} uri={selfie} onPress={() => capture("selfie")} />
           </View>
           <Button title="Submit for verification" loading={busy} disabled={!front || !selfie || number.length < 5} onPress={submit} />
-        </ScrollView>
+        </FormScroll>
       )}
     </SafeAreaView>
   );

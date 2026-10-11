@@ -1,7 +1,6 @@
 import * as Haptics from "expo-haptics";
-import { LinearGradient } from "expo-linear-gradient";
 import { AlertCircle, ChevronLeft, type LucideIcon } from "lucide-react-native";
-import { forwardRef, type ReactNode } from "react";
+import { forwardRef, useState, type ReactNode } from "react";
 import {
   ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View,
   type PressableProps, type StyleProp, type TextInputProps, type TextProps, type TextStyle, type ViewStyle,
@@ -37,12 +36,33 @@ export function Arabic({ children, size = 24, color = colors.brand800, style }: 
 
 /* ---------- Pressable with spring feedback ---------- */
 
+// Layout props belong on the outer pressable, or a `flex: 1` card collapses to the width
+// of its content (the cause of squeezed, icon-only cards in rows).
+const OUTER_KEYS = ["flex", "flexGrow", "flexShrink", "flexBasis", "alignSelf", "width", "minWidth", "maxWidth", "margin",
+  "marginTop", "marginBottom", "marginLeft", "marginRight", "marginHorizontal", "marginVertical", "position", "top", "bottom",
+  "left", "right", "zIndex"] as const;
+
+function splitStyle(style: StyleProp<ViewStyle>): [ViewStyle, ViewStyle] {
+  const flat = { ...(StyleSheet.flatten(style) ?? {}) } as Record<string, unknown>;
+  const outer: Record<string, unknown> = {};
+  for (const k of OUTER_KEYS) {
+    if (k in flat) {
+      outer[k] = flat[k];
+      delete flat[k];
+    }
+  }
+  return [outer as ViewStyle, flat as ViewStyle];
+}
+
 export function Tap({ children, style, onPress, haptic = true, scale = 0.97, disabled, ...rest }: PressableProps & { style?: StyleProp<ViewStyle>; haptic?: boolean; scale?: number; children: ReactNode }) {
   const s = useSharedValue(1);
   const anim = useAnimatedStyle(() => ({ transform: [{ scale: s.value }] }));
+  const [outer, inner] = splitStyle(style);
+  const fills = outer.flex != null || outer.flexGrow != null || outer.width != null;
   return (
     <Pressable
       {...rest}
+      style={outer}
       disabled={disabled}
       onPressIn={() => (s.value = withSpring(scale, { damping: 20, stiffness: 400 }))}
       onPressOut={() => (s.value = withSpring(1, { damping: 18, stiffness: 300 }))}
@@ -51,41 +71,43 @@ export function Tap({ children, style, onPress, haptic = true, scale = 0.97, dis
         onPress?.(e);
       }}
     >
-      <Animated.View style={[anim, style]}>{children}</Animated.View>
+      <Animated.View style={[anim, fills && { flexGrow: 1 }, inner]}>{children}</Animated.View>
     </Pressable>
   );
 }
 
 /* ---------- Buttons ---------- */
 
-type BtnVariant = "primary" | "gold" | "secondary" | "ghost" | "danger";
+type BtnVariant = "primary" | "gold" | "secondary" | "ghost" | "danger" | "light" | "outlineLight";
+
+const BTN: Record<BtnVariant, { bg?: string; fg: string; border?: string }> = {
+  primary: { bg: colors.brand700, fg: colors.white },
+  gold: { bg: colors.gold500, fg: colors.brand950 },
+  secondary: { bg: colors.white, fg: colors.ink900, border: colors.sand300 },
+  ghost: { fg: colors.brand700 },
+  danger: { bg: colors.rose600, fg: colors.white },
+  light: { bg: colors.white, fg: colors.brand900 },
+  outlineLight: { fg: colors.white, border: "rgba(255,255,255,0.6)" },
+};
 
 export function Button({ title, onPress, variant = "primary", loading, disabled, icon: Icon, style, size = "lg" }: {
   title: string; onPress?: () => void; variant?: BtnVariant; loading?: boolean; disabled?: boolean; icon?: LucideIcon; style?: StyleProp<ViewStyle>; size?: "md" | "lg";
 }) {
   const height = size === "lg" ? 54 : 44;
-  const fg = variant === "primary" || variant === "danger" ? colors.white : variant === "gold" ? colors.brand950 : colors.ink900;
-  const content = (
-    <View style={[styles.btnInner, { height }]}>
-      {loading ? <ActivityIndicator color={fg} /> : Icon ? <Icon size={18} color={fg} strokeWidth={2.2} /> : null}
-      <Text style={[styles.btnText, { color: fg, fontSize: size === "lg" ? 16 : 14 }]}>{title}</Text>
-    </View>
-  );
+  const { bg, fg, border } = BTN[variant];
   const off = disabled || loading;
   return (
-    <Tap onPress={onPress} disabled={off} style={[{ opacity: off ? 0.55 : 1, borderRadius: radius.md, overflow: "hidden" }, style]}>
-      {variant === "primary" ? (
-        <LinearGradient colors={[colors.brand600, colors.brand800]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>{content}</LinearGradient>
-      ) : variant === "gold" ? (
-        <LinearGradient colors={["#F5C96E", colors.gold600]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>{content}</LinearGradient>
-      ) : (
-        <View style={variant === "secondary" ? styles.btnSecondary : variant === "danger" ? { backgroundColor: colors.rose600 } : null}>{content}</View>
-      )}
+    <Tap onPress={onPress} disabled={off} accessibilityRole="button" accessibilityState={{ disabled: !!off }}
+      style={[{ opacity: off ? 0.5 : 1, borderRadius: radius.md, backgroundColor: bg, borderWidth: border ? 1.5 : 0, borderColor: border }, style]}>
+      <View style={[styles.btnInner, { height: border ? height - 3 : height }]}>
+        {loading ? <ActivityIndicator color={fg} /> : Icon ? <Icon size={18} color={fg} strokeWidth={2.2} /> : null}
+        <Text style={[styles.btnText, { color: fg, fontSize: size === "lg" ? 16 : 14 }]}>{title}</Text>
+      </View>
     </Tap>
   );
 }
 
-export function IconButton({ icon: Icon, onPress, color = colors.ink900, bg = colors.white, size = 42, badge, label }: {
+export function IconButton({ icon: Icon, onPress, color = colors.ink900, bg = colors.sand100, size = 42, badge, label }: {
   icon: LucideIcon; onPress?: () => void; color?: string; bg?: string; size?: number; badge?: number; label: string;
 }) {
   return (
@@ -145,13 +167,15 @@ export function Badge({ label, tone = "neutral", icon: Icon }: { label: string; 
 /* ---------- Inputs ---------- */
 
 export const Input = forwardRef<TextInput, TextInputProps & { label?: string; hint?: string; error?: string; icon?: LucideIcon }>(
-  function Input({ label, hint, error, icon: Icon, style, ...rest }, ref) {
+  function Input({ label, hint, error, icon: Icon, style, onFocus, onBlur, ...rest }, ref) {
+    const [focused, setFocused] = useState(false);
     return (
       <View style={{ gap: 7 }}>
         {label && <T v="label">{label}</T>}
-        <View style={[styles.input, error ? { borderColor: colors.rose600 } : null]}>
-          {Icon && <Icon size={18} color={colors.ink400} />}
-          <TextInput ref={ref} placeholderTextColor={colors.ink300} style={[styles.inputText, style]} {...rest} />
+        <View style={[styles.input, focused && styles.inputFocused, error ? { borderColor: colors.rose600 } : null]}>
+          {Icon && <Icon size={18} color={focused ? colors.brand700 : colors.ink400} />}
+          <TextInput ref={ref} placeholderTextColor={colors.ink300} style={[styles.inputText, style]}
+            onFocus={(e) => { setFocused(true); onFocus?.(e); }} onBlur={(e) => { setFocused(false); onBlur?.(e); }} {...rest} />
         </View>
         {error ? <T v="caption" color={colors.rose600}>{error}</T> : hint ? <T v="caption">{hint}</T> : null}
       </View>
@@ -212,11 +236,10 @@ export function Divider({ style }: { style?: StyleProp<ViewStyle> }) {
 const styles = StyleSheet.create({
   btnInner: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 9, paddingHorizontal: 20 },
   btnText: { fontFamily: fonts.bold, letterSpacing: 0.1 },
-  btnSecondary: { backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.sand300, borderRadius: radius.md },
-  iconBtn: { borderRadius: 14, alignItems: "center", justifyContent: "center", ...shadow.card },
+  iconBtn: { borderRadius: 14, alignItems: "center", justifyContent: "center" },
   dot: { position: "absolute", top: -3, right: -3, minWidth: 18, height: 18, borderRadius: 9, backgroundColor: colors.gold500, alignItems: "center", justifyContent: "center", paddingHorizontal: 4, borderWidth: 2, borderColor: colors.sand100 },
   dotText: { fontFamily: fonts.bold, fontSize: 9, color: colors.brand950 },
-  card: { backgroundColor: colors.white, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.sand200, ...shadow.card },
+  card: { backgroundColor: colors.white, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.sand200 },
   sectionHead: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12, paddingHorizontal: 20 },
   chip: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 14, height: 36, borderRadius: radius.pill, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.sand300 },
   chipActive: { backgroundColor: colors.brand700, borderColor: colors.brand700 },
@@ -224,6 +247,7 @@ const styles = StyleSheet.create({
   badge: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 9, paddingVertical: 3.5, borderRadius: radius.pill, alignSelf: "flex-start" },
   badgeText: { fontFamily: fonts.bold, fontSize: 11 },
   input: { flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: colors.white, borderRadius: radius.md, borderWidth: 1.5, borderColor: colors.sand300, paddingHorizontal: 14, minHeight: 54 },
+  inputFocused: { borderColor: colors.brand600, backgroundColor: colors.white },
   inputText: { flex: 1, fontFamily: fonts.medium, fontSize: 16, color: colors.ink900, paddingVertical: 12 },
   segment: { flexDirection: "row", backgroundColor: colors.sand200, borderRadius: 14, padding: 4 },
   segmentItem: { flex: 1, alignItems: "center", paddingVertical: 9, borderRadius: 11 },

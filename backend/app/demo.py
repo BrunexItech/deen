@@ -140,7 +140,7 @@ OPPS = [
     _opp(0, "Professionals Mentorship Circle", "career", "mentorship",
          "Be paired with a senior Muslim professional in your field for six months of monthly mentoring.", 28,
          education_levels=["undergraduate", "graduate", "postgraduate"], duration_label="6 months", duration_weeks=26,
-         apply_mode="internal", access_tier="premium", target_user_types=["graduate", "professional"],
+         apply_mode="internal", access_tier="member", target_user_types=["graduate", "professional"],
          form_questions=[Q("goal", "What do you want to achieve in 6 months?", "long_text")]),
     # ---------------- Entrepreneurship ----------------
     _opp(1, "Barakah Women Founders Business Grant", "entrepreneurship", "business_grant",
@@ -284,7 +284,7 @@ async def seed_demo(session) -> None:
             opp.verified_at = opp.published_at
         opps.append(opp)
 
-    member_plan = await session.scalar(select(Plan).where(Plan.code == "member_monthly"))
+    member_plan = await session.scalar(select(Plan).where(Plan.code == "community"))
     members: list[User] = []
     for name, phone, prof in MEMBERS:
         u = User(full_name=name, phone=phone, role=Role.member, password_hash=hash_password(DEMO_PASSWORD),

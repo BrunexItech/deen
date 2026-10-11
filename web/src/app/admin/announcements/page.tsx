@@ -15,7 +15,7 @@ interface Announcement {
 }
 
 const AUDIENCES: Record<string, string> = {
-  all: "All members", free: "Free members", members: "Paying members", premium: "Premium members",
+  all: "All members", free: "Not yet paid", members: "Paid-up members",
   county: "Members in specific counties", organizations: "Organization teams",
 };
 

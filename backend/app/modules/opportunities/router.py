@@ -12,7 +12,7 @@ from app.core.deps import DB, Member
 from app.core.roles import Role
 from app.modules.applications.models import Application
 from app.modules.opportunities.matching import evaluate, headline
-from app.modules.opportunities.models import Opportunity, SavedOpportunity
+from app.modules.opportunities.models import AccessTier, Opportunity, SavedOpportunity
 from app.modules.opportunities.service import (card, detail, is_locked, live_filter, member_context, orgs_by_id,
                                                saved_ids, track)
 from app.modules.orgs.models import Organization, OrgStatus, Verification
@@ -300,7 +300,7 @@ async def engagement(opp_id: str, body: EventIn, p: Member, session: DB):
     opp = await _published(session, opp_id)
     ctx = await member_context(session, p.user)
     if body.kind == "click" and is_locked(opp, ctx):
-        raise HTTPException(402, "Upgrade your membership to apply for this opportunity")
+        raise HTTPException(402, "This opportunity is for paid-up DEEN members")
     await track(session, opp, body.kind, p.user, ctx.profile)
     await session.commit()
     return {"ok": True, "external_url": opp.external_url if body.kind == "click" else None}
@@ -320,6 +320,24 @@ async def public_preview(opp_id: str, session: DB):
     c = card(opp, org)
     return {k: c[k] for k in ("id", "title", "summary", "category", "type", "organization", "deadline", "days_left",
                               "location", "amount_label", "is_event", "starts_at")}
+
+
+_PUBLIC_FIELDS = ("id", "title", "summary", "category", "type", "organization", "deadline", "days_left", "location",
+                  "amount_label", "is_event", "starts_at", "closing_soon", "verified_by_deen")
+
+
+@public_router.get("/opportunities")
+async def public_list(session: DB, category: str | None = None, limit: int = 6, page: int = 1):
+    """The website's opportunity pages: live listings, member-only ones excluded."""
+    limit, page = min(max(limit, 1), 48), max(page, 1)
+    stmt = (select(Opportunity, Organization).join(Organization, Organization.id == Opportunity.organization_id)
+            .where(live_filter(), Opportunity.access_tier == AccessTier.free))
+    if category:
+        stmt = stmt.where(Opportunity.category == category)
+    rows = (await session.execute(stmt.order_by(Opportunity.featured.desc(), Opportunity.published_at.desc())
+                                  .offset((page - 1) * limit).limit(limit + 1))).all()
+    items = [{k: c[k] for k in _PUBLIC_FIELDS} for c in (card(o, org) for o, org in rows[:limit])]
+    return {"items": items, "has_more": len(rows) > limit, "page": page}
 
 
 @public_router.get("/stats")

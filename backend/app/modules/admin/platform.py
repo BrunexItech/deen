@@ -4,7 +4,6 @@ from datetime import timedelta
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy import func, or_, select
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.audit import record
@@ -24,7 +23,7 @@ from app.modules.notifications.service import notify
 from app.modules.opportunities.models import Opportunity
 from app.modules.orgs.models import Organization
 from app.modules.subscriptions.models import Payment, PayStatus, Plan, Subscription, SubStatus
-from app.modules.subscriptions.router import plan_out
+from app.modules.subscriptions.service import COMMUNITY_CODE, fee_out, fee_plan
 from app.modules.taxonomy.models import Category, OpportunityType
 from app.modules.taxonomy.router import categories_tree
 from app.modules.users.models import MemberProfile, User, UserStatus
@@ -77,54 +76,44 @@ async def update_report(report_id: str, body: ReportUpdateIn, session: DB, p: Pr
 
 # ---------- billing ----------
 
-@router.get("/plans")
-async def plans(session: DB, p: Principal = require(Perm.payments_view)):
-    rows = (await session.execute(select(Plan).order_by(Plan.sort, Plan.price_kes))).scalars().all()
-    subs = dict((await session.execute(select(Subscription.plan_id, func.count()).where(
-        Subscription.status == SubStatus.active, Subscription.ends_at > utcnow()).group_by(Subscription.plan_id))).all())
-    return [{**plan_out(pl), "active": pl.active, "sort": pl.sort, "subscribers": subs.get(pl.id, 0)} for pl in rows]
+@router.get("/fee")
+async def get_fee(session: DB, p: Principal = require(Perm.payments_view)):
+    plan = await fee_plan(session)
+    paying = await session.scalar(select(func.count(func.distinct(Subscription.user_id))).where(
+        Subscription.status == SubStatus.active, Subscription.ends_at > utcnow())) or 0
+    return {**fee_out(plan), "enabled": bool(plan and plan.active), "paying_members": paying}
 
 
-class PlanIn(BaseModel):
-    code: str = Field(pattern=r"^[a-z0-9_]{2,40}$")
-    name: str = Field(min_length=2, max_length=80)
-    tagline: str | None = Field(None, max_length=200)
-    tier: str = Field(pattern="^(free|member|premium)$")
-    price_kes: float = Field(ge=0, le=1_000_000)
-    interval_months: int = Field(1, ge=1, le=24)
-    benefits: list[str] = Field(default_factory=list, max_length=15)
-    features: dict = {}
-    highlight: bool = False
-    active: bool = True
-    sort: int = 0
+MIN_FEE_KES = 50
 
 
-@router.post("/plans")
-async def create_plan(body: PlanIn, session: DB, p: Principal = require(Perm.plans_manage)):
-    plan = Plan(**body.model_dump())
-    session.add(plan)
-    try:
-        await session.flush()
-    except IntegrityError:
-        raise HTTPException(409, "A plan with that code exists")
-    record(session, actor_id=p.id, action="plan.created", entity="plan", entity_id=plan.id, ip=p.ip, **body.model_dump(
-        include={"code", "price_kes"}))
-    await session.commit()
-    return plan_out(plan)
+class FeeIn(BaseModel):
+    amount_kes: float = Field(ge=MIN_FEE_KES, le=1_000_000)  # set by the admin, never below KES 50
+    period_months: int = Field(ge=1, le=12)
+    covers: list[str] = Field(default_factory=list, max_length=8)
+    free_monthly_applications: int | None = Field(None, ge=0, le=100)  # None = unlimited
+    note: str | None = Field(None, max_length=200)
+    enabled: bool = True
 
 
-@router.put("/plans/{plan_id}")
-async def update_plan(plan_id: str, body: PlanIn, session: DB, p: Principal = require(Perm.plans_manage)):
-    plan = await session.get(Plan, plan_id)
+@router.put("/fee")
+async def update_fee(body: FeeIn, session: DB, p: Principal = require(Perm.plans_manage)):
+    """The one community maintenance fee. Changes apply to new payments; a period already
+    paid for is never shortened."""
+    plan = await fee_plan(session)
     if not plan:
-        raise HTTPException(404, "Plan not found")
-    before = float(plan.price_kes)
-    for k, v in body.model_dump().items():
-        setattr(plan, k, v)
-    record(session, actor_id=p.id, action="plan.updated", entity="plan", entity_id=plan.id, ip=p.ip,
-           price_before=before, price_after=body.price_kes)
+        plan = Plan(code=COMMUNITY_CODE, name="Community maintenance fee", tier="member")
+        session.add(plan)
+    before = float(plan.price_kes or 0)
+    plan.price_kes, plan.interval_months, plan.active, plan.tagline = (body.amount_kes, body.period_months,
+                                                                       body.enabled, body.note)
+    plan.benefits = [c.strip()[:200] for c in body.covers if c.strip()]
+    plan.features = {"free_monthly_applications": body.free_monthly_applications}
+    await session.flush()
+    record(session, actor_id=p.id, action="fee.updated", entity="plan", entity_id=plan.id, ip=p.ip,
+           amount_before=before, amount_after=body.amount_kes, period_months=body.period_months, enabled=body.enabled)
     await session.commit()
-    return plan_out(plan)
+    return fee_out(plan)
 
 
 @router.get("/payments")
@@ -157,7 +146,7 @@ async def payments(session: DB, p: Principal = require(Perm.payments_view), stat
 class AnnouncementIn(BaseModel):
     title: str = Field(min_length=3, max_length=160)
     body: str = Field(min_length=3, max_length=2000)
-    audience: str = Field("all", pattern="^(all|free|members|premium|county|organizations)$")
+    audience: str = Field("all", pattern="^(all|free|members|county|organizations)$")
     counties: list[str] = []
     channels: list[str] = ["push"]
 
@@ -200,8 +189,6 @@ async def deliver_announcement(session: AsyncSession, payload: dict) -> None:
             Subscription.status == SubStatus.active, Subscription.ends_at > now)
         if a.audience == "members":
             stmt = stmt.where(User.id.in_(paying))
-        elif a.audience == "premium":
-            stmt = stmt.where(User.id.in_(paying.where(Plan.tier == "premium")))
         elif a.audience == "free":
             stmt = stmt.where(User.id.notin_(paying))
         elif a.audience == "county" and a.counties:

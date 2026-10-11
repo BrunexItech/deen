@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Store } from "lucide-react-native";
 import { useEffect, useState } from "react";
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { FormScroll } from "@/components/Keyboard";
 import { LoadingScreen } from "@/components/Loader";
 import { Badge, Button, Card, Chip, Header, Input, Segmented, T } from "@/components/ui";
 import { get, post, put } from "@/lib/api";
@@ -41,8 +42,7 @@ export default function MyListing() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Header title={existing ? "My listing" : "List your business"} />
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
+        <FormScroll contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }}>
           {existing && (
             <Card style={{ flexDirection: "row", gap: 12, alignItems: "center" }}>
               <Store size={20} color={colors.brand700} />
@@ -70,8 +70,7 @@ export default function MyListing() {
             <T v="body">Halal certified (KEBS / Halal body)</T>
           </Pressable>
           <Button title={existing ? "Save & resubmit" : "Submit for review"} loading={save.isPending} disabled={!f.name || f.headline.length < 5 || !f.category} onPress={() => save.mutate()} />
-        </ScrollView>
-      </KeyboardAvoidingView>
+        </FormScroll>
     </SafeAreaView>
   );
 }

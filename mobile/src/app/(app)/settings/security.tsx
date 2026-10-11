@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Fingerprint, KeyRound, LogOut, Smartphone } from "lucide-react-native";
 import { useEffect, useState } from "react";
-import { Alert, ScrollView, StyleSheet, Switch, View } from "react-native";
+import { Alert, StyleSheet, Switch, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { FormScroll } from "@/components/Keyboard";
 import { Badge, Button, Card, Header, Input, T, Tap } from "@/components/ui";
 import { del, get, post } from "@/lib/api";
 import { authenticate, lockCapability } from "@/lib/biometrics";
@@ -39,7 +40,7 @@ export default function Security() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Header title="Security" />
-      <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }}>
+      <FormScroll contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }}>
         <Card style={styles.row}>
           <View style={styles.icon}><Fingerprint size={22} color={colors.brand700} /></View>
           <View style={{ flex: 1 }}>
@@ -75,7 +76,7 @@ export default function Security() {
           { text: "Cancel", style: "cancel" },
           { text: "Sign out all", style: "destructive", onPress: async () => { await post("/auth/logout-all").catch(() => undefined); signOut(false); } },
         ])} />
-      </ScrollView>
+      </FormScroll>
     </SafeAreaView>
   );
 }

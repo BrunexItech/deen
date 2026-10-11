@@ -2,7 +2,7 @@ import { router } from "expo-router";
 import { Check, Lock, Mail, Phone, User } from "lucide-react-native";
 import { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
-import { AuthScaffold } from "@/components/AuthScaffold";
+import { AuthScaffold, SwitchLink } from "@/components/AuthScaffold";
 import { Button, Input, T } from "@/components/ui";
 import { ApiError, post } from "@/lib/api";
 import { colors } from "@/lib/theme";
@@ -63,6 +63,7 @@ export default function SignUp() {
         </T>
       </Pressable>
       {error && <T v="small" color={colors.rose600}>{error}</T>}
+      <SwitchLink question="Already have an account?" action="Log in" onPress={() => router.replace("/sign-in")} />
     </AuthScaffold>
   );
 }

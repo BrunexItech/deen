@@ -14,6 +14,15 @@ let accessToken: string | null = null;
 let refreshing: Promise<boolean> | null = null;
 let onSessionLost: (() => void) | null = null;
 
+/** Accepts "10.0.0.5:8020", "HTTP://host/", stray spaces: returns "http://10.0.0.5:8020". */
+export function normalizeServer(input: string): string {
+  let url = input.trim().replace(/\s+/g, "").replace(/\/+$/, "");
+  const scheme = url.match(/^([a-z]+):\/\//i);
+  if (scheme) url = scheme[1].toLowerCase() + url.slice(scheme[1].length);
+  else url = `http://${url}`;
+  return url;
+}
+
 export class ApiError extends Error {
   constructor(public status: number, message: string, public body?: unknown) {
     super(message);
@@ -31,8 +40,21 @@ export const apiConfig = {
     return DEFAULT_API;
   },
   async setServer(url: string | null) {
-    await secure.setServer(url);
-    baseUrl = (url ?? DEFAULT_API).replace(/\/$/, "");
+    const clean = url ? normalizeServer(url) : null;
+    await secure.setServer(clean);
+    baseUrl = clean ?? DEFAULT_API;
+  },
+  /** Reachability check for the testing server sheet. */
+  async ping(url: string): Promise<boolean> {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 6000);
+    try {
+      return (await fetch(`${normalizeServer(url)}/health`, { signal: ctrl.signal })).ok;
+    } catch {
+      return false;
+    } finally {
+      clearTimeout(timer);
+    }
   },
   setAccess(token: string | null) {
     accessToken = token;

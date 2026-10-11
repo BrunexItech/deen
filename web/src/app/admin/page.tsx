@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, BadgeCheck, Banknote, Building2, ClipboardCheck, Flag, HeartHandshake, Sparkles, Users } from "lucide-react";
+import { ArrowRight, BadgeCheck, Banknote, Briefcase, Building2, ClipboardCheck, Flag, HeartHandshake, Store, Users } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Bars, TrendChart } from "@/components/charts";
@@ -71,7 +71,7 @@ export default function OverviewPage() {
     { label: "organizations pending verification", n: a.pending_orgs, href: "/admin/organizations?verification=pending", icon: <Building2 size={16} /> },
     { label: "open reports", n: a.open_reports, href: "/admin/reports", icon: <Flag size={16} /> },
     { label: "identity checks", n: a.identity_pending, href: "/admin/identity", icon: <BadgeCheck size={16} /> },
-    { label: "directory listings", n: a.directory_pending, href: "/admin/directory", icon: <Sparkles size={16} /> },
+    { label: "directory listings", n: a.directory_pending, href: "/admin/directory", icon: <Store size={16} /> },
   ].filter((x) => x.n > 0);
 
   return (
@@ -97,7 +97,7 @@ export default function OverviewPage() {
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Stat label="Registered members" value={compact(k.members)} hint={`+${num(k.new_members)} in ${days} days · ${num(k.active_7d)} active this week`} icon={<Users size={20} />} />
-        <Stat label="Live opportunities" value={num(k.live_opportunities)} hint={`${num(k.expired_opportunities)} expired · ${num(k.verified_orgs)}/${num(k.organizations)} providers verified`} icon={<Sparkles size={20} />} tone="gold" />
+        <Stat label="Live opportunities" value={num(k.live_opportunities)} hint={`${num(k.expired_opportunities)} expired · ${num(k.verified_orgs)}/${num(k.organizations)} providers verified`} icon={<Briefcase size={20} />} tone="gold" />
         <Stat label="Successful connections" value={num(k.successful_connections)} hint={`${num(k.accepted)} accepted · ${num(k.outcomes)} success stories`} icon={<HeartHandshake size={20} />} />
         <Stat label="Revenue" value={kes(k.revenue_period)} hint={`${num(k.paying_members)} paying members · ${kes(k.revenue_all)} all-time`} icon={<Banknote size={20} />} tone="gold" />
       </div>

@@ -203,7 +203,7 @@ export default function AdminOpportunityPage() {
                 <div>
                   <div className="mb-1.5 text-[13px] font-semibold text-ink-700">Who can apply</div>
                   <Select value={o.access_tier} onChange={(e) => placement.mutate({ featured: o.featured, access_tier: e.target.value })}>
-                    <option value="free">Everyone</option><option value="member">Members</option><option value="premium">Premium</option>
+                    <option value="free">Everyone</option><option value="member">Paid-up members</option>
                   </Select>
                 </div>
               </div>

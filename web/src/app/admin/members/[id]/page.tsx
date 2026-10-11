@@ -7,7 +7,7 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { PageLoader } from "@/components/Loader";
-import { Avatar, Badge, Button, Card, CardHeader, Field, Input, Modal, PageHeader, Select } from "@/components/ui";
+import { Avatar, Badge, Button, Card, CardHeader, Field, Input, Modal, PageHeader } from "@/components/ui";
 import { get, post } from "@/lib/api";
 import { useCan } from "@/lib/auth";
 import { ago, APP_STATUS, fmtDate, kes } from "@/lib/format";
@@ -17,7 +17,7 @@ interface MemberDetail {
   id: string; full_name: string; phone: string; email: string | null; status: string; identity_status: string;
   created_at: string; last_active_at: string | null;
   profile: { county: string | null; town: string | null; age: number | null; gender: string | null; education_level: string | null; field_of_study: string | null; institution: string | null; profession: string | null; skills: string[]; interests: string[]; languages: string[]; bio: string | null; completeness: number };
-  membership: { tier: string; plan_name: string; ends_at: string | null; sponsored: boolean };
+  membership: { paid: boolean; ends_at: string | null; sponsored: boolean };
   applications: { id: string; opportunity: string; status: string; created_at: string }[];
   payments: { id: string; plan: string; amount_kes: number; status: string; receipt: string | null; created_at: string }[];
   devices: { device_name: string; platform: string; last_seen_at: string | null; biometric_enabled: boolean }[];
@@ -30,8 +30,7 @@ export default function MemberPage() {
   const { data: tax } = useTaxonomy();
   const { data: m, isLoading } = useQuery({ queryKey: ["admin", "member", id], queryFn: () => get<MemberDetail>(`/admin/members/${id}`) });
   const [grantOpen, setGrantOpen] = useState(false);
-  const [grant, setGrant] = useState({ plan_code: "member_yearly", reason: "" });
-  const plans = useQuery({ queryKey: ["plans"], queryFn: () => get<{ code: string; name: string; price_kes: number }[]>("/plans"), enabled: grantOpen });
+  const [grant, setGrant] = useState({ reason: "" });
   const refresh = () => qc.invalidateQueries({ queryKey: ["admin", "member", id] });
 
   const suspend = useMutation({
@@ -100,11 +99,11 @@ export default function MemberPage() {
           <Card>
             <CardHeader title="Membership" />
             <div className="rounded-2xl bg-gradient-to-br from-brand-800 to-brand-950 p-4 text-white">
-              <div className="text-xs uppercase tracking-widest text-gold-400">{m.membership.tier}</div>
-              <div className="text-xl font-bold">{m.membership.plan_name}</div>
-              <div className="text-sm text-brand-100/70">{m.membership.ends_at ? `Until ${fmtDate(m.membership.ends_at)}` : "No expiry"}{m.membership.sponsored && " · Sponsored"}</div>
+              <div className="text-xs uppercase tracking-widest text-gold-400">Community fee</div>
+              <div className="text-xl font-bold">{m.membership.paid ? "Paid up" : "Not paid"}</div>
+              {m.membership.ends_at && <div className="text-sm text-brand-100/70">Until {fmtDate(m.membership.ends_at)}{m.membership.sponsored && " · paid by someone else"}</div>}
             </div>
-            {can("plans.manage") && <Button variant="secondary" className="mt-3 w-full" icon={<Gift size={15} />} onClick={() => setGrantOpen(true)}>Grant membership</Button>}
+            {can("plans.manage") && <Button variant="secondary" className="mt-3 w-full" icon={<Gift size={15} />} onClick={() => setGrantOpen(true)}>Waive one fee period</Button>}
           </Card>
           <Card>
             <CardHeader title="Signed-in devices" />
@@ -128,11 +127,10 @@ export default function MemberPage() {
           )}
         </div>
       </div>
-      <Modal open={grantOpen} onClose={() => setGrantOpen(false)} title="Grant a complimentary membership"
-        footer={<Button loading={doGrant.isPending} disabled={grant.reason.length < 3} onClick={() => doGrant.mutate()}>Grant</Button>}>
+      <Modal open={grantOpen} onClose={() => setGrantOpen(false)} title="Waive one fee period"
+        footer={<Button loading={doGrant.isPending} disabled={grant.reason.length < 3} onClick={() => doGrant.mutate()}>Waive fee</Button>}>
         <div className="space-y-4">
-          <Field label="Plan"><Select value={grant.plan_code} onChange={(e) => setGrant({ ...grant, plan_code: e.target.value })}>{plans.data?.filter((x) => x.price_kes > 0).map((x) => <option key={x.code} value={x.code}>{x.name}</option>)}</Select></Field>
-          <Field label="Reason" hint="Recorded in the audit log."><Input value={grant.reason} onChange={(e) => setGrant({ ...grant, reason: e.target.value })} placeholder="e.g. Scholarship beneficiary" /></Field>
+          <Field label="Reason" hint="Recorded in the audit log."><Input value={grant.reason} onChange={(e) => setGrant({ ...grant, reason: e.target.value })} placeholder="e.g. Student in need" /></Field>
         </div>
       </Modal>
     </>

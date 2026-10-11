@@ -3,13 +3,14 @@ import * as DocumentPicker from "expo-document-picker";
 import { router, useLocalSearchParams } from "expo-router";
 import { Check, FileText, Paperclip, ShieldCheck, X } from "lucide-react-native";
 import { useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Animated, { ZoomIn } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { FormScroll } from "@/components/Keyboard";
 import { DeenLoader, LoadingScreen } from "@/components/Loader";
 import { OrgLogo } from "@/components/OpportunityCard";
 import { Arabic, Button, Card, Chip, Header, Input, T, Tap } from "@/components/ui";
-import { ApiError, get, post, uploadFile } from "@/lib/api";
+import { get, post, uploadFile } from "@/lib/api";
 import { keys, useProfile } from "@/lib/queries";
 import { useSession } from "@/lib/session";
 import { colors } from "@/lib/theme";
@@ -72,7 +73,6 @@ export default function Apply() {
       qc.invalidateQueries({ queryKey: keys.membership });
     },
     onError: (e) => {
-      if (e instanceof ApiError && e.status === 402) router.push("/membership");
       toastError(e);
     },
   });
@@ -120,8 +120,7 @@ export default function Apply() {
   return (
     <SafeAreaView style={styles.flex}>
       <Header title="Apply" subtitle={o.organization.name} />
-      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <ScrollView contentContainerStyle={{ padding: 20, gap: 18, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
+        <FormScroll contentContainerStyle={{ padding: 20, gap: 18, paddingBottom: 40 }}>
           <Card style={{ flexDirection: "row", gap: 12, alignItems: "center" }}>
             <OrgLogo org={o.organization} size={44} />
             <View style={styles.flex}>
@@ -159,8 +158,7 @@ export default function Apply() {
 
           <Button title="Submit application" loading={submit.isPending} disabled={missing.length > 0 || uploading} onPress={() => submit.mutate()} />
           {missing.length > 0 && <T v="caption" center>Answer the required questions ({missing.length} left)</T>}
-        </ScrollView>
-      </KeyboardAvoidingView>
+        </FormScroll>
     </SafeAreaView>
   );
 }

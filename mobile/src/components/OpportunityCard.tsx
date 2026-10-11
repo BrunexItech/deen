@@ -1,17 +1,17 @@
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import { BadgeCheck, Bookmark, BookmarkCheck, Briefcase, CalendarDays, Clock, Crown, GraduationCap, HeartHandshake, Landmark, Lock, MapPin, Rocket, ShieldCheck, Sparkles, Users, type LucideIcon } from "lucide-react-native";
+import { BadgeCheck, Bookmark, BookmarkCheck, Briefcase, CalendarDays, CircleCheck, Clock, GraduationCap, HeartHandshake, Landmark, Lock, MapPin, ShieldCheck, TrendingUp, Users, type LucideIcon } from "lucide-react-native";
 import { StyleSheet, Text, View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import { apiConfig } from "@/lib/api";
 import { useToggleSave } from "@/lib/queries";
-import { CATEGORY_META, colors, fonts, radius, shadow } from "@/lib/theme";
+import { CATEGORY_META, colors, fonts, radius } from "@/lib/theme";
 import type { OppCard, OrgMini } from "@/lib/types";
 import { Badge, T, Tap } from "./ui";
 import { Image } from "expo-image";
 
 export const CATEGORY_ICON: Record<string, LucideIcon> = {
-  education: GraduationCap, career: Briefcase, entrepreneurship: Rocket, community: Users, islamic_economy: Landmark,
+  education: GraduationCap, career: Briefcase, entrepreneurship: TrendingUp, community: Users, islamic_economy: Landmark,
   support: HeartHandshake,
 };
 
@@ -61,7 +61,7 @@ function deadlineLabel(o: OppCard) {
 export function OpportunityCard({ o, compact = false }: { o: OppCard; compact?: boolean }) {
   const save = useToggleSave();
   const meta = CATEGORY_META[o.category] ?? CATEGORY_META.community;
-  const Icon = CATEGORY_ICON[o.category] ?? Sparkles;
+  const Icon = CATEGORY_ICON[o.category] ?? Briefcase;
   const blocked = o.match && !o.match.eligible;
   return (
     <Tap onPress={() => router.push(`/opportunity/${o.id}`)} scale={0.985} style={[styles.card, compact && { width: 290 }]}>
@@ -89,8 +89,8 @@ export function OpportunityCard({ o, compact = false }: { o: OppCard; compact?: 
       {!compact && <T v="small" numberOfLines={2} style={{ marginTop: 6 }}>{o.summary}</T>}
       {o.match && o.match.reasons.length > 0 && !blocked && (
         <View style={styles.reason}>
-          <Sparkles size={13} color={colors.gold600} />
-          <T v="caption" numberOfLines={1} style={{ color: colors.gold700, flex: 1 }}>{o.match.reasons[0]}</T>
+          <CircleCheck size={13} color={colors.leaf600} />
+          <T v="caption" numberOfLines={1} style={{ color: colors.leaf700, flex: 1 }}>{o.match.reasons[0]}</T>
         </View>
       )}
       {blocked && (
@@ -113,7 +113,7 @@ export function OpportunityCard({ o, compact = false }: { o: OppCard; compact?: 
         </View>
         <View style={{ flex: 1 }} />
         {o.locked ? (
-          <Badge label={o.access_tier === "premium" ? "Premium" : "Members"} tone="gold" icon={o.access_tier === "premium" ? Crown : Lock} />
+          <Badge label="Members" tone="gold" icon={Lock} />
         ) : (
           <Tap onPress={() => save.mutate(o)} hitSlop={10} haptic>
             {o.saved ? <BookmarkCheck size={20} color={colors.brand700} fill={colors.brand100} /> : <Bookmark size={20} color={colors.ink400} />}
@@ -127,7 +127,7 @@ export function OpportunityCard({ o, compact = false }: { o: OppCard; compact?: 
 /** Large, image-free hero card for featured opportunities. */
 export function FeaturedCard({ o }: { o: OppCard }) {
   const meta = CATEGORY_META[o.category] ?? CATEGORY_META.community;
-  const Icon = CATEGORY_ICON[o.category] ?? Sparkles;
+  const Icon = CATEGORY_ICON[o.category] ?? Briefcase;
   return (
     <Tap onPress={() => router.push(`/opportunity/${o.id}`)} scale={0.98} style={{ width: 300 }}>
       <LinearGradient colors={[colors.brand700, colors.brand950]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.featured}>
@@ -153,19 +153,19 @@ export function FeaturedCard({ o }: { o: OppCard }) {
 }
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: colors.white, borderRadius: radius.lg, padding: 16, borderWidth: 1, borderColor: colors.sand200, ...shadow.card },
+  card: { backgroundColor: colors.white, borderRadius: radius.lg, padding: 16, borderWidth: 1, borderColor: colors.sand200 },
   top: { flexDirection: "row", gap: 12, alignItems: "flex-start" },
   orgRow: { flexDirection: "row", alignItems: "center", gap: 4 },
   amount: { fontFamily: fonts.bold, fontSize: 14, color: colors.brand700, marginTop: 8 },
   trust: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 6, marginTop: 10 },
   verified: { flexDirection: "row", alignItems: "center", gap: 4 },
   verifiedText: { fontFamily: fonts.bold, fontSize: 11, color: colors.leaf700 },
-  reason: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 10, backgroundColor: colors.gold50, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 7 },
+  reason: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 10, backgroundColor: colors.leaf50, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 7 },
   footer: { flexDirection: "row", alignItems: "center", gap: 10, marginTop: 12 },
   cat: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 },
   catText: { fontFamily: fonts.bold, fontSize: 11 },
   metaItem: { flexDirection: "row", alignItems: "center", gap: 4 },
   metaText: { fontFamily: fonts.medium, fontSize: 12, color: colors.ink500 },
-  featured: { height: 200, borderRadius: 24, padding: 18, overflow: "hidden", ...shadow.float },
+  featured: { height: 200, borderRadius: 20, padding: 18, overflow: "hidden" },
   featuredGlow: { position: "absolute", width: 220, height: 220, borderRadius: 110, backgroundColor: "rgba(227,157,41,0.14)", top: -90, right: -70 },
 });

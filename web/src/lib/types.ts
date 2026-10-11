@@ -96,7 +96,7 @@ export interface Opportunity {
   form_questions: Question[];
   required_documents: string[];
   attachments: { file_id: string; label: string; url: string }[];
-  access_tier: "free" | "member" | "premium";
+  access_tier: "free" | "member";
   status: OppStatus;
   featured: boolean;
   feature_requested: boolean;

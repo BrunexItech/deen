@@ -1,7 +1,8 @@
 import { Download, ShieldCheck, Trash2 } from "lucide-react-native";
 import { useState } from "react";
-import { ScrollView, Share, View } from "react-native";
+import { Share, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { FormScroll } from "@/components/Keyboard";
 import { Sheet } from "@/components/Sheet";
 import { Button, Card, Header, Input, T } from "@/components/ui";
 import { get, post } from "@/lib/api";
@@ -43,7 +44,7 @@ export default function Privacy() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Header title="Privacy & data" />
-      <ScrollView contentContainerStyle={{ padding: 20, gap: 16 }}>
+      <FormScroll contentContainerStyle={{ padding: 20, gap: 16 }}>
         <Card style={{ gap: 8, backgroundColor: colors.brand50, borderColor: colors.brand100 }}>
           <ShieldCheck size={22} color={colors.brand700} />
           <T v="h3">Your data, your rights</T>
@@ -59,7 +60,7 @@ export default function Privacy() {
           <T v="small">Your profile, saved items, notifications and identity documents are erased. This cannot be undone.</T>
           <Button title="Delete account" icon={Trash2} variant="danger" size="md" onPress={() => setOpen(true)} />
         </Card>
-      </ScrollView>
+      </FormScroll>
       <Sheet open={open} onClose={() => setOpen(false)} title="Delete your account?" footer={<Button title="Delete permanently" variant="danger" loading={busy} disabled={!password} onPress={remove} />}>
         <T v="small">Enter your password to confirm. We&apos;re sad to see you go. May Allah make it easy for you.</T>
         <View><Input label="Password" secureTextEntry value={password} onChangeText={setPassword} /></View>

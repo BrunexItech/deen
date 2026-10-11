@@ -3,12 +3,12 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import {
-  AlertTriangle, BadgeCheck, Bookmark, BookmarkCheck, CalendarDays, Check, ChevronRight, Crown, ExternalLink, FileText,
-  Flag, Landmark, MapPin, Share2, ShieldCheck, Sparkles, Users, XCircle,
+  AlertTriangle, BadgeCheck, Bookmark, BookmarkCheck, Briefcase, CalendarDays, Check, ChevronRight, ExternalLink, FileText, Flag, Landmark, Lock, MapPin, Share2, ShieldCheck, Users, XCircle,
 } from "lucide-react-native";
 import { useState } from "react";
-import { Alert, FlatList, ScrollView, Share, StyleSheet, Text, View } from "react-native";
+import { Alert, FlatList, Share, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { FormScroll } from "@/components/Keyboard";
 import { LoadingScreen } from "@/components/Loader";
 import { QASection } from "@/components/QASection";
 import { CATEGORY_ICON, MatchRing, OpportunityCard, OrgLogo, Verified } from "@/components/OpportunityCard";
@@ -72,7 +72,7 @@ export default function OpportunityScreen() {
   if (q.isError || !q.data) return <SafeAreaView style={{ flex: 1 }}><Header /><ErrorState message={(q.error as Error)?.message} onRetry={() => q.refetch()} /></SafeAreaView>;
   const o = q.data;
   const meta = CATEGORY_META[o.category] ?? CATEGORY_META.community;
-  const Icon = CATEGORY_ICON[o.category] ?? Sparkles;
+  const Icon = CATEGORY_ICON[o.category] ?? Briefcase;
   const edu = (k: string) => tax?.education_levels.find((e) => e.key === k)?.name ?? k;
   const closed = o.days_left !== null && o.deadline !== null && new Date(o.deadline) < new Date();
   const name = (list: { key: string; name: string }[] | undefined, k: string) => list?.find((x) => x.key === k)?.name ?? k;
@@ -113,7 +113,7 @@ export default function OpportunityScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.sand100 }}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 140 }} showsVerticalScrollIndicator={false}>
+      <FormScroll contentContainerStyle={{ paddingBottom: 140 }} showsVerticalScrollIndicator={false}>
         <LinearGradient colors={[colors.brand800, colors.brand950]} style={{ paddingTop: insets.top }}>
           <View style={styles.glow} />
           <Header dark right={
@@ -249,7 +249,7 @@ export default function OpportunityScreen() {
               contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }} showsHorizontalScrollIndicator={false} />
           </View>
         )}
-      </ScrollView>
+      </FormScroll>
 
       <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 14) }]}>
         <IconButton icon={o.saved ? BookmarkCheck : Bookmark} label="Save" onPress={() => save.mutate(o)} color={o.saved ? colors.brand700 : colors.ink700} size={54} />
@@ -259,7 +259,7 @@ export default function OpportunityScreen() {
           ) : closed ? (
             <Button title="Applications closed" variant="secondary" disabled />
           ) : o.locked ? (
-            <Button title={`Unlock with ${o.access_tier === "premium" ? "Premium" : "Membership"}`} variant="gold" icon={Crown} onPress={() => router.push("/membership")} />
+            <Button title="For paid-up members" variant="secondary" icon={Lock} onPress={() => router.push("/membership")} />
           ) : o.apply_mode === "internal" ? (
             <Button title={o.is_event ? "Register" : "Apply now"} onPress={() => router.push(`/apply/${o.id}`)} />
           ) : (

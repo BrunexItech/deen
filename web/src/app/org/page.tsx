@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Eye, HeartHandshake, Inbox, MousePointerClick, Plus, Sparkles } from "lucide-react";
+import { Activity, Eye, HeartHandshake, Inbox, MousePointerClick, Plus } from "lucide-react";
 import Link from "next/link";
 import { TrendChart } from "@/components/charts";
 import { PageLoader } from "@/components/Loader";
@@ -53,7 +53,7 @@ export default function OrgDashboard() {
           <CardHeader title="Engagement, last 30 days" />
           {data.series.length ? (
             <TrendChart data={data.series} series={[{ key: "view", label: "Views", color: "#e39d29" }, { key: "click", label: "Clicks", color: "#004485" }, { key: "apply", label: "Applications", color: "#43b02a" }]} />
-          ) : <Empty icon={<Sparkles size={24} />} title="No activity yet" body="Once an opportunity is published, members' views and applications appear here." />}
+          ) : <Empty icon={<Activity size={24} />} title="No activity yet" body="Once an opportunity is published, members' views and applications appear here." />}
         </Card>
         <Card>
           <CardHeader title="Where interest comes from" />

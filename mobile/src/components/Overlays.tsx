@@ -80,7 +80,7 @@ export function AppLock() {
         <T v="caption" color="rgba(255,255,255,0.45)" center>{hijriLabel()}</T>
         <View style={{ width: "100%", marginTop: 48, gap: 12 }}>
           <Button title={`Unlock with ${label}`} icon={Fingerprint} variant="gold" loading={busy} onPress={tryUnlock} />
-          <Button title="Sign in with password instead" variant="ghost" onPress={() => signOut(false)} style={{ opacity: 0.9 }} />
+          <Button title="Log in with password instead" variant="ghost" onPress={() => signOut(false)} style={{ opacity: 0.9 }} />
         </View>
       </LinearGradient>
     </View>

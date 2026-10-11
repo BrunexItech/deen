@@ -12,6 +12,7 @@ import * as SystemUI from "expo-system-ui";
 import { useEffect } from "react";
 import { AppState } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AppLock, ToastHost } from "@/components/Overlays";
 import { ApiError } from "@/lib/api";
@@ -68,19 +69,21 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <QueryClientProvider client={queryClient}>
-          <StatusBar style="dark" />
-          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.sand100 }, animation: "slide_from_right" }}>
-            <Stack.Protected guard={status === "signedOut"}>
-              <Stack.Screen name="(auth)" options={{ animation: "fade" }} />
-            </Stack.Protected>
-            <Stack.Protected guard={status === "ready"}>
-              <Stack.Screen name="(app)" options={{ animation: "fade" }} />
-            </Stack.Protected>
-          </Stack>
-          <AppLock />
-          <ToastHost />
-        </QueryClientProvider>
+        <KeyboardProvider>
+          <QueryClientProvider client={queryClient}>
+            <StatusBar style="dark" />
+            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.sand100 }, animation: "slide_from_right" }}>
+              <Stack.Protected guard={status === "signedOut"}>
+                <Stack.Screen name="(auth)" options={{ animation: "fade" }} />
+              </Stack.Protected>
+              <Stack.Protected guard={status === "ready"}>
+                <Stack.Screen name="(app)" options={{ animation: "fade" }} />
+              </Stack.Protected>
+            </Stack>
+            <AppLock />
+            <ToastHost />
+          </QueryClientProvider>
+        </KeyboardProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
