@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 .venv/
 backend/.env
+deploy/.env
 backend/data/
 .pytest_cache/
 
