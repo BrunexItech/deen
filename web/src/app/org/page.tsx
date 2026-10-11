@@ -52,7 +52,7 @@ export default function OrgDashboard() {
         <Card className="xl:col-span-2">
           <CardHeader title="Engagement, last 30 days" />
           {data.series.length ? (
-            <TrendChart data={data.series} series={[{ key: "view", label: "Views", color: "#e39d29" }, { key: "click", label: "Clicks", color: "#004485" }, { key: "apply", label: "Applications", color: "#43b02a" }]} />
+            <TrendChart data={data.series} series={[{ key: "view", label: "Views", color: "#2FB5B0" }, { key: "click", label: "Clicks", color: "#086769" }, { key: "apply", label: "Applications", color: "#43b02a" }]} />
           ) : <Empty icon={<Activity size={24} />} title="No activity yet" body="Once an opportunity is published, members' views and applications appear here." />}
         </Card>
         <Card>

@@ -6,7 +6,7 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
     <div className="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
       <aside className="pattern-khatam relative hidden overflow-hidden bg-gradient-to-br from-brand-800 via-brand-900 to-brand-950 p-12 text-white lg:flex lg:flex-col">
         <div className="flex items-center gap-3">
-          <img src="/deen-icon.png" alt="" className="h-11 w-11 object-contain" />
+          <img src="/deen-icon.png" alt="" className="h-11 w-11 rounded-xl bg-white object-contain p-1" />
           <span className="text-xl font-extrabold tracking-[0.3em]">DEEN</span>
         </div>
         <div className="my-auto max-w-md">
@@ -21,7 +21,7 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
             <div><div className="text-2xl font-extrabold text-gold-400">Measured</div><div className="text-brand-100/60">by real impact</div></div>
           </div>
         </div>
-        <p className="text-xs text-brand-100/40">© {new Date().getFullYear()} DEEN · Development and Education Empowerment Network · Discover. Verify. Apply. Grow.</p>
+        <p className="text-xs text-brand-100/40">© {new Date().getFullYear()} DEEN · Development and Education Empowerment Network · Empower. Equip. Elevate.</p>
         <img src="/deen-icon.png" alt="" className="pointer-events-none absolute -bottom-32 -right-32 w-[460px] opacity-[0.08] grayscale" />
       </aside>
       <main className="flex items-center justify-center px-5 py-12">

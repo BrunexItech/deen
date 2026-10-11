@@ -1,5 +1,5 @@
 /** The DEEN loader: the official emblem breathes at the centre while two arcs in the
- * logo's colours orbit it: gold and green on the inside, royal blue on the outside.
+ * logo's colours orbit it: a bold teal arc on a faint ring, and a thin black arc counter-rotating.
  * Everything runs on the UI thread (Reanimated), so it stays smooth while the JS
  * thread is busy fetching and parsing data. */
 import { Image } from "expo-image";
@@ -31,24 +31,24 @@ export function DeenLoader({ size = 64, tone = "light" }: { size?: number; tone?
 
   const s = size;
   const layer: ViewStyle = { position: "absolute", width: s, height: s };
-  const track = tone === "dark" ? "rgba(255,255,255,0.14)" : "rgba(0,68,133,0.12)";
-  const blue = tone === "dark" ? colors.brand400 : colors.brand700;
-  // Circumferences for r=46 (outer) and r=38 (inner) in a 100-unit viewBox.
+  const track = tone === "dark" ? "rgba(255,255,255,0.14)" : "rgba(8,103,105,0.12)";
+  const teal = tone === "dark" ? colors.gold400 : colors.brand600;
+  const ink = tone === "dark" ? "rgba(255,255,255,0.85)" : colors.ink900;
   return (
     <View style={{ width: s, height: s }} accessibilityRole="progressbar" accessibilityLabel="Loading">
-      <Animated.View style={[layer, outer]}>
-        <Svg width={s} height={s} viewBox="0 0 100 100">
-          <Circle cx={50} cy={50} r={46} fill="none" stroke={track} strokeWidth={4} />
-          <Circle cx={50} cy={50} r={46} fill="none" stroke={blue} strokeWidth={4} strokeLinecap="round" strokeDasharray="70 219" />
-        </Svg>
-      </Animated.View>
       <Animated.View style={[layer, inner]}>
         <Svg width={s} height={s} viewBox="0 0 100 100">
-          <Circle cx={50} cy={50} r={38} fill="none" stroke={colors.gold500} strokeWidth={4.5} strokeLinecap="round" strokeDasharray="52 187" />
-          <Circle cx={50} cy={50} r={38} fill="none" stroke={colors.leaf500} strokeWidth={4.5} strokeLinecap="round" strokeDasharray="26 213" strokeDashoffset={-119} />
+          <Circle cx={50} cy={50} r={46} fill="none" stroke={track} strokeWidth={3.5} />
+          <Circle cx={50} cy={50} r={46} fill="none" stroke={teal} strokeWidth={3.5} strokeLinecap="round" strokeDasharray="82 207" />
         </Svg>
       </Animated.View>
-      <Animated.View style={[{ position: "absolute", left: s * 0.22, top: s * 0.22, width: s * 0.56, height: s * 0.56 }, emblem]}>
+      <Animated.View style={[layer, outer]}>
+        <Svg width={s} height={s} viewBox="0 0 100 100">
+          <Circle cx={50} cy={50} r={39} fill="none" stroke={ink} strokeWidth={2} strokeLinecap="round" strokeDasharray="34 211" />
+        </Svg>
+      </Animated.View>
+      {/* The emblem is teal and black: on dark screens it sits on a white disc. */}
+      <Animated.View style={[{ position: "absolute", left: s * 0.24, top: s * 0.24, width: s * 0.52, height: s * 0.52, borderRadius: s, padding: tone === "dark" ? s * 0.05 : 0, backgroundColor: tone === "dark" ? colors.white : "transparent" }, emblem]}>
         <Image source={EMBLEM} style={{ width: "100%", height: "100%" }} contentFit="contain" />
       </Animated.View>
     </View>

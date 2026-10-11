@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
   body: { flex: 1, alignItems: "center", paddingHorizontal: 28, paddingTop: 60, paddingBottom: 20 },
   pulseWrap: { width: 170, height: 170, alignItems: "center", justifyContent: "center" },
   ring: { position: "absolute", width: 170, height: 170, borderRadius: 85, borderWidth: 2, borderColor: colors.gold400 },
-  core: { width: 128, height: 128, borderRadius: 42, backgroundColor: "rgba(255,255,255,0.07)", borderWidth: 1, borderColor: "rgba(242,190,92,0.35)", alignItems: "center", justifyContent: "center" },
+  core: { width: 128, height: 128, borderRadius: 42, backgroundColor: "rgba(255,255,255,0.07)", borderWidth: 1, borderColor: "rgba(111,211,206,0.35)", alignItems: "center", justifyContent: "center" },
   points: { marginTop: 28, gap: 12, alignSelf: "stretch" },
   point: { flexDirection: "row", alignItems: "center", gap: 10 },
 });

@@ -91,9 +91,9 @@ export default function Welcome() {
 }
 
 const styles = StyleSheet.create({
-  glow: { position: "absolute", width: 460, height: 460, borderRadius: 230, backgroundColor: "rgba(11,87,164,0.35)", top: -180, right: -160 },
+  glow: { position: "absolute", width: 460, height: 460, borderRadius: 230, backgroundColor: "rgba(8,125,126,0.35)", top: -180, right: -160 },
   brand: { flexDirection: "row", alignItems: "center", gap: 12, paddingHorizontal: 24, paddingTop: 20 },
-  logo: { width: 52, height: 52 },
+  logo: { width: 52, height: 52, borderRadius: 14, backgroundColor: colors.white },
   wordmark: { fontFamily: fonts.extrabold, fontSize: 20, letterSpacing: 6, color: colors.white },
   expansion: { fontFamily: fonts.medium, fontSize: 11, lineHeight: 15, color: "rgba(255,255,255,0.65)", marginTop: 2 },
   middle: { flex: 1, justifyContent: "center", paddingHorizontal: 24 },
@@ -105,6 +105,6 @@ const styles = StyleSheet.create({
   pointBody: { fontFamily: fonts.regular, fontSize: 13, lineHeight: 18, color: "rgba(255,255,255,0.65)", marginTop: 1 },
   actions: { paddingHorizontal: 24, paddingBottom: 16 },
   legal: { fontFamily: fonts.regular, fontSize: 11, color: "rgba(255,255,255,0.45)", textAlign: "center", marginTop: 14 },
-  backdrop: { flex: 1, backgroundColor: "rgba(0,23,51,0.5)" },
+  backdrop: { flex: 1, backgroundColor: "rgba(4,41,43,0.5)" },
   sheet: { backgroundColor: colors.white, padding: 24, borderTopLeftRadius: 28, borderTopRightRadius: 28, paddingBottom: 40 },
 });

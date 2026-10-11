@@ -5,15 +5,14 @@ import clsx from "clsx";
 export function DeenLoader({ size = 56, className }: { size?: number; className?: string }) {
   return (
     <div className={clsx("deen-loader relative", className)} style={{ width: size, height: size }} role="img" aria-label="Loading">
-      <svg className="orbit-slow absolute inset-0" viewBox="0 0 100 100" width={size} height={size}>
-        <circle cx="50" cy="50" r="46" fill="none" stroke="#004485" strokeOpacity="0.12" strokeWidth="4" />
-        <circle cx="50" cy="50" r="46" fill="none" stroke="#004485" strokeWidth="4" strokeLinecap="round" strokeDasharray="70 219" />
-      </svg>
       <svg className="orbit absolute inset-0" viewBox="0 0 100 100" width={size} height={size}>
-        <circle cx="50" cy="50" r="38" fill="none" stroke="#e39d29" strokeWidth="4.5" strokeLinecap="round" strokeDasharray="52 187" />
-        <circle cx="50" cy="50" r="38" fill="none" stroke="#43b02a" strokeWidth="4.5" strokeLinecap="round" strokeDasharray="26 213" strokeDashoffset="-119" />
+        <circle cx="50" cy="50" r="46" fill="none" stroke="#087d7e" strokeOpacity="0.12" strokeWidth="3.5" />
+        <circle cx="50" cy="50" r="46" fill="none" stroke="#087d7e" strokeWidth="3.5" strokeLinecap="round" strokeDasharray="82 207" />
       </svg>
-      <img src="/deen-icon.png" alt="" className="emblem absolute object-contain" style={{ inset: size * 0.22, width: size * 0.56, height: size * 0.56 }} />
+      <svg className="orbit-slow absolute inset-0" viewBox="0 0 100 100" width={size} height={size}>
+        <circle cx="50" cy="50" r="39" fill="none" stroke="#0f1a17" strokeWidth="2" strokeLinecap="round" strokeDasharray="34 211" />
+      </svg>
+      <img src="/deen-icon.png" alt="" className="emblem absolute object-contain" style={{ inset: size * 0.24, width: size * 0.52, height: size * 0.52 }} />
     </div>
   );
 }

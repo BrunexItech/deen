@@ -54,7 +54,7 @@ export function TrendChart({ data, series, height = 260, format }: {
   );
 }
 
-export function Bars({ data, dataKey, labelKey, color = "#004485", height = 240, colors }: {
+export function Bars({ data, dataKey, labelKey, color = "#086769", height = 240, colors }: {
   data: Record<string, number | string>[]; dataKey: string; labelKey: string; color?: string; height?: number; colors?: string[];
 }) {
   return (

@@ -19,14 +19,14 @@ import { fmtTime, usePrayer } from "@/lib/usePrayer";
 
 // Home categories (spec section 33). Each opens Explore pre-filtered.
 const QUICK: { label: string; icon: LucideIcon; params: Record<string, string>; color: string }[] = [
-  { label: "Scholarships", icon: GraduationCap, params: { types: "scholarship" }, color: "#004485" },
+  { label: "Scholarships", icon: GraduationCap, params: { types: "scholarship" }, color: "#086769" },
   { label: "Grants", icon: Award, params: { types: "business_grant,funding,education_assistance" }, color: "#C98516" },
-  { label: "Jobs", icon: Briefcase, params: { types: "job,graduate_trainee" }, color: "#0B57A4" },
+  { label: "Jobs", icon: Briefcase, params: { types: "job,graduate_trainee" }, color: "#087D7E" },
   { label: "Attachments", icon: Building2, params: { types: "attachment" }, color: "#2E9A2E" },
   { label: "Internships", icon: ClipboardList, params: { types: "internship" }, color: "#7C3AED" },
   { label: "Volunteer", icon: HandHeart, params: { types: "volunteer" }, color: "#BE123C" },
   { label: "Training", icon: BookOpen, params: { types: "training,workshop,seminar,certification" }, color: "#0F766E" },
-  { label: "Fellowships", icon: Users, params: { types: "fellowship" }, color: "#1D4ED8" },
+  { label: "Fellowships", icon: Users, params: { types: "fellowship" }, color: "#0B7C7D" },
   { label: "Business", icon: TrendingUp, params: { category: "entrepreneurship" }, color: "#B45309" },
   { label: "Islamic Economy", icon: Landmark, params: { category: "islamic_economy" }, color: "#6D28D9" },
 ];

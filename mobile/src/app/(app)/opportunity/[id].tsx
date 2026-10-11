@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
   verifiedText: { fontFamily: fonts.extrabold, fontSize: 11, letterSpacing: 1, color: colors.white },
   role: { flexDirection: "row", flexWrap: "wrap", marginTop: 14, backgroundColor: colors.white, borderRadius: 18, borderWidth: 1, borderColor: colors.sand200, padding: 6 },
   roleItem: { width: "50%", padding: 8, gap: 2 },
-  glow: { position: "absolute", width: 300, height: 300, borderRadius: 150, backgroundColor: "rgba(227,157,41,0.14)", top: -120, right: -100 },
+  glow: { position: "absolute", width: 300, height: 300, borderRadius: 150, backgroundColor: "rgba(47,181,176,0.14)", top: -120, right: -100 },
   hero: { paddingHorizontal: 20, paddingBottom: 22, paddingTop: 6 },
   cat: { flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 9, alignSelf: "flex-start" },
   catText: { fontFamily: fonts.bold, fontSize: 12 },

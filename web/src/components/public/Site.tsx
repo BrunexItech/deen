@@ -45,7 +45,7 @@ export function SiteFooter() {
             <span className="font-extrabold tracking-[0.25em] text-white">DEEN</span>
           </div>
           <p className="mt-3 text-sm">Development and Education Empowerment Network.</p>
-          <p className="text-sm">Discover. Verify. Apply. Grow.</p>
+          <p className="text-sm">Empower. Equip. Elevate.</p>
         </div>
         <FooterCol title="Members" links={[["/how-it-works", "How it works"], ["/opportunities", "Opportunities"], ["/membership", "Membership"], ["/pay", "Pay the fee"], ["/downloads/deen.apk", "Get the Android app"]]} />
         <FooterCol title="Help" links={[["/safety", "Stay safe"], ["/faq", "Questions"], ["/contact", "Contact us"], ["/organizations", "For organizations"], ["/login", "Partner sign in"]]} />

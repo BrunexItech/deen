@@ -1,23 +1,23 @@
 /** DEEN design tokens: shared with the web portal so the brand reads as one system. */
 export const colors = {
-  // DEEN brand, sampled from the official logo: navy wordmark, royal-blue sky,
-  // gold arch and green growth bars.
-  brand950: "#001733",
-  brand900: "#00255F",
-  brand800: "#00316F",
-  brand700: "#004485",
-  brand600: "#0B57A4",
-  brand500: "#2A72C2",
-  brand400: "#5B96D8",
-  brand100: "#DCE8F7",
-  brand50: "#EEF4FC",
+  // D.E.E.N brand, sampled from the official logo: teal and black. "gold" is the
+  // accent scale (a lighter teal); the name is kept so every screen picks it up.
+  brand950: "#04292B",
+  brand900: "#063A3C",
+  brand800: "#075052",
+  brand700: "#086769",
+  brand600: "#087D7E",
+  brand500: "#1A9596",
+  brand400: "#4DB3B4",
+  brand100: "#D5EEEE",
+  brand50: "#EDF8F8",
 
-  gold700: "#9A6410",
-  gold600: "#C98516",
-  gold500: "#E39D29",
-  gold400: "#F2BE5C",
-  gold100: "#FCEBC8",
-  gold50: "#FEF7E8",
+  gold700: "#0A6466",
+  gold600: "#0B7C7D",
+  gold500: "#2FB5B0",
+  gold400: "#6FD3CE",
+  gold100: "#D3F1EF",
+  gold50: "#ECF9F8",
 
   leaf700: "#237A24",
   leaf600: "#2E9A2E",

@@ -167,5 +167,5 @@ const styles = StyleSheet.create({
   metaItem: { flexDirection: "row", alignItems: "center", gap: 4 },
   metaText: { fontFamily: fonts.medium, fontSize: 12, color: colors.ink500 },
   featured: { height: 200, borderRadius: 20, padding: 18, overflow: "hidden" },
-  featuredGlow: { position: "absolute", width: 220, height: 220, borderRadius: 110, backgroundColor: "rgba(227,157,41,0.14)", top: -90, right: -70 },
+  featuredGlow: { position: "absolute", width: 220, height: 220, borderRadius: 110, backgroundColor: "rgba(47,181,176,0.14)", top: -90, right: -70 },
 });

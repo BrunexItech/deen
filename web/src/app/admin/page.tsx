@@ -49,7 +49,7 @@ function Ranked({ title, rows }: { title: string; rows: { id?: string; label: st
   );
 }
 
-const CAT_COLORS = ["#004485", "#e39d29", "#43b02a", "#2a72c2", "#7c3aed", "#be123c"];
+const CAT_COLORS = ["#086769", "#2FB5B0", "#43b02a", "#1A9596", "#7c3aed", "#be123c"];
 
 function greeting() {
   const h = Number(new Date().toLocaleString("en-KE", { hour: "numeric", hour12: false, timeZone: "Africa/Nairobi" }));
@@ -108,9 +108,9 @@ export default function OverviewPage() {
           <TrendChart
             data={data.series}
             series={[
-              { key: "views", label: "Views", color: "#e39d29" },
+              { key: "views", label: "Views", color: "#2FB5B0" },
               { key: "applications", label: "Applications", color: "#43b02a" },
-              { key: "signups", label: "New members", color: "#004485" },
+              { key: "signups", label: "New members", color: "#086769" },
             ]}
           />
         </Card>

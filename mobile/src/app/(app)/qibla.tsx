@@ -18,7 +18,7 @@ function Dial() {
   const ticks = Array.from({ length: 72 }, (_, i) => i * 5);
   return (
     <Svg width={SIZE} height={SIZE}>
-      <Circle cx={c} cy={c} r={c - 4} fill="rgba(255,255,255,0.04)" stroke="rgba(242,190,92,0.35)" strokeWidth={1.5} />
+      <Circle cx={c} cy={c} r={c - 4} fill="rgba(255,255,255,0.04)" stroke="rgba(111,211,206,0.35)" strokeWidth={1.5} />
       {ticks.map((d) => {
         const major = d % 90 === 0;
         const r1 = c - 8, r2 = c - (major ? 26 : d % 30 === 0 ? 20 : 14);
@@ -118,8 +118,8 @@ export default function Qibla() {
 const styles = StyleSheet.create({
   center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 28 },
   compass: { width: SIZE + 40, height: SIZE + 40, alignItems: "center", justifyContent: "center" },
-  glow: { position: "absolute", width: SIZE + 40, height: SIZE + 40, borderRadius: (SIZE + 40) / 2, backgroundColor: "rgba(227,157,41,0.05)" },
-  glowOn: { backgroundColor: "rgba(227,157,41,0.22)" },
+  glow: { position: "absolute", width: SIZE + 40, height: SIZE + 40, borderRadius: (SIZE + 40) / 2, backgroundColor: "rgba(47,181,176,0.05)" },
+  glowOn: { backgroundColor: "rgba(47,181,176,0.22)" },
   // Fixed marker at 12 o'clock: the direction the phone is pointing.
   pointer: { position: "absolute", top: 0, zIndex: 2, width: 0, height: 0, borderLeftWidth: 10, borderRightWidth: 10, borderTopWidth: 16, borderLeftColor: "transparent", borderRightColor: "transparent", borderTopColor: colors.white },
   status: { fontFamily: fonts.extrabold, fontSize: 22, color: colors.white, marginTop: 30, marginBottom: 6 },

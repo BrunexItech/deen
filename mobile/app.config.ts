@@ -54,7 +54,7 @@ const config: ExpoConfig = {
     ["expo-local-authentication", { faceIDPermission: "DEEN uses Face ID to keep your account locked." }],
     ["expo-location", { locationWhenInUsePermission: "DEEN uses your location for accurate prayer times and the Qibla direction." }],
     ["expo-image-picker", { cameraPermission: "DEEN uses the camera to photograph your ID for identity verification.", photosPermission: false, microphonePermission: false }],
-    ["expo-notifications", { icon: "./assets/notification-icon.png", color: "#004485" }],
+    ["expo-notifications", { icon: "./assets/notification-icon.png", color: "#086769" }],
     ["expo-build-properties", { android: { usesCleartextTraffic: allowCleartext } }],
     "./plugins/withReleaseSigning",
   ],

@@ -3,23 +3,23 @@
 /* DEEN design tokens. Emerald for trust, gold for light/opportunity, sand for calm. */
 @theme {
   /* DEEN brand, sampled from the official logo: navy wordmark, royal-blue sky, gold arch, green growth. */
-  --color-brand-950: #001733;
-  --color-brand-900: #00255f;
-  --color-brand-800: #00316f;
-  --color-brand-700: #004485;
-  --color-brand-600: #0b57a4;
-  --color-brand-500: #2a72c2;
-  --color-brand-400: #5b96d8;
-  --color-brand-200: #b9d0ee;
-  --color-brand-100: #dce8f7;
-  --color-brand-50: #eef4fc;
+  --color-brand-950: #04292b;
+  --color-brand-900: #063a3c;
+  --color-brand-800: #075052;
+  --color-brand-700: #086769;
+  --color-brand-600: #087d7e;
+  --color-brand-500: #1a9596;
+  --color-brand-400: #4db3b4;
+  --color-brand-200: #a9dada;
+  --color-brand-100: #d5eeee;
+  --color-brand-50: #edf8f8;
 
-  --color-gold-700: #9a6410;
-  --color-gold-600: #c98516;
-  --color-gold-500: #e39d29;
-  --color-gold-400: #f2be5c;
-  --color-gold-100: #fcebc8;
-  --color-gold-50: #fef7e8;
+  --color-gold-700: #0a6466;
+  --color-gold-600: #0b7c7d;
+  --color-gold-500: #2fb5b0;
+  --color-gold-400: #6fd3ce;
+  --color-gold-100: #d3f1ef;
+  --color-gold-50: #ecf9f8;
 
   --color-leaf-800: #1d5f1f;
   --color-leaf-700: #237a24;
@@ -89,7 +89,7 @@ textarea {
   border-radius: 10px;
 }
 
-/* ---------- The DEEN loader: the logo emblem inside a tri-colour orbit ---------- */
+/* ---------- The DEEN loader: the logo emblem inside two orbiting arcs ---------- */
 .deen-loader .orbit { animation: deen-spin 1.4s cubic-bezier(0.5, 0.15, 0.5, 0.85) infinite; transform-origin: 50% 50%; }
 .deen-loader .orbit-slow { animation: deen-spin 2.8s linear infinite reverse; transform-origin: 50% 50%; }
 .deen-loader .emblem { animation: deen-breathe 1.8s ease-in-out infinite; transform-origin: 50% 50%; }

@@ -117,9 +117,9 @@ export default function Deen() {
 
 const styles = StyleSheet.create({
   hero: { borderRadius: 28, padding: 22, overflow: "hidden" },
-  glow: { position: "absolute", width: 280, height: 280, borderRadius: 140, backgroundColor: "rgba(227,157,41,0.15)", top: -130, right: -90 },
+  glow: { position: "absolute", width: 280, height: 280, borderRadius: 140, backgroundColor: "rgba(47,181,176,0.15)", top: -130, right: -90 },
   hijri: { fontFamily: fonts.extrabold, fontSize: 34, color: colors.white, marginTop: 6, letterSpacing: -0.5 },
-  next: { marginTop: 22, flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end", backgroundColor: "rgba(255,255,255,0.08)", borderRadius: 18, padding: 16, borderWidth: 1, borderColor: "rgba(242,190,92,0.25)" },
+  next: { marginTop: 22, flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end", backgroundColor: "rgba(255,255,255,0.08)", borderRadius: 18, padding: 16, borderWidth: 1, borderColor: "rgba(111,211,206,0.25)" },
   nextName: { fontFamily: fonts.extrabold, fontSize: 24, color: colors.white },
   nextTime: { fontFamily: fonts.extrabold, fontSize: 26, color: colors.gold400 },
   row: { flexDirection: "row", alignItems: "center", gap: 12, paddingHorizontal: 18, paddingVertical: 12 },

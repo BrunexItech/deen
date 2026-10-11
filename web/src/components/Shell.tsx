@@ -19,7 +19,7 @@ export interface NavItem {
 }
 
 function Mark({ size = 38 }: { size?: number }) {
-  return <img src="/deen-icon.png" alt="" width={size} height={size} className="object-contain drop-shadow" />;
+  return <img src="/deen-icon.png" alt="" width={size} height={size} className="rounded-xl bg-white object-contain p-0.5" />;
 }
 
 export function Shell({ nav, children, context }: { nav: NavItem[]; children: ReactNode; context: "admin" | "org" }) {

@@ -33,10 +33,10 @@ function cvHtml(name: string, phone: string | null, email: string | null, p: Pro
   const groups = KINDS.map(([k, label]) => [label, items.filter((i) => i.kind === k)] as const).filter(([, xs]) => xs.length);
   return `<!doctype html><html><head><meta charset="utf-8"/><style>
   body{font-family:-apple-system,Roboto,Helvetica,Arial,sans-serif;color:#0f1a17;margin:40px;font-size:12.5px;line-height:1.5}
-  h1{font-size:26px;margin:0;color:#00255f;letter-spacing:.5px} .contact{color:#5e6b66;margin-top:4px}
-  h2{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#c98516;border-bottom:2px solid #e39d29;padding-bottom:4px;margin-top:26px}
-  .item{margin:10px 0} .title{font-weight:700} .org{color:#004485} .when{color:#7f8a86;float:right} .v{color:#237a24;font-size:10.5px;font-weight:700}
-  .skills span{display:inline-block;background:#eef4fc;color:#00316f;border-radius:10px;padding:2px 9px;margin:2px}
+  h1{font-size:26px;margin:0;color:#063A3C;letter-spacing:.5px} .contact{color:#5e6b66;margin-top:4px}
+  h2{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#c98516;border-bottom:2px solid #2FB5B0;padding-bottom:4px;margin-top:26px}
+  .item{margin:10px 0} .title{font-weight:700} .org{color:#086769} .when{color:#7f8a86;float:right} .v{color:#237a24;font-size:10.5px;font-weight:700}
+  .skills span{display:inline-block;background:#eef4fc;color:#075052;border-radius:10px;padding:2px 9px;margin:2px}
   footer{margin-top:36px;color:#a7b0ac;font-size:10px;text-align:center}</style></head><body>
   <h1>${esc(name)}</h1>
   <div class="contact">${[phone, email, p?.county ? `${p.county}, ${p.country ?? "Kenya"}` : null].filter(Boolean).map(esc).join(" · ")}</div>
@@ -47,7 +47,7 @@ function cvHtml(name: string, phone: string | null, email: string | null, p: Pro
     ${x.description ? `<div>${esc(x.description)}</div>` : ""}</div>`).join("")}`).join("")}
   ${p?.skills?.length ? `<h2>Skills</h2><div class="skills">${p.skills.map((s) => `<span>${esc(s)}</span>`).join("")}</div>` : ""}
   ${p?.languages?.length ? `<h2>Languages</h2><p>${p.languages.map(esc).join(", ")}</p>` : ""}
-  <footer>Generated with DEEN · Discover. Verify. Apply. Grow.</footer></body></html>`;
+  <footer>Generated with DEEN · Empower. Equip. Elevate.</footer></body></html>`;
 }
 
 export default function ExperienceScreen() {
