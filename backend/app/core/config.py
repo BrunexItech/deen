@@ -54,6 +54,9 @@ class Settings(BaseSettings):
 
     # Messaging providers (sandbox = log only; dev codes are returned to the client)
     sms_provider: str = "sandbox"  # sandbox | africastalking
+    # Pilot only: with no SMS account yet, show verification codes on screen even in
+    # production. Must be false before real members join.
+    otp_on_screen: bool = False
     at_username: str = "sandbox"
     at_api_key: str = ""
     at_sender_id: str = ""

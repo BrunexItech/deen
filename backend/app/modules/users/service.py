@@ -117,7 +117,7 @@ async def send_otp(session: AsyncSession, target: str, purpose: OtpPurpose) -> s
                                                          "Never share this code with anyone.</p>"))
     else:
         await channels.send_sms(target, text)
-    dev = not settings.is_production and settings.sms_provider == "sandbox"
+    dev = settings.sms_provider == "sandbox" and (not settings.is_production or settings.otp_on_screen)
     return code if dev else None
 
 
