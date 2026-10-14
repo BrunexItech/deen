@@ -14,10 +14,13 @@ export default async function Home() {
         <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-12 px-5 pb-20 pt-14 lg:grid-cols-[1.2fr_1fr] lg:pb-28 lg:pt-20">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-gold-400 ring-1 ring-gold-400/30">
-              <BadgeCheck size={14} /> Every opportunity checked by DEEN
+              <BadgeCheck size={14} /> Introducing D.E.E.N · Development and Education Empowerment Network
             </div>
             <h1 className="mt-6 text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-6xl">Real opportunities for our community.</h1>
-            <p className="mt-6 max-w-xl text-lg text-brand-50/80">Scholarships, jobs, attachments, business funding and support. All in one safe app, matched to you.</p>
+            <p className="mt-6 max-w-xl text-lg text-brand-50/80">
+              DEEN is a digital opportunity platform that connects you with verified opportunities in education, employment,
+              entrepreneurship, skills development, community development and professional growth.
+            </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <a href="/downloads/deen.apk" className="inline-flex items-center gap-2.5 rounded-2xl bg-gold-500 px-6 py-4 font-bold text-brand-950 shadow-lg shadow-black/20 hover:bg-gold-400">
                 <Download size={20} /> Get the Android app
